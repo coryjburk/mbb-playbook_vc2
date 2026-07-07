@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eccles MBA — Consulting Case Frameworks Playbook</title>
+    <style>
+        :root {
+            --primary-red: #CC0000;
+            --accent-gold: #c9a84c;
+            --bg-dark: #121212;
+            --bg-card: #1e1e1e;
+            --bg-sidebar: #0a0a0a;
+            --text-main: #f5f5f5;
+            --text-muted: #a0a0a0;
+            --border-color: #333333;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            font-family: var(--font-family);
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* PERMANENT GLOBAL SIDEBAR */
+        aside {
+            width: 320px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            padding: 0 24px 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 15px;
+        }
+
+        .brand h2 {
+            color: var(--primary-red);
+            margin: 0 0 5px 0;
+            font-size: 1.3rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .brand p {
+            color: var(--accent-gold);
+            margin: 0;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .nav-label {
+            padding: 10px 24px 5px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        aside a {
+            text-decoration: none;
+            color: var(--text-muted);
+            padding: 12px 24px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-left: 4px solid transparent;
+        }
+
+        aside a:hover, aside a.active {
+            background-color: rgba(204, 0, 0, 0.1);
+            color: var(--primary-red);
+            border-left-color: var(--primary-red);
+        }
+
+        .count-badge {
+            background-color: #2a2a2a;
+            color: var(--accent-gold);
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        main {
+            flex: 1;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            background-color: rgba(18, 18, 18, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title-area h1 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        
+        .header-subtitle {
+            margin: 2px 0 0 0;
+            font-size: 0.85rem;
+            color: var(--accent-gold);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .search-container {
+            width: 350px;
+        }
+
+        .search-input {
+            width: 100%;
+            background-color: #1e1e1e;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 10px 15px;
+            color: white;
+            font-family: var(--font-family);
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+        }
+
+        .search-input:focus { outline: none; border-color: var(--primary-red); }
+
+        /* HORIZONTAL INTERNAL FILTER TOOLBAR */
+        .local-toolbar {
+            background-color: #161616;
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 40px;
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+        }
+
+        .toolbar-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .toolbar-btn:hover, .toolbar-btn.active {
+            background-color: rgba(204, 0, 0, 0.1);
+            color: white;
+        }
+
+        .section-container {
+            padding: 40px;
+            max-width: 1300px;
+            width: calc(100% - 80px);
+            margin: 0 auto;
+        }
+
+        .hero {
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 30px;
+        }
+
+        .track-pill {
+            display: inline-block;
+            background-color: rgba(201, 168, 76, 0.1);
+            color: var(--accent-gold);
+            padding: 5px 14px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .hero h2 {
+            font-size: 2.5rem;
+            margin: 0 0 15px 0;
+            font-weight: 800;
+        }
+
+        .description {
+            color: var(--text-muted);
+            line-height: 1.6;
+            font-size: 1.1rem;
+            max-width: 900px;
+            margin: 0;
+        }
+
+        .frameworks-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 28px;
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background-color: var(--accent-gold);
+            transition: background-color 0.2s;
+        }
+
+        .card:hover {
+            border-color: var(--primary-red);
+            transform: translateY(-2px);
+        }
+
+        .card:hover::before { background-color: var(--primary-red); }
+        .card-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .card-category { font-size: 0.8rem; text-transform: uppercase; color: var(--accent-gold); font-weight: 700; letter-spacing: 1px; }
+        .card-title { font-size: 1.6rem; margin: 0 0 15px 0; font-weight: 700; color: var(--text-main); }
+        .content-block { margin-bottom: 20px; }
+        .content-block-label { font-size: 0.85rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; letter-spacing: 0.5px; }
+        .content-block-text { font-size: 1rem; line-height: 1.5; color: #e0e0e0; }
+        .structure-list { margin: 8px 0; padding-left: 20px; }
+        .structure-list li { margin-bottom: 6px; line-height: 1.4; }
+        .structure-list strong { color: var(--accent-gold); }
+
+        .btn-action {
+            background-color: var(--primary-red);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-action:hover { background-color: #a00000; }
+        .customization-box { background-color: rgba(201, 168, 76, 0.05); border: 1px dashed rgba(201, 168, 76, 0.3); border-radius: 6px; padding: 18px; margin-top: 20px; }
+        .customization-box strong { color: var(--accent-gold); }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal.active { display: flex; }
+        
+        .modal-content {
+            background-color: var(--bg-card);
+            width: 90%;
+            max-width: 850px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 35px;
+            border-radius: 8px;
+            border: 1px solid var(--primary-red);
+            position: relative;
+        }
+
+        .close-modal { position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--text-muted); font-size: 2rem; cursor: pointer; }
+        .recording-indicator { display: none; color: var(--primary-red); font-weight: 700; align-items: center; gap: 6px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+
+        textarea {
+            width: 100%;
+            box-sizing: border-box;
+            height: 160px;
+            background-color: #121212;
+            color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: var(--font-family);
+            font-size: 1rem;
+            line-height: 1.5;
+            resize: vertical;
+        }
+
+        .copy-box { background-color: #121212; padding: 20px; border-left: 4px solid var(--accent-gold); font-family: monospace; margin-top: 15px; white-space: pre-wrap; font-size: 0.9rem; color: #dcdcdc; max-height: 250px; overflow-y: auto; }
+        .modal-buttons-row { display: flex; gap: 15px; margin-top: 15px; align-items: center; }
+        #filler-words { font-size: 0.9rem; font-weight: 600; color: var(--accent-gold); }
+        .no-results { text-align: center; padding: 40px; color: var(--text-muted); font-size: 1.1rem; border: 1px dashed var(--border-color); border-radius: 8px; }
+    </style>
+</head>
+<body>
+
+    <!-- PERMANENT GLOBAL SIDEBAR -->
+    <aside>
+        <div class="brand">
+            <h2>Eccles MBA</h2>
+            <p>Consulting Command Center</p>
+        </div>
+        <div class="nav-label">Core Directory</div>
+        <a href="./index.html">Ecosystem Dashboard</a>
+        <a href="./playbook_frameworks.html" class="active">20 Case Frameworks</a>
+        <a href="./playbook_math.html">15 Analytics Math Drills</a>
+        <a href="./playbook_battlecard.html">MBB Battlecard Vault</a>
+        
+        <div class="nav-label">Practice Sprints</div>
+        <a href="./playbook_sprint_01.html">Sprint 1: Profitability</a>
+        <a href="./playbook_sprint_02.html">Sprint 2: M&A Strategy</a>
+        <a href="./playbook_sprint_03.html">Sprint 3: Operations</a>
+        <a href="./playbook_sprint_04.html">Sprint 4: Tech & SaaS</a>
+        <a href="./playbook_sprint_05.html">Sprint 5: GTM & Pricing</a>
+        <a href="./playbook_sprint_06.html">Sprint 6: Capstones</a>
+    </aside>
+
+    <main>
+        <header>
+            <div class="header-title-area">
+                <h1>Consulting Case Frameworks</h1>
+                <div class="header-subtitle">Eccles MBA · MBB Preparation Module</div>
+            </div>
+            <div class="search-container">
+                <input type="text" id="search-box" class="search-input" placeholder="Search frameworks..." oninput="handleSearch()">
+            </div>
+        </header>
+
+        <!-- HORIZONTAL TOOLBAR FOR LOCAL FILTER VIEWS -->
+        <div class="local-toolbar" id="local-toolbar-filters">
+            <button class="toolbar-btn active" onclick="filterCategory('all', this)">All Frameworks <span class="count-badge" id="badge-all">20</span></button>
+            <button class="toolbar-btn" onclick="filterCategory('Core Strategy & Diagnostics', this)">Strategy & Diagnostics <span class="count-badge" id="badge-strategy">0</span></button>
+            <button class="toolbar-btn" onclick="filterCategory('Growth & Commercial Strategy', this)">Growth & Pricing <span class="count-badge" id="badge-growth">0</span></button>
+            <button class="toolbar-btn" onclick="filterCategory('Operations & Execution', this)">Operations & Execution <span class="count-badge" id="badge-operations">0</span></button>
+            <button class="toolbar-btn" onclick="filterCategory('Fit, Leadership & Synthesis', this)">Fit & Synthesis <span class="count-badge" id="badge-fit">0</span></button>
+        </div>
+
+        <section class="section-container">
+            <div class="hero">
+                <span class="track-pill">Frameworks Track</span>
+                <h2>Consulting Case Frameworks</h2>
+                <p class="description">
+                    Master the structured problem-solving mechanisms demanded by McKinsey, Bain, BCG, and premier boutique firms. Use these frameworks not as static blueprints, but as customizable scaffolding to show clean, structured, MECE executive thinking.
+                </p>
+            </div>
+
+            <div class="frameworks-grid" id="frameworks-display"></div>
+        </section>
+
+        <!-- Interactive Practice Modal -->
+        <div id="practice-modal" class="modal">
+            <div class="modal-content">
+                <button class="close-modal" onclick="closeModal()">×</button>
+                <h2 style="color: var(--primary-red); margin-top: 0; font-size: 1.75rem;">Interactive Case Structuring Masterclass</h2>
+                <h3 id="modal-framework-title" style="margin: 5px 0 15px 0; font-size: 1.2rem; color: var(--accent-gold);"></h3>
+                
+                <div style="background-color: #252525; padding: 15px; border-radius: 6px; border-left: 3px solid var(--primary-red);">
+                    <span style="font-size: 0.8rem; text-transform: uppercase; font-weight: 800; color: var(--text-muted); display: block; margin-bottom: 4px;">Live Consulting Use Case Blueprint:</span>
+                    <p id="modal-case-text" style="margin: 0; font-size: 1rem; line-height: 1.5; color: #fff;"></p>
+                </div>
+                
+                <div class="modal-buttons-row">
+                    <button class="btn-action" onclick="toggleRecording()" id="btn-record">🎙️ Start Voice Structuring</button>
+                    <span class="recording-indicator" id="recording-status">🔴 Live Recording Engine Engaged</span>
+                    <div id="filler-words">Filler Words Detected: 0</div>
+                </div>
+                
+                <textarea id="transcription-box" placeholder="Your live recording speech transcript will populate here..."></textarea>
+                <button class="btn-action" style="background-color: var(--accent-gold); color: black; margin-top: 15px; width: 100%; justify-content: center;" onclick="generateFrameworkCoachingPrompt()">Generate Rigorous AI Coaching Prompt</button>
+                
+                <div id="ai-prompt-output" style="display: none;">
+                    <p style="margin-top: 20px; font-weight: 700; color: #fff;">Copy this payload directly into your AI assistant:</p>
+                    <div class="copy-box" id="ai-copy-text"></div>
+                    <button class="btn-action" style="margin-top: 12px;" onclick="copyToClipboard()">Copy Payload to Clipboard</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const CONSULTING_FRAMEWORKS = [
+            { id: "fw_01", frameworkName: "Hypothesis-Driven Problem Solving", category: "Core Strategy & Diagnostics", whenToUse: "Deploy in the initial 2-5 minutes of any elite strategy case to immediately direct focus toward high-probability value drivers.", coreStructure: ["Isolate Primary Objective: Define absolute financial or competitive goal of client.", "Formulate Core Hypothesis: Propose a highly specific initial claim regarding root cause or path based on immediate context.", "Deconstruct via Sub-Hypotheses: Map out logical conditions required to prove or disprove the core thesis.", "Identify Data Requirements: Isolate critical metrics needed to validate each sub-hypothesis branch."], consultingUseCase: "A legacy global automotive original equipment manufacturer (OEM) experiences a 15% drop in business-class margins over 12 months.", commonMistakes: "Treating the initial hypothesis as an absolute conclusion rather than an analytical target; configuring structured paths around generic business variables that do not test the hypothesis directly.", customizationStrategy: "Avoid phrases like 'My framework'. State instead: 'To rigorously test the hypothesis that low-cost premium fleet alternatives have structurally disrupted our margin configuration, I intend to evaluate three specific areas: utilization yields, localized contract degradation, and variable service delivery costs.'" },
+            { id: "fw_02", frameworkName: "MECE Issue Trees", category: "Core Strategy & Diagnostics", whenToUse: "Use to break down broad, ambiguous client challenges into logical parts that do not overlap and leave no analytical blind spots.", coreStructure: ["Mutually Exclusive (ME): Ensure every branch represents a separate, distinct issue with zero operational or financial overlap.", "Collectively Exhaustive (CE): Verify the combined branches capture 100% of the potential problem space.", "Horizontal Tier Parity: Keep all concurrent branches at a consistent level of abstraction or detail.", "Operational Depth: Drive the issue tree down at least three levels deep to expose addressable levers."], consultingUseCase: "A major gold mining corporation faces persistent declines in total shareholder returns despite strong global bullion spot prices.", commonMistakes: "Mixing operational buckets with financial metrics on the same tier; failing to cover hidden issues like regulatory friction or post-merger integration drag.", customizationStrategy: "Explicitly align your tree with the client's asset taxonomy: 'To guarantee our assessment is mutually exclusive and collectively exhaustive, I will separate our operational analysis by asset life-cycle phases: exploratory drilling reserves, active extraction optimization, and downstream refining throughput.'" },
+            { id: "fw_03", frameworkName: "The Master Profitability Framework", category: "Core Strategy & Diagnostics", whenToUse: "The fundamental tool for isolating the specific financial drivers behind sudden or chronic bottom-line deterioration.", coreStructure: ["Profit = (Revenue) - (Cost Base)", "Revenue = Volume × Average Price per Unit across distinct product segments.", "Volume Drivers: Macro factors (market demand, cycles) vs Micro factors (brand, sales channels, inventory).", "Cost Base = Total Fixed Costs + Total Variable Costs.", "Fixed Levers: Property/plant, corporate SG&A overhead, long-term tech platforms.", "Variable Levers: Raw inputs, direct labor, processing power, logistics/delivery costs."], consultingUseCase: "A premium direct-to-consumer apparel brand achieves record-high revenue scaling but experiences a 400-basis-point crash in net margin.", commonMistakes: "Failing to segment revenue or costs immediately; treating variables as static items instead of dynamic, moving parts.", customizationStrategy: "Pivot quickly to specific unit economics: 'For a direct-to-consumer fashion enterprise, I must immediately break revenue down into digital acquisition conversion rates, average order value, and return frequency, while analyzing costs via customer acquisition costs (CAC) and fulfillment logistics costs.'" },
+            { id: "fw_04", frameworkName: "Organic & Inorganic Revenue Growth Framework", category: "Growth & Commercial Strategy", whenToUse: "Deploy when a client faces stagnating sales, market saturation, or needs to hit ambitious expansion goals set by board or PE sponsors.", coreStructure: ["Organic Share Optimization: Increase conversion, adjust pricing, or optimize product mix within existing customer footprints.", "Organic Footprint Scaling: Launch existing products into new regions, customer segments, or alternative digital distribution models.", "Inorganic Acceleration: Pursue joint ventures, programmatic M&A, or strategic IP acquisitions.", "Product/Service Innovation: Develop adjacent offerings or next-generation product replacements to capture additional wallet share."], consultingUseCase: "A tier-1 enterprise B2B SaaS platform sees its annual recurring revenue (ARR) growth slow from 45% to 12% after reaching a $100M run-rate.", commonMistakes: "Recommending broad marketing spend without first analyzing net revenue retention (NRR), churn dynamics, or customer acquisition cost (CAC) efficiency.", customizationStrategy: "Customize the strategy around product-led growth metrics: 'We must divide our expansion path into three distinct horizons: optimizing net dollar retention within enterprise cohorts, cross-selling the new AI module, and evaluating programmatic acquisition of mid-market niche competitors.'" },
+            { id: "fw_05", frameworkName: "Rigorous Market Entry Framework", category: "Growth & Commercial Strategy", whenToUse: "Use to evaluate whether a company should expand its footprint into a completely new geography, industry vertical, or product ecosystem.", coreStructure: ["Target Market Attractiveness: Size, projected CAGR, margin health, structural entry barriers, and regulatory risks.", "Competitive Intensity: Incumbent market concentration, fragmentation, technical parity, and potential defensive responses.", "Capabilities & Right to Win: Core asset synergies, channel access, talent availability, and operational gaps.", "Financial Viability & Execution Strategy: Required upfront capital, cash-flow timelines, ROI thresholds, and choice of entry model (organic build vs acquisition vs JV)."], consultingUseCase: "A leading European utility provider evaluates an entry into the utility-scale battery storage market in the Southwestern United States.", commonMistakes: "Focusing too much on general market size while ignoring complex regulatory restrictions, grid interconnection delays, or the cost of capital.", customizationStrategy: "Tailor the approach directly to the operating environment: 'I will analyze this entry by looking at ERCOT market design rules, localized supply chain bottlenecks for lithium iron phosphate cells, and our capability to leverage existing transmission relationships.'" },
+            { id: "fw_06", frameworkName: "Advanced Pricing Strategy Framework", category: "Growth & Commercial Strategy", whenToUse: "Essential for analyzing how to maximize value capture for a new product launch, or optimizing current yield architectures.", coreStructure: ["Cost-Plus Architecture: Baseline variable production costs plus capital amortization requirements (defines absolute floor).", "Competitor-Indexed Pricing: Pricing benchmarks against direct substitutes, adjusted for value differences and brand premium.", "Value-Based Dynamic Pricing: Quantified economic value to the customer (EVC), willingness to pay, and price elasticity.", "Strategic Optimization Mechanics: Tiered subscriptions, bundling strategies, razor-and-blade pricing models, or loss-leader entry points."], consultingUseCase: "A specialized biotech player introduces a groundbreaking, single-infusion gene therapy that slashes lifelong chronic treatment costs by 60%.", commonMistakes: "Using simple cost-plus pricing for highly valuable innovations; failing to account for how insurance reimbursement models affect adoption.", customizationStrategy: "Focus purely on economic value capture: 'Cost-plus is irrelevant for a curative therapy. I will frame our approach around value-based pricing, calculating the total lifetime cost reduction for healthcare payors and pricing the treatment to capture a percentage of that systemic savings.'" },
+            { id: "fw_07", frameworkName: "M&A & Commercial Due Diligence Framework", category: "Growth & Commercial Strategy", whenToUse: "Deploy when advising corporate buyers or private equity firms on acquiring a target asset.", coreStructure: ["Target Standalone Performance: Historical financial health, true underlying run-rate EBITDA, organic growth trend, and customer concentration.", "Synergy Validation: Hard cost savings (overhead reduction, facility optimization) vs soft revenue upside (cross-selling, channel sharing).", "Integration Execution Risks: Technology platform migration complexity, culture clashes, regulatory hurdles, and key staff retention.", "Deal Financials & Deal Architecture: Valuation multiples, debt capacity, exit timelines, and alternative strategic targets."], consultingUseCase: "A Tier-1 aerospace supplier evaluates the acquisition of a highly specialized titanium additive manufacturing facility.", commonMistakes: "Accepting management's synergy targets without testing them; failing to identify hidden customer concentration risks or defense contract compliance issues.", customizationStrategy: "Structure the evaluation around operational metrics: 'I will run a commercial due diligence track focused on asset utilization limits, customer concentration within defense primes, and the technical durability of their current patent portfolio.'" },
+            { id: "fw_08", frameworkName: "The Consulting 3Cs (Company, Customers, Competitors)", category: "Core Strategy & Diagnostics", whenToUse: "An excellent high-level strategic model for general corporate strategy diagnoses and broad corporate position assessments.", coreStructure: ["Company Diagnostics: Core capabilities, unique technology, brand asset equity, variable cost structures, financial health, and capacity constraints.", "Customer Mechanics: Segments, changing preferences, lifetime value trends, price elasticity, acquisition funnels, and unaddressed needs.", "Competitor Dynamics: Market share concentration, relative cost advantages, capacity expansion pipelines, and technological disruption vulnerability."], consultingUseCase: "A regional luxury hotel group experiences dropping occupancy rates despite an expanding local luxury tourism sector.", commonMistakes: "Using the framework as a simple list of facts rather than connecting the points to find the root cause.", customizationStrategy: "Make the categories interact with each other: 'I will look for mismatches between our client's historic asset investments, the shifting requirements of millennial travelers, and the digital agility of boutique hotel players.'" },
+            { id: "fw_09", frameworkName: "The Refined Consulting 4Ps", category: "Growth & Commercial Strategy", whenToUse: "Great for diagnosing tactical marketing failures, poor product launches, or commercial go-to-market execution gaps.", coreStructure: ["Value Proposition & Product Fit: Differentiation, features, design lifecycle, packaging, and portfolio alignment.", "Dynamic Monetization Strategy (Price): Price architecture, discounts, terms, and value alignment with target segments.", "Channel Architecture (Place): Multi-channel distribution networks, logistics access, inventory control, and retail partnerships.", "Demand Generation (Promotion): Integrated marketing campaigns, programmatic digital spend, loyalty programs, and sales team incentives."], consultingUseCase: "An established global beverage brand launches a premium cold-brew product line that fails to secure retail shelf velocity.", commonMistakes: "Sounding like an advertising pitch rather than a strategic business analysis; focusing on creative messaging instead of distribution economics.", customizationStrategy: "Translate the marketing terminology into operational metrics: 'We must evaluate the product through slotting fee structures at supermarkets, margin incentives for independent distributors, and on-shelf visibility compared to capitalized incumbents.'" },
+            { id: "fw_10", frameworkName: "Porter's Five Forces (Consulting Adaptation)", category: "Core Strategy & Diagnostics", whenToUse: "Use to diagnose long-term structural changes in industry margin pools or evaluate macroeconomic industry attractiveness.", coreStructure: ["Supplier Bargaining Power: Input concentration, switching costs, and the threat of forward integration.", "Buyer Power Leverage: Customer concentration, price sensitivity, and ease of backward integration.", "Threat of Direct Substitutes: Price-to-performance tradeoffs, shifting technology trends, and low switching friction.", "Threat of De Novo Entrants: Regulatory entry barriers, capital scale requirements, network effects, and distribution access.", "Internal Industry Rivalry: Industry consolidation trends, exit barriers, fixed-cost architectures, and competitive price wars."], consultingUseCase: "A global container shipping company faces a sharp multi-year drop in freight rates and structural overcapacity.", commonMistakes: "Presenting a static description of an industry instead of showing how the forces are actively shifting over time.", customizationStrategy: "Frame the analysis around moving parts: 'I will analyze how shifting alliance structures among shipping lines, combined with the growing scale of corporate retail buyers, has fundamentally degraded the long-term pricing power of container carriers.'" },
+            { id: "fw_11", frameworkName: "End-to-End Value Chain Analysis", category: "Operations & Execution", whenToUse: "The standard framework for operational turnarounds, manufacturing bottleneck identification, and major cost restructuring.", coreStructure: ["Inbound Logistics Optimization: Raw material sourcing, supplier lead times, inventory safety stock, and inbound freight costs.", "Core Conversion Operations: Machine utilization, labor efficiency, scrap/yield rates, and production layout bottlenecks.", "Outbound Logistics Architecture: Warehousing distribution networks, fulfillment center layouts, last-mile delivery, and shipping fleet mix.", "Commercial Support Ecosystem: Sales orchestration, warranty workflows, customer support responsiveness, and corporate overhead integration."], consultingUseCase: "An industrial agricultural equipment manufacturer experiences long delivery delays despite factories running 24/7.", commonMistakes: "Analyzing organizational steps in isolation without examining the critical handoffs and information gaps between departments.", customizationStrategy: "Map the structure directly to physical workflows: 'I will trace the operational flow from tier-1 steel supply lead times, through welding bay capacity limits, to final dealer network allocation algorithms to find where the bottleneck resides.'" },
+            { id: "fw_12", frameworkName: "Market Sizing & Estimation Architecture", category: "Core Strategy & Diagnostics", whenToUse: "Deploy when reliable data is missing and you must calculate market capacity, volume consumption, or revenue potential from scratch.", coreStructure: ["Top-Down Demographically Driven Method: Start with total population -> filter by relevant household income -> filter by age -> estimate penetration share -> apply consumption frequency.", "Bottom-Up Operationally Driven Method: Start with unit production nodes (e.g., number of stores, planes, machines) -> calculate capacity per node -> apply utilization rates -> multiply by average spend.", "Sanity Checking Mechanism: Compare your estimate against logical benchmarks (e.g., percentage of GDP, similar countries, or macro industry revenue limits)."], consultingUseCase: "A private equity client wants to estimate the total annual market size for premium medical pet insurance in Tokyo.", commonMistakes: "Picking arbitrary percentages without giving solid real-world logic; making math errors by failing to use clean rounding shortcuts.", customizationStrategy: "Choose the method that matches the business model: 'Because pet insurance distribution is heavily tied to veterinary clinics, I will build a bottom-up model based on the density of specialized pet clinics across Tokyo, combined with average pet patient spend profiles.'" },
+            { id: "fw_13", frameworkName: "Structural Cost Reduction Framework", category: "Operations & Execution", whenToUse: "Deploy when a client faces severe profit pressure and must quickly optimize its operational cost footprint without hurting core capabilities.", coreStructure: ["Direct COGS Optimization: Renegotiate supplier pricing, substitute raw materials, consolidate spend volume, and reduce factory floor waste.", "Labor & SG&A Rationalization: Automate back-office tasks, optimize organizational layers, consolidate shared corporate services, and adjust real estate footprints.", "External Spend Analysis: Auditing and reducing third-party consulting, software licenses, travel expenses, and marketing agency fees.", "Asset Efficiency: Sell underutilized properties, transition from capital-heavy assets to flexible operating models, and optimize working capital cycles."], consultingUseCase: "A global investment bank mandates a 20% reduction in total operational costs across its back-office and middle-office operations.", commonMistakes: "Recommending broad headcount cuts without analyzing how it will impact operational risk, regulatory compliance, or core processing capacity.", customizationStrategy: "Target structural areas: 'Instead of small, temporary cuts, I will focus our cost assessment on three structural areas: sunsetting legacy core banking mainframes, consolidating regional compliance centers, and standardizing procurement vendor contracts.'" },
+            { id: "fw_14", frameworkName: "Operations Improvement & Throughput Optimization", category: "Operations & Execution", whenToUse: "Use to maximize output, eliminate quality defects, and reduce cycle times in asset-heavy or service-delivery operations.", coreStructure: ["Bottleneck Identification (Theory of Constraints): Map step-by-step capacity to find the single step that limits the total process flow.", "Variance & Defect Reduction (Six Sigma Lens): Isolate and eliminate the root causes of errors, rework, and inconsistent output.", "Waste Eliminating Operations (Lean Principles): Cut non-value-add actions like excess inventory movement, wait times, and administrative over-processing.", "Asset & Equipment Optimization: Deploy predictive maintenance to eliminate unplanned downtime and boost overall equipment effectiveness (OEE)."], consultingUseCase: "A high-volume fulfillment center for a major e-commerce player misses its 2-day delivery targets during peak holiday demand periods.", commonMistakes: "Investing in expensive automation or hiring more staff before identifying and fixing the true process bottleneck.", customizationStrategy: "Apply operational physics rules directly: 'Using Little's Law, I will measure work-in-progress levels and queue times at the automated scanning bays to see if the issue is processing speed or layout sorting logic.'" },
+            { id: "fw_15", frameworkName: "Digital Transformation & Technology Modernization Framework", category: "Operations & Execution", whenToUse: "Deploy when legacy tech architectures hold back an enterprise from scaling, or when they need to transition to data-driven business models.", coreStructure: ["Technology Infrastructure Foundation: Cloud migration, microservices adoption, APIs for easy integration, and sunsetting old legacy mainframes.", "Data Orchestration & Analytics Engine: Centralizing data silos, ensuring data accuracy, and deploying predictive AI/ML models.", "Core Process Automation: Replacing repetitive manual tasks with RPA, automating workflows, and optimizing digital interactions.", "Change Enablement & Digital Literacy: Training teams, aligning organizational culture, and updating performance tracking metrics."], consultingUseCase: "A 100-year-old mutual insurance company takes 22 days to manually process standard property casualty claims.", commonMistakes: "Treating digital transformation as a pure IT software installation project, while ignoring necessary process redesign and change management.", customizationStrategy: "Focus the framework around business impact: 'I will focus our assessment on the technology-to-business handoff: integrating automated OCR document parsing with cloud claims engines to drive the manual processing time from 22 days down to real-time auto-approval.'" },
+            { id: "fw_16", frameworkName: "Advanced Customer Segmentation Framework", category: "Growth & Commercial Strategy", whenToUse: "Deploy when marketing spend yields diminishing returns, or when product lines are cannibalizing each other due to vague targeting.", coreStructure: ["Firmographic & Demographic Attributes: B2C (age, household income, location) vs B2B (industry vertical, annual revenue, headcount).", "Behavioral Utilization Patterns: Frequency of purchase, product usage metrics, platform engagement habits, and brand loyalty trends.", "Needs-Based & Value-Driven Motivation: Specific pain points, feature requirements, quality expectations, and willingness-to-pay elasticities.", "Cohort Margin Profile: Calculating customer acquisition cost (CAC), customer lifetime value (LTV), and cost-to-serve profiles per segment."], consultingUseCase: "A global co-working provider faces major churn in mid-market enterprise accounts while small freelance segments grow.", commonMistakes: "Segmenting customers by basic demographics like age or size when the true driver is feature requirements or software integration needs.", customizationStrategy: "Focus on behavioral value partitions: 'I will group our corporate accounts based on utilization profiles—specifically desk-to-employee ratios and contract duration flexibility—to identify high-value, predictable revenue cohorts.'" },
+            { id: "fw_17", frameworkName: "Large-Scale Change Management Framework", category: "Operations & Execution", whenToUse: "Essential for post-merger integrations, major cost turnarounds, or when rolling out massive enterprise technology changes.", coreStructure: ["Leadership Alignment & Mandate: Securing executive commitment, defining clear milestones, and designing unambiguous transformation targets.", "Stakeholder Mobilization & Network Champions: Identifying internal influencers, addressing resistance points, and creating communication channels.", "Milestone Execution Accountability: Building a dedicated Project Management Office (PMO), tracking KPIs, and running clean feedback loops.", "Incentive & Cultural Alignment: Adjusting performance reviews, updating compensation rewards, and reinforcing new behaviors."], consultingUseCase: "A multi-hospital network faces significant doctor resistance when rolling out a standardized Electronic Health Record (EHR) platform.", commonMistakes: "Assuming technology or process adoption happens by simple executive decree without creating peer-led change champions.", customizationStrategy: "Focus on operational friction: 'I will structure our transformation path around peer doctor change champions, while designing custom interfaces that minimize disruption to daily patient documentation times.'" },
+            { id: "fw_18", frameworkName: "Synthesis & Executive Recommendation Framework", category: "Fit, Leadership & Synthesis", whenToUse: "The absolute gold standard structure for the final 2 minutes of any case interview, or when communicating with C-suite executives.", coreStructure: ["Lead with the Direct Recommendation: A bold, definitive, and actionable 'Yes' or 'No' answer to the primary business question.", "Supporting Strategic Pillars: Three quantified, structured rationales (e.g., financial upside, competitive protection, operational readiness).", "Quantified Structural Risks: One or two critical downsides, complete with operational mitigation strategies.", "Immediate Actionable Next Steps: Concrete short-term projects to kick off execution within the next 30 to 90 days."], consultingUseCase: "The final wrap-up presentation to an industrial conglomerate on whether to invest $400M in green hydrogen production assets.", commonMistakes: "Providing a chronological summary of the case work and analysis rather than leading directly with the final conclusion.", customizationStrategy: "Lead with the answer and quantify immediately: 'Our clear recommendation is to proceed with the $400M green hydrogen asset investment. This is driven by three factors: a guaranteed 14% IRR based on off-take agreements, protection against incoming carbon taxation, and deep alignment with current engineering capabilities. The top risk is electricity price volatility, which we can mitigate via long-term power purchase agreements. Next steps are to finalize the engineering joint venture contract.'" },
+            { id: "fw_19", frameworkName: "McKinsey PEI / Behavioral Story Framework", category: "Fit, Leadership & Synthesis", whenToUse: "Deploy specifically during the McKinsey Personal Experience Interview (PEI) to showcase personal leadership, impact, and drive.", coreStructure: ["Strategic Context (15% of time): A very brief description of the high-stakes situation, challenge, or conflict.", "Personal Action (75% of time): A detailed, step-by-step breakdown of your specific individual actions, interpersonal conversations, and rationale.", "Measurable Impact (10% of time): The quantified strategic business or team outcome achieved because of your actions.", "Refined Key Learnings: A brief summary showing your self-awareness and transferable executive skills."], consultingUseCase: "Answering the behavioral prompt: 'Tell me about a time you managed a major conflict within a cross-functional project team.'", commonMistakes: "Telling a generic team story using 'We' instead of focusing deeply on your specific individual thoughts, words, and actions ('I').", customizationStrategy: "Make your personal contribution clear: 'I will structure my story to focus entirely on the specific individual conversations and psychological approaches I used to realign two competing corporate vice presidents during a high-stakes restructuring project.'" },
+            { id: "fw_20", frameworkName: "Fit Interview Story Bank Framework", category: "Fit, Leadership & Synthesis", whenToUse: "Use to build a versatile bank of personal stories that can adapt to fit any behavioral prompt from Bain, BCG, or elite firms.", coreStructure: ["The Strategic Anchor: Tie the story's outcome directly to a major corporate priority like ROI growth, cost savings, or culture shifts.", "The Operational Pivot: Explain how you navigated deep ambiguity, analyzed data, or managed tough stakeholders.", "The Personal Catalyst: Highlight the specific leadership skills you used to change the team's trajectory.", "The Consulting Connection: Clearly connect the lessons learned in the story back to the fast-paced, client-facing consulting environment."], consultingUseCase: "Answering the prompt: 'Tell me about a time you had to make a high-stakes decision using highly incomplete or ambiguous data.'", commonMistakes: "Getting lost in technical industry jargon rather than focusing on transferable leadership skills and structured problem solving.", customizationStrategy: "Connect your history back to consulting: 'I will structure this response to demonstrate how my background managing chaotic supply chain delays translates directly into the fast-moving, high-pressure environments typical of partner-level client engagements.'" }
+        ];
+
+        let currentCategory = 'all';
+
+        function calculateNavigationBadges() {
+            const counts = { 'all': CONSULTING_FRAMEWORKS.length, 'Core Strategy & Diagnostics': 0, 'Growth & Commercial Strategy': 0, 'Operations & Execution': 0, 'Fit, Leadership & Synthesis': 0 };
+            CONSULTING_FRAMEWORKS.forEach(fw => { if (counts[fw.category] !== undefined) counts[fw.category]++; });
+            for (let key in counts) {
+                let el = document.getElementById('badge-' + (key === 'all' ? 'all' : key === 'Core Strategy & Diagnostics' ? 'strategy' : key === 'Growth & Commercial Strategy' ? 'growth' : key === 'Operations & Execution' ? 'operations' : 'fit'));
+                if (el) el.innerText = counts[key];
+            }
+        }
+
+        function renderFrameworks(dataToRender) {
+            const container = document.getElementById('frameworks-display');
+            container.innerHTML = '';
+            if (dataToRender.length === 0) {
+                container.innerHTML = `<div class="no-results">No premium frameworks match your search benchmarks.</div>`;
+                return;
+            }
+            dataToRender.forEach(fw => {
+                let structureListHtml = '<ol class="structure-list">';
+                fw.coreStructure.forEach(step => {
+                    const parts = step.split(':');
+                    structureListHtml += parts.length > 1 ? `<li><strong>${parts[0]}:</strong>${parts.slice(1).join(':')}</li>` : `<li>${step}</li>`;
+                });
+                structureListHtml += '</ol>';
+
+                container.innerHTML += `
+                    <div class="card">
+                        <div class="card-meta">
+                            <span class="card-category">${fw.category}</span>
+                            <span style="font-size:0.75rem; background:#2a2a2a; color:var(--accent-gold); padding:4px 10px; border-radius:4px; font-weight:bold;">FRAMEWORK ${fw.id.split('_')[1]}</span>
+                        </div>
+                        <h3 class="card-title">${fw.frameworkName}</h3>
+                        <div class="content-block"><div class="content-block-label">Strategic Application Window</div><div class="content-block-text">${fw.whenToUse}</div></div>
+                        <div class="content-block"><div class="content-block-label">MECE Core Structural Elements</div><div class="content-block-text">${structureListHtml}</div></div>
+                        <div class="content-block"><div class="content-block-label">Common Pitfalls</div><div class="content-block-text" style="color:#ff8b8b;">${fw.commonMistakes}</div></div>
+                        <div class="customization-box"><div class="content-block-label" style="color:var(--accent-gold);">Eccles Elite Customization Playbook Move</div><div class="content-block-text" style="font-style:italic; color:#e5c158;">"${fw.customizationStrategy}"</div></div>
+                        <div style="margin-top:25px; display:flex; justify-content:space-between; align-items:center;">
+                            <div style="font-size:0.85rem; color:var(--text-muted); max-width:65%;"><strong>Active Scenario:</strong> ${fw.consultingUseCase.substring(0,75)}...</div>
+                            <button class="btn-action" onclick="openPracticeModal('${fw.id}')">Practice Customization →</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function filterCategory(categoryName, activeBtn) {
+            currentCategory = categoryName;
+            document.querySelectorAll('.toolbar-btn').forEach(btn => btn.classList.remove('active'));
+            activeBtn.classList.add('active');
+            handleSearch();
+        }
+
+        function handleSearch() {
+            const query = document.getElementById('search-box').value.toLowerCase().trim();
+            let filtered = CONSULTING_FRAMEWORKS;
+            if (currentCategory !== 'all') filtered = filtered.filter(fw => fw.category === currentCategory);
+            if (query !== '') {
+                filtered = filtered.filter(fw => fw.frameworkName.toLowerCase().includes(query) || fw.whenToUse.toLowerCase().includes(query) || fw.consultingUseCase.toLowerCase().includes(query) || fw.customizationStrategy.toLowerCase().includes(query));
+            }
+            renderFrameworks(filtered);
+        }
+
+        let recognition, isRecording = false, activeFrameworkId = null;
+
+        function openPracticeModal(id) {
+            const fw = CONSULTING_FRAMEWORKS.find(f => f.id === id);
+            if (!fw) return;
+            activeFrameworkId = id;
+            document.getElementById('practice-modal').classList.add('active');
+            document.getElementById('modal-framework-title').innerText = fw.frameworkName;
+            document.getElementById('modal-case-text').innerText = fw.consultingUseCase;
+            document.getElementById('transcription-box').value = '';
+            document.getElementById('filler-words').innerText = 'Filler Words Detected: 0';
+            document.getElementById('ai-prompt-output').style.display = 'none';
+        }
+
+        function closeModal() {
+            document.getElementById('practice-modal').classList.remove('active');
+            if (isRecording) stopRecordingEngine();
+        }
+
+        function toggleRecording() { if (!isRecording) startRecordingEngine(); else stopRecordingEngine(); }
+
+        function startRecordingEngine() {
+            const btn = document.getElementById('btn-record'), status = document.getElementById('recording-status'), box = document.getElementById('transcription-box');
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) { alert("Speech engine requires Chrome/Edge."); return; }
+            const SpeechGen = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechGen(); recognition.continuous = true; recognition.interimResults = true; recognition.lang = 'en-US';
+            recognition.onresult = function(event) {
+                let finalTranscript = '';
+                for (let i = event.resultIndex; i < event.results.length; ++i) { if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript; }
+                if (finalTranscript) { box.value += finalTranscript + ' '; countFillerWords(box.value); }
+            };
+            recognition.start(); btn.innerText = "🛑 Stop Engine"; btn.style.backgroundColor = "#555"; status.style.display = "inline-flex"; isRecording = true;
+        }
+
+        function stopRecordingEngine() {
+            const btn = document.getElementById('btn-record'), status = document.getElementById('recording-status');
+            if (recognition) recognition.stop();
+            btn.innerText = "🎙️ Start Voice Structuring"; btn.style.backgroundColor = "var(--primary-red)"; status.style.display = "none"; isRecording = false;
+        }
+
+        function countFillerWords(text) {
+            const fillers = ['um', 'uh', 'like', 'you know', 'basically', 'actually', 'sort of', 'kind of'];
+            let count = 0; const cleanWords = text.toLowerCase().split(/\s+/);
+            cleanWords.forEach(word => { if (fillers.includes(word.replace(/[^a-z]/g, ''))) count++; });
+            document.getElementById('filler-words').innerText = `Filler Words Detected: ${count}`;
+        }
+
+function generateFrameworkCoachingPrompt() {
+    const fw = CONSULTING_FRAMEWORKS.find(f => f.id === activeFrameworkId);
+    const userSpeech = document.getElementById('transcription-box').value;
+    
+    if (!fw) return;
+
+    const structuredPayload = `
+[CONSULTING / MBB INTERVIEW COACHING — ECCLES MBA MODULE]
+Evaluate the candidate's operational framework customization overview against the specific scenario context using partner-level standards.
+
+CORE FRAMEWORK APPLIED: ${fw.frameworkName}
+TARGET INDUSTRIAL USE CASE: "${fw.consultingUseCase}"
+EXPECTED ELITE CUSTOMIZATION: "${fw.customizationStrategy}"
+
+CANDIDATE TRANSCRIBED RESPONSE STATEMENT:
+"${userSpeech || "[Candidate provided no spoken transcript. Evaluate the framework context and generate a model response mapping directly into this architecture.]"}"
+
+Provide deep, objective structural metrics utilizing exactly this markdown output schema:
+
+**What Worked**
+[Detail 1-2 key structural elements.]
+
+**Top 2 Areas for Improvement**
+1. [Identify primary gap vs elite MBB delivery]
+2. [Identify secondary logical gap]
+
+**Advanced Consulting Power Move**
+[Provide one expert-level industry variable or insight tailored to this case]
+
+**Dashboard Scorecard Matrix**
+Assign exactly one rubric score (1. Emerging | 2. Developing | 3. Interview-Ready | 4. MBB-Caliber) for each applicable competency based on this specific performance:
+* Case Structuring: [Score]
+* Business Judgment: [Score]
+* Math Accuracy: [Score (N/A if not tested)]
+* Synthesis: [Score]
+* Fit / PEI Storytelling: [Score (N/A if not tested)]
+* Executive Presence: [Score]
+* Communication Clarity: [Score]
+* Recommendation Strength: [Score]
+    `;
+
+    document.getElementById('ai-copy-text').innerText = structuredPayload.trim();
+    document.getElementById('ai-prompt-output').style.display = 'block';
+}
+
+        function copyToClipboard() { navigator.clipboard.writeText(document.getElementById('ai-copy-text').innerText); alert("Payload copied!"); }
+        window.onload = () => { calculateNavigationBadges(); renderFrameworks(CONSULTING_FRAMEWORKS); };
+    </script>
+</body>
+</html>
