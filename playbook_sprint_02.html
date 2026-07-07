@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eccles MBA — Consulting Practice Sprint 2</title>
+    <style>
+        :root {
+            --primary-red: #CC0000;
+            --accent-gold: #c9a84c;
+            --bg-dark: #121212;
+            --bg-card: #1e1e1e;
+            --bg-sidebar: #0a0a0a;
+            --text-main: #f5f5f5;
+            --text-muted: #a0a0a0;
+            --border-color: #333333;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            font-family: var(--font-family);
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* PERMANENT GLOBAL SIDEBAR */
+        aside {
+            width: 320px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            padding: 0 24px 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 15px;
+        }
+
+        .brand h2 {
+            color: var(--primary-red);
+            margin: 0 0 5px 0;
+            font-size: 1.3rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .brand p {
+            color: var(--accent-gold);
+            margin: 0;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .nav-label {
+            padding: 10px 24px 5px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        aside a {
+            text-decoration: none;
+            color: var(--text-muted);
+            padding: 12px 24px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-left: 4px solid transparent;
+        }
+
+        aside a:hover, aside a.active {
+            background-color: rgba(204, 0, 0, 0.1);
+            color: var(--primary-red);
+            border-left-color: var(--primary-red);
+        }
+
+        .count-badge {
+            background-color: #2a2a2a;
+            color: var(--accent-gold);
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        main {
+            flex: 1;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            background-color: rgba(18, 18, 18, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title-area h1 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        
+        .header-subtitle {
+            margin: 2px 0 0 0;
+            font-size: 0.85rem;
+            color: var(--accent-gold);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* HORIZONTAL LOCAL TOOLBAR VIEW TOGGLE */
+        .local-toolbar {
+            background-color: #161616;
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 40px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .toolbar-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toolbar-btn:hover, .toolbar-btn.active {
+            background-color: rgba(204, 0, 0, 0.1);
+            color: white;
+        }
+
+        .section-container {
+            padding: 40px;
+            max-width: 1300px;
+            width: calc(100% - 80px);
+            margin: 0 auto;
+            display: none;
+        }
+
+        .section-container.active {
+            display: block;
+        }
+
+        .hero {
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 30px;
+        }
+
+        .track-pill {
+            display: inline-block;
+            background-color: rgba(201, 168, 76, 0.1);
+            color: var(--accent-gold);
+            padding: 5px 14px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .hero h2 {
+            font-size: 2.5rem;
+            margin: 0 0 15px 0;
+            font-weight: 800;
+        }
+
+        .description {
+            color: var(--text-muted);
+            line-height: 1.6;
+            font-size: 1.1rem;
+            max-width: 900px;
+            margin: 0;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 28px;
+            transition: all 0.25s ease;
+            position: relative;
+        }
+
+        .card-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            margin: 0;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .tag-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .badge-category { background-color: rgba(201, 168, 76, 0.1); color: var(--accent-gold); }
+        .badge-difficulty { background-color: rgba(204, 0, 0, 0.1); color: var(--primary-red); }
+
+        .content-block {
+            margin-top: 15px;
+            background-color: #161616;
+            padding: 15px 20px;
+            border-radius: 6px;
+            border-left: 3px solid #333;
+        }
+
+        .content-block-title {
+            font-size: 0.85rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .content-block-text {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #e0e0e0;
+            white-space: pre-line;
+        }
+
+        .tabs-container { margin-top: 20px; }
+        .tab-headers { display: flex; border-bottom: 1px solid var(--border-color); gap: 10px; }
+        
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab-btn.active { color: var(--primary-red); border-bottom-color: var(--primary-red); }
+        .tab-content { display: none; padding: 15px 5px; font-size: 0.95rem; line-height: 1.5; }
+        .tab-content.active { display: block; }
+
+        .btn-action {
+            background-color: var(--primary-red);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .btn-action:hover { background-color: #a00000; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal.active { display: flex; }
+        
+        .modal-content {
+            background-color: var(--bg-card);
+            width: 90%;
+            max-width: 850px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 35px;
+            border-radius: 8px;
+            border: 1px solid var(--primary-red);
+            position: relative;
+        }
+
+        .close-modal { position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--text-muted); font-size: 2rem; cursor: pointer; }
+        textarea { width: 100%; box-sizing: border-box; height: 160px; background-color: #121212; color: white; border: 1px solid var(--border-color); border-radius: 4px; padding: 15px; margin-top: 15px; font-family: var(--font-family); font-size: 1rem; line-height: 1.5; resize: vertical; }
+        .copy-box { background-color: #121212; padding: 20px; border-left: 4px solid var(--accent-gold); font-family: monospace; margin-top: 15px; white-space: pre-wrap; font-size: 0.9rem; color: #dcdcdc; max-height: 250px; overflow-y: auto; }
+        .recording-indicator { display: none; color: var(--primary-red); font-weight: 700; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <!-- PERMANENT GLOBAL SIDEBAR -->
+    <aside>
+        <div class="brand">
+            <h2>Eccles MBA</h2>
+            <p>Consulting Command Center</p>
+        </div>
+        <div class="nav-label">Core Directory</div>
+        <a href="./index.html">Ecosystem Dashboard</a>
+        <a href="./playbook_frameworks.html">20 Case Frameworks</a>
+        <a href="./playbook_math.html">15 Analytics Math Drills</a>
+        <a href="./playbook_battlecard.html">MBB Battlecard Vault</a>
+        
+        <div class="nav-label">Practice Sprints</div>
+        <a href="./playbook_sprint_01.html">Sprint 1: Profitability</a>
+        <a href="./playbook_sprint_02.html" class="active">Sprint 2: M&A Strategy</a>
+        <a href="./playbook_sprint_03.html">Sprint 3: Operations</a>
+        <a href="./playbook_sprint_04.html">Sprint 4: Tech & SaaS</a>
+        <a href="./playbook_sprint_05.html">Sprint 5: GTM & Pricing</a>
+        <a href="./playbook_sprint_06.html">Sprint 6: Capstones</a>
+    </aside>
+
+    <main>
+        <header>
+            <div class="header-title-area">
+                <h1 id="header-display-title">Sprint 2: Case Prompts</h1>
+                <div class="header-subtitle">M&A, Corporate Valuation, and Strategic Investments</div>
+            </div>
+        </header>
+
+        <!-- REGIONAL HORIZONTAL VIEW TOOLBAR -->
+        <div class="local-toolbar">
+            <button class="toolbar-btn active" id="btn-cases" onclick="switchView('cases-view', this)">MBB Case Prompts <span class="count-badge">5</span></button>
+            <button class="toolbar-btn" id="btn-questions" onclick="switchView('questions-view', this)">Paired Question Bank <span class="count-badge">20</span></button>
+        </div>
+
+        <!-- VIEW: CASES -->
+        <section id="cases-view" class="section-container active">
+            <div class="hero">
+                <span class="track-pill">M&A Strategy Block</span>
+                <h2>MBB Case Prompt Library</h2>
+                <p class="description">Practice investment hypothesis testing, corporate valuation modeling, and hard synergy assessment across 5 complex structural cases.</p>
+            </div>
+            <div class="content-grid" id="cases-anchor"></div>
+        </section>
+
+        <!-- VIEW: QUESTIONS -->
+        <section id="questions-view" class="section-container">
+            <div class="hero">
+                <span class="track-pill">M&A Fit & Logic Block</span>
+                <h2>Paired Question Bank</h2>
+                <p class="description">20 interview questions targeting corporate finance judgment, transactional strategy, and leadership profiles under extreme ambiguity.</p>
+            </div>
+            <div class="content-grid" id="questions-anchor"></div>
+        </section>
+
+        <!-- Global Interactive Modal Canvas -->
+        <div id="practice-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title-header">
+            <div class="modal-content">
+                <button class="close-modal" onclick="closeModal()" aria-label="Close practice modal">×</button>
+                <h2 style="color: var(--primary-red); margin-top: 0;" id="modal-title-header">Interactive Practice Arena</h2>
+                <h3 id="modal-item-title" style="color: var(--accent-gold); margin: 5px 0 15px 0;"></h3>
+                
+                <div style="background-color: #252525; padding: 15px; border-radius: 6px; border-left: 3px solid var(--primary-red);">
+                    <span style="font-size: 0.8rem; text-transform: uppercase; font-weight: 800; color: var(--text-muted); display: block;" id="modal-context-label">Context Prompt:</span>
+                    <p id="modal-prompt-text" style="margin: 5px 0 0 0; font-size: 1rem; line-height: 1.5; color: #fff;"></p>
+                </div>
+                
+                <div style="margin-top: 15px; display: flex; gap: 15px; align-items: center;">
+                    <button class="btn-action" onclick="toggleRecordingEngine()" id="btn-record">🎙️ Start Spoken Answer</button>
+                    <span class="recording-indicator" id="recording-status" role="status">🔴 Audio Pipeline Live...</span>
+                    <div id="filler-words" aria-live="polite" style="font-size: 0.9rem; font-weight:600; color:var(--accent-gold);">Filler Words: 0</div>
+                    <div id="timer-display" style="font-size: 0.9rem; font-weight:700; color:var(--text-muted); margin-left:auto;">⏱ 2:00</div>
+                </div>
+                
+                <textarea id="transcription-box" aria-label="Live speech transcript" placeholder="Your live recording speech transcript will populate here..."></textarea>
+                <button class="btn-action" style="background-color: var(--accent-gold); color: black; width: 100%; justify-content: center;" onclick="triggerAIFeedbackPayload()">Generate Rigorous AI Coaching Prompt</button>
+                
+                <div id="ai-prompt-output" style="display: none;">
+                    <p style="margin-top: 20px; font-weight: 700; font-size: 0.95rem;">Copy this payload directly into your AI assistant for partner-grade processing:</p>
+                    <div class="copy-box" id="ai-copy-text"></div>
+                    <button class="btn-action" onclick="copyPayloadToClipboard()">Copy Payload to Clipboard</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const SPRINT_CASES = [
+            {
+                id: "s2_case_01",
+                caseType: "M&A due diligence",
+                difficulty: "Advanced",
+                title: "Tier-1 Aerospace Supplier Consolidation Play",
+                clientContext: "Our client is a dominant tier-1 aerospace manufacturing prime. A niche competitor specializing in advanced structural titanium additive components is available for acquisition at an enterprise value multiple of 12x EBITDA.",
+                interviewerPrompt: "The client board needs to validate whether the synergies are real or inflated before placing a definitive bid. How would you structure this evaluation?",
+                candidateObjectives: "1. Quantify cold operational synergies vs integration friction.\n2. Isolate target asset customer concentration risk pipelines.\n3. Verify the underlying scalability of the asset's IP footprint.",
+                clarifyingQuestions: "What is the historical revenue retention performance of the target's primary defense prime accounts? Secondly, what percentage of the estimated synergy pool is tied to hard cost-side optimization versus soft cross-selling projections?",
+                suggestedStructure: "M&A Validation Framework:\n- Target Financial Integrity: True normalized EBITDA run-rate, customer churn metrics, CapEx requirements.\n- Operational Synergy Pillars: Cost reduction (headcount, real estate consolidation) vs Revenue accretion (cross-selling IP through client channels).\n- Integration Barriers: Regulatory compliance frameworks (ITAR), engineering culture mismatches.",
+                keyBusinessIssues: "Target asset relies on just two major defense primitives for 75% of total volume; current factory output is maxed out at 92% utilization, requiring immediate CapEx scaling to expand.",
+                mathRequired: "Calculate post-synergy blended transaction multiples. Evaluate the internal rate of return (IRR) adjustments if one major account cancels post-transaction.",
+                sampleDataOrExhibit: "Exhibit 1: Target Operating Financials:\n- Standalone EBITDA: $50M\n- Expected Gross Cost Synergies: $15M\n- Post-merger Integration Costs: $10M upfront\n- Current Transaction Multiple: 12x Standalone EBITDA",
+                strongAnswerPath: "The candidate identifies that a 12x standalone multiple drops significantly if cost synergies are achieved. They focus heavily on validating the 92% capacity constraint, recognizing that revenue synergies cannot occur without immediate factory expansion expenditures.",
+                finalRecommendation: "Proceed with the acquisition but adjust the initial valuation down to account for cap-ex constraints. Implement strict retention bonuses for the target's core additive manufacturing engineering team, and immediately move production over to our under-utilized midwest facility.",
+                coachingNotes: "Premium responses push past investment banking summaries. Candidates must demonstrate deep understanding of industrial physics, factory floor utilization metrics, and regulatory constraints.",
+                redFlags: "Accepting management's synergy targets without factoring in capacity limits or the asset's high customer concentration risk."
+            },
+            {
+                id: "s2_case_02",
+                caseType: "Private equity commercial due diligence",
+                difficulty: "Expert",
+                title: "Healthcare Specialty Clinic Platform Roldup",
+                clientContext: "A top-tier private equity fund is evaluating the simultaneous acquisition and roll-up of three regional orthopedic clinic platforms to form a unified multi-state healthcare delivery ecosystem.",
+                interviewerPrompt: "The investment committee needs to verify if the roll-up can drive higher EBITDA margins through shared corporate services, or if localized doctor retention risks will destroy the platform value. How do you map your diligence track?",
+                candidateObjectives: "1. Evaluate the scalability of shared non-clinical corporate operations.\n2. Assess localized patient acquisition mechanics across geographies.\n3. Value doctor compensation models to prevent churn post-acquisition.",
+                clarifyingQuestions: "How do the existing margin profiles compare across the three target entities? What percentage of total clinical revenues is tied directly to the founders' individual reputations?",
+                suggestedStructure: "PE Roldup Framework:\n- Operational Integration: Shared service consolidation (billing architectures, centralized compliance pipelines, procurement).\n- Commercial Footprint: Referral network strength, regional market share, payor mix optimization (Commercial vs Medicare margins).\n- Talent Protection Strategy: Doctor equity structures, earn-out timelines, recruitment pipelines.",
+                keyBusinessIssues: "Founder physicians represent 40% of high-margin surgical bookings and are planning near-term retirements; differing electronic health record systems complicate immediate operational integrations.",
+                mathRequired: "Calculate the blended platform margin expansion required to hit the fund's 22% target internal rate of return (IRR) over a 5-year hold period.",
+                sampleDataOrExhibit: "Table 2: Operational Benchmarks Per Target:\n- Target A: Revenue $40M, EBITDA 15%, 12 Clinics\n- Target B: Revenue $25M, EBITDA 10%, 8 Clinics\n- Target C: Revenue $15M, EBITDA 18%, 4 Clinics",
+                strongAnswerPath: "The candidate isolates Target B as an operational underperformer and identifies it as the best opportunity for margin expansion. They connect physician equity retention models directly to patient volume protections, warning that founder churn will immediately destroy the platform's valuation premium.",
+                finalRecommendation: "Approve the transactions contingent on rewriting physician contracts to feature a 4-year equity earn-out framework. Standardize operations on Target C's digital framework to scale up Target B's margins, and transition administrative burdens to a single centralized shared services hub.",
+                coachingNotes: "Candidates must understand corporate roll-up strategies. Show how shared administrative services convert fragmented small businesses into high-margin enterprise platforms.",
+                redFlags: "Treating this as a simple real estate deal without evaluating physician alignment, patient referral dynamics, or local insurance payor mixes."
+            },
+            {
+                id: "s2_case_03",
+                caseType: "New product or service launch",
+                difficulty: "Core",
+                title: "FinTech Neo-Bank Small Business Credit Integration",
+                clientContext: "A rapidly growing consumer-focused Neo-Bank is assessing the launch of a proprietary automated working-capital credit line product tailored specifically for micro-enterprise small businesses.",
+                interviewerPrompt: "The executive team wants a market launch blueprint that balances rapid customer acquisition with robust underwriting risk protections. How would you structure this strategy?",
+                candidateObjectives: "1. Size the true addressable market within the existing user database.\n2. Design pricing and underwriting data structures based on transaction behaviors.\n3. Determine capital balance sheet funding pathways (internal cash reserves vs wholesale debt facilities).",
+                clarifyingQuestions: "Do we plan to white-label an existing commercial underwriting platform or build a custom credit risk engine internally? What historical default rates are built into our initial financial models?",
+                suggestedStructure: "Product Launch Framework:\n- Market Context & Opportunity: Total addressable user baseline, borrowing habits, unmet credit needs.\n- Technical Risk Infrastructure: Data points for risk assessment (cash-flow monitoring, transaction histories), default mitigation.\n- Go-to-Market Execution: Customer acquisition channels, pricing models, product feature iterations.\n- Capital Allocation Engine: Net interest margin optimization, capital reserves, compliance liquidity rules.",
+                keyBusinessIssues: "High risk of adverse selection as higher-risk businesses seek rapid credit lines; strict capital reserve requirements limiting alternative tech growth budgets.",
+                mathRequired: "Calculate net interest margins (NIM) under varying credit default scenarios to identify the baseline loan loss reserve requirements.",
+                sampleDataOrExhibit: "Exhibit 3: Small Business Cohort Transaction Metrics:\n- Eligible Internal Micro-Enterprise Base: 500,000 accounts\n- Average Target Working Capital Loan Size: $10,000\n- Projected Annual Interest Rate Yield: 14%\n- Estimated Baseline Annual Default Rate: 3%",
+                strongAnswerPath: "The candidate identifies that the Neo-Bank has a massive advantage: real-time visibility into their customers' primary cash-flow transactions. They recommend using this proprietary data to bypass traditional credit scores, creating a fast approval loop while keeping risk low by tracking real-time transaction velocities.",
+                finalRecommendation: "Launch the credit product using a phased rollout to the top 10% lowest-risk users. Build custom risk scoring based on daily deposit consistency, and fund the initial portfolio using internal deposits to maximize margins before taking on wholesale institutional debt.",
+                coachingNotes: "Refine candidate strategy around proprietary data advantages. A tech platform's best weapon against legacy banks is real-time user data access.",
+                redFlags: "Suggesting outsourcing risk scoring to traditional credit bureaus, which completely ignores the Neo-Bank's proprietary transaction data advantage."
+            },
+            {
+                id: "s2_case_04",
+                caseType: "Turnaround strategy",
+                difficulty: "Advanced",
+                title: "Industrial Commercial Vehicle Fleet Asset Divestiture",
+                clientContext: "A global industrial heavy machinery manufacturer is facing structural declines in its commercial delivery van business unit. Activist investors are demanding management spin off or liquidate the asset to unlock capital.",
+                interviewerPrompt: "The Board needs to evaluate whether to invest capital into an electric fleet pivot or proceed with an immediate asset divestiture. How would you guide this strategic assessment?",
+                candidateObjectives: "1. Valuation comparison of standalone enterprise value vs corporate breakup value.\n2. Assess buyer interest profiles across strategic competitors vs private equity asset acquirers.\n3. Map stranded cost implications and corporate overhead reductions post-sale.",
+                clarifyingQuestions: "What is the standalone book value of the heavy machinery segment's integrated manufacturing assets? Are there shared technology platforms between the van business and our high-margin defense equipment vertical?",
+                suggestedStructure: "Divestiture Framework:\n- Standalone Future Potential: ROI of electric fleet pivot, remaining cash lifespan, restructuring paths.\n- Transaction Valuation Dynamics: Discounted cash flow (DCF) vs comparable multiples, transaction cost overhead.\n- Stranded Overhead Analysis: Reallocating shared corporate service expenses post-sale, rightsizing parent operations.\n- Execution Playbook: Carve-out timeline vs full equity carve-out IPO paths.",
+                keyBusinessIssues: "The division shares 30% of its core corporate IT and real estate footprint with the parent entity, meaning a sale will leave significant stranded overhead costs for the remaining business.",
+                mathRequired: "Calculate the net cash proceeds after factoring in taxes, separation costs, and the ongoing burden of un-optimized corporate overhead structures.",
+                sampleDataOrExhibit: "Table 4: Financial Breakdown of Van Division:\n- Standalone Annual Revenue: $400M, EBITDA: $20M\n- Breakup Net Asset Book Value: $180M\n- Shared Parent Corporate Overhead Assigned to Division: $15M/year",
+                strongAnswerPath: "The candidate realizes that because standalone EBITDA is low ($20M) and assignable corporate overhead is high ($15M), the division is barely profitable on a standalone basis. They note that selling the asset for a low multiple will hurt the parent company unless they also execute an aggressive corporate restructuring to eliminate stranded overhead costs.",
+                finalRecommendation: "Execute a carve-out sale of the manufacturing footprint to a private equity buyer focused on operational turnarounds. Simultaneously, launch an aggressive cost reduction plan at the parent company to eliminate the $15M in stranded overhead within 6 months of the close.",
+                coachingNotes: "Remind students that corporate carve-outs are messy. A business unit never exists in a vacuum; shared service allocations must always be resolved.",
+                redFlags: "Recommending an immediate sale based on valuation multiples without addressing the shared parent overhead costs left behind."
+            },
+            {
+                id: "s2_case_05",
+                caseType: "Capacity expansion",
+                difficulty: "Expert",
+                title: "Semiconductor Fabrication Fab 2 Capital Allocation",
+                clientContext: "A specialized analog semiconductor foundry is experiencing 98% utilization capacity across its core European facility due to the high global demand for automotive micro-controller chips.",
+                interviewerPrompt: "The client is deciding whether to invest $1.2B to build a second fabrication plant in Arizona or expand the European facility through cleanroom optimization. How would you evaluate this capital choice?",
+                candidateObjectives: "1. Compare net present value (NPV) across geographic footprints.\n2. Assess supply chain resilience metrics vs cross-border regulatory subsidies (CHIPS Act).\n3. Match production expansion schedules with long-term automotive demand projections.",
+                clarifyingQuestions: "What percentage of the $1.2B Arizona construction budget is covered by government grants via the US CHIPS Act? Secondly, what is the expected time-to-market difference between the two options?",
+                suggestedStructure: "Capital Allocation Framework:\n- Project Financial Architecture: CapEx requirements, cash flow timelines, internal hurdle rates, NPV comparisons.\n- Regulatory & Subsidy Dynamics: Tax incentives, cash grants, geopolitical tariff protections.\n- Supply Chain Logistics: Access to wafer inputs, localized talent pools, customer shipping economics.\n- Demand Risk: Cyclical semiconductor demand swings, technology obsolescence timelines.",
+                keyBusinessIssues: "Building a new fabrication plant takes 36 months to achieve initial production yield, while European facility optimization can add 15% capacity within 9 months at a much lower cost.",
+                mathRequired: "Calculate the internal rate of return (IRR) across both options, factoring in a 40% government subsidy for the US construction path.",
+                sampleDataOrExhibit: "Exhibit 5: Capital Investment Options:\n- Option A (US Fab Build): CapEx $1.2B, 3-Year Lag, 40% Grant Subsidy, +100% Capacity Yield.\n- Option B (Euro Optimization): CapEx $200M, 9-Month Lag, 0% Subsidy, +15% Capacity Yield.",
+                strongAnswerPath: "The candidate highlights the time-to-market risk. While the US factory offers huge long-term scaling and great government subsidies, a 3-year construction lag leaves the client exposed to near-term demand shifts. They recommend a phased approach: optimize Europe immediately to capture near-term revenue, while using US grants to build long-term geographic diversification.",
+                finalRecommendation: "Approve the optimized European upgrade immediately using internal cash flows to capture near-term automotive chip demand. Simultaneously, sign the definitive agreements for the US CHIPS Act grants to kick off the Arizona expansion as our long-term supply pipeline.",
+                coachingNotes: "Focus on timing dependencies. In cyclical tech sectors like semiconductors, speed-to-market often beats long-term theoretical margin optimization models.",
+                redFlags: "Choosing the massive US expansion solely because of government subsidies while completely ignoring the 3-year production delay."
+            }
+        ];
+
+        const SPRINT_QUESTIONS = [
+            {
+                id: "s2_q_01",
+                category: "M&A, Due Diligence, and Investment Cases",
+                difficulty: "Core",
+                question: "What is the core strategic difference between an acquisition conducted by a corporate strategic buyer versus a private equity financial sponsor?",
+                conversational: "The key differentiator comes down to investment horizons and synergy tracking mechanics. A corporate strategic buyer looks to integrate the target asset permanently to unlock operational synergies, such as cost-side optimization or cross-selling products through existing channels. Conversely, a private equity financial sponsor typically operates on a strict 5-to-7 year hold timeline. They focus heavily on capital efficiency, cost restructuring, and using debt leverage to expand EBITDA margins before exiting the investment.",
+                deepdive: "Strategic buyers evaluate long-term market protection and competitive synergies, often allowing them to pay a higher premium. Financial buyers target cash generation capabilities, standalone operational improvements, and multiple arbitrage opportunities at exit.",
+                coaching: "Frame your answer using formal transaction terms. Call out 'EBITDA expansion,' 'operational synergies,' and 'leverage models' to demonstrate professional corporate finance fluency.",
+                redFlag: "Claiming private equity firms only care about cutting headcount, which shows a superficial understanding of modern financial engineering and operational scaling strategies."
+            },
+            {
+                id: "s2_q_02",
+                category: "Consulting Fit & Motivation",
+                difficulty: "Core",
+                question: "Why does our firm's transactional M&A and private equity advisory practice group appeal to your professional goals over joining an investment banking track?",
+                conversational: "Investment banking focuses heavily on transaction structuring, capital markets navigation, and closing deals. While that financial architecture is critical, I want to drive the operational strategy that happens *after* the deal closes. Consulting allows me to sit down with executive teams during commercial due diligence, test business model assumptions, and design the actual post-merger integration blueprints that convert theoretical synergy models into hard bottom-line results.",
+                deepdive: "This prompt tests your understanding of industry roles. You must clearly differentiate transactional execution (banking) from operational value creation (consulting).",
+                coaching: "Highlight your interest in operational dynamics. Show that you care about execution tracking, technology integration, and customer cohort protection over simple valuation modeling.",
+                redFlag: "Giving an answer that sounds like you are settling for consulting because you missed out on investment banking recruiting paths."
+            },
+            {
+                id: "s2_q_03",
+                category: "Data Interpretation, Charts, and Exhibits",
+                difficulty: "Advanced",
+                question: "If an exhibit reveals a target company's revenues are climbing at 20% CAGR while absolute operating cash flows are shrinking, what hypotheses would you investigate?",
+                conversational: "I would immediately investigate three potential financial issues. First, working capital degradation—specifically checking if a spike in accounts receivable proves they are booking low-quality sales but struggling to collect cash from clients. Second, margin compression—evaluating if rising customer acquisition costs or input cost inflation are outpacing revenue growth. Third, structural shifts in product mix toward lower-margin offerings.",
+                deepdive: "This question evaluates your core accounting judgment. Disconnects between accrual revenue tracking and actual cash flow generation highlight serious operational risks.",
+                coaching: "Use formal financial terms. Mentioning 'working capital expansion,' 'receivables aging metrics,' and 'cash conversion cycles' signals intermediate corporate finance competency.",
+                redFlag: "Failing to connect revenue growth to working capital variations, or assuming that growing revenues always mean a company is financially healthy."
+            },
+            {
+                id: "s2_q_04",
+                category: "Consulting Math & Business Judgment",
+                difficulty: "Advanced",
+                question: "A target asset generates $80M in top-line revenue at a 25% EBITDA margin. The corporate buyer believes they can achieve 10% cost efficiencies across the target's baseline cost structure. Calculate the post-synergy EBITDA.",
+                conversational: "Let's break down the financials. At $80M in revenue and a 25% margin, the target's standalone EBITDA is exactly $20M, which means their total cost base is $60M. Achieving a 10% cost efficiency reduces expenses by $6M. Adding this $6M in structural savings directly back to our baseline profit yields a post-synergy EBITDA of $26M, expanding the operating margin to 32.5%.",
+                deepdive: "Cost synergies flow straight to the bottom line. Candidates must quickly calculate the cost baseline ($60M) rather than mistakenly taking 10% of total revenue ($8M).",
+                coaching: "Speak your steps clearly. State your intermediate calculations ($20M standalone profit, $60M cost base) before delivering the final value to keep the interviewer aligned with your logic.",
+                redFlag: "Applying the 10% efficiency percentage directly to the EBITDA number, which is a fundamental financial logic error."
+            },
+            {
+                id: "s2_q_05",
+                category: "Personal Experience / Behavioral Interview",
+                difficulty: "Advanced",
+                question: "Tell me about a time you had to defend an unpopular strategic investment recommendation to senior decision makers. How did you structure your pushback?",
+                conversational: "During our annual budget review, our leadership team wanted to pause funding for our automated warehouse tracking project due to a short-term cash crunch. I knew halting development would cost us double in renegotiation penalties later. Instead of arguing on project timelines, I built a financial model comparing the net present value of pausing versus proceeding. I proved that keeping the project active saved $400,000 in structural costs over 24 months, which convinced the VP to protect our funding pipeline.",
+                deepdive: "Senior stakeholders respect data-driven pushback. The response must prove that you can protect your strategic ideas using hard financial metrics rather than emotional appeals.",
+                coaching: "Focus on the data framework you deployed to manage the pushback. Structure the narrative around the quantitative tradeoffs to project professional executive credibility.",
+                redFlag: "Sounding defensive or claiming you won the disagreement through pure persistence without deploying real financial business metrics."
+            },
+            {
+                id: "s2_q_06",
+                category: "M&A, Due Diligence, and Investment Cases",
+                difficulty: "Expert",
+                question: "Explain the corporate finance concept of 'Stranded Costs' during a corporate spin-off or business asset carve-out transaction.",
+                conversational: "Stranded costs represent corporate overhead expenses—such as shared IT networks, centralized legal functions, and real estate assets—that were previously paid for by the divested business unit. When that unit is carved out and sold, those fixed overhead costs do not disappear automatically; they remain behind with the parent company. Unless parent leadership moves quickly to right-size operations, these stranded costs will immediately compress the remaining business's profit margins.",
+                deepdive: "Carve-out strategies require matching operational separation steps with strict corporate rightsizing plans to eliminate structural cost drag on the remaining business.",
+                coaching: "Explain how you would resolve the issue: explicitly state that parent management must execute a transition service agreement (TSA) to phase out these shared costs over time.",
+                redFlag: "Assuming that selling a business unit automatically reduces corporate headquarters overhead expenses by a matching percentage."
+            },
+            {
+                id: "s2_q_07",
+                category: "Case Interview Fundamentals",
+                difficulty: "Core",
+                question: "Our client is a premium global consumer brand assessing an acquisition of a distressed digital platform. What are the primary risk buckets you would analyze?",
+                conversational: "I would structure my risk assessment around three specific tracks. First, asset brand dilution risk—verifying if the target's distressed profile will hurt our core luxury brand position. Second, technology integration debt—checking if their legacy platform requires immediate capital infusions to connect with our global logistics engine. Third, customer churn metrics—confirming if active user retention is dropping post-distress.",
+                deepdive: "Distressed asset acquisitions require balancing low entry valuations against high turnaround costs, integration complexities, and brand liabilities.",
+                coaching: "Use industry-specific terms. Mentioning 'technical debt,' 'brand equity erosion,' and 'cohort retention decay' signals intermediate consulting readiness.",
+                redFlag: "Focusing entirely on the cheap purchase price while ignoring the ongoing capital expenditures required to fix the underlying technology platforms."
+            },
+            {
+                id: "s2_q_08",
+                category: "Synthesis, Recommendation, and Executive Communication",
+                difficulty: "Advanced",
+                question: "Deliver a final 90-second executive summary to a private equity client on whether to acquire an upscale regional fitness franchise network.",
+                conversational: "Our definitive recommendation is to proceed with the acquisition of the fitness franchise at the proposed $120M valuation. This choice is driven by three factors: First, a strong 28% cash-on-cash return profile across suburban club cohorts. Second, a clear operational roll-up path—centralizing corporate marketing and procurement to unlock 400 basis points of margin expansion. Third, a low customer churn rate of 2% matching industry benchmarks. The primary risk is local real estate lease inflation, which we can mitigate by signing long-term 10-year rental caps. Next steps are to finalize the physician referral network partnerships and kick off phase-1 operational diligence.",
+                deepdive: "Elite final summaries are answer-first, quantified, structured, and action-oriented. Never summarize the history of your case work; lead directly with the definitive strategic decision.",
+                coaching: "Use the classic pyramid principle structure: clear recommendation first, backed by exactly three quantified operational pillars, followed by a mitigation plan and immediate next steps.",
+                redFlag: "Wandering through an unstructured summary of case observations instead of delivering a bold, definitive investment decision."
+            },
+            {
+                id: "s2_q_09",
+                category: "Consulting Fit & Motivation",
+                difficulty: "Core",
+                question: "How do you plan to handle the fast-paced, high-travel lifestyle of elite management consulting teams at our office footprint?",
+                conversational: "I look at the consulting pace as an incredible accelerator for my professional development. During my pre-MBA engineering career, I managed complex multi-site factory floor turnarounds that required constant travel and rapid adaptation under tight timelines. I build strict personal routines around sleep, nutrition, and project organization, which allows me to maintain high energy levels and deliver consistent results for client teams regardless of location.",
+                deepdive: "Firms want to verify that you have a realistic understanding of the lifestyle demands and possess the personal maturity and resilience to prevent early burnout.",
+                coaching: "Connect your answer to real past experiences. Prove that you have successfully managed high-pressure, fast-paced workloads or travel schedules in your previous career tracks.",
+                redFlag: "Overpromising with generic phrases like 'I never sleep' or 'I live to work,' which signals low emotional intelligence and poor long-term professional sustainability."
+            },
+            {
+                id: "s2_q_10",
+                category: "Case Interview Fundamentals",
+                difficulty: "Advanced",
+                question: "A client wants to expand production capacity by building an offshore manufacturing asset. What macroeconomic variables carry the highest risk?",
+                conversational: "I would prioritize three macroeconomic risk pools. First, foreign exchange volatility—evaluating how shifts in local currency pairings will affect our localized operational cost structures. Second, cross-border tariff structures and changing regulatory trade frameworks. Third, localized labor rate inflation metrics that could quickly destroy our target cost advantages within the region.",
+                deepdive: "Offshore capacity expansion strategies must balance cheap input asset advantages against complex geopolitical risks, trade protections, and currency cross-currency exposures.",
+                coaching: "Signpost your categories clearly using formal macroeconomic terms like 'FX exposure metrics,' 'import tariff architectures,' and 'structural labor cost inflation.'",
+                redFlag: "Focusing purely on the cheap cost of local labor while completely ignoring currency shifts or incoming international trade barriers."
+            },
+            {
+                id: "s2_q_11",
+                category: "M&A, Due Diligence, and Investment Cases",
+                difficulty: "Expert",
+                question: "What is a 'Transition Service Agreement' (TSA) and why is it critical during a large-scale corporate carve-out transaction?",
+                conversational: "A Transition Service Agreement is a formal contract where the parent company agrees to temporarily provide critical back-office services—like payroll processing, IT data access, or accounting infrastructure—to the newly carved-out business entity for a specified timeframe post-transaction. It is critical because it prevents the carved-out company from facing an immediate operational shutdown on day one, giving them the runway to stand up independent corporate infrastructure without delaying the transaction close.",
+                deepdive: "TSAs act as operational bridges during complex separations, protecting the target asset's valuation while they build out independent back-office capabilities.",
+                coaching: "Explain the financial risk: warn that if a TSA runs past its deadline, the buyer can face high financial penalties from the parent company.",
+                redFlag: "Confusing a TSA with a standard supplier contract or failing to realize it is an interim operational separation bridge between parent and buyer."
+            },
+            {
+                id: "s2_q_12",
+                category: "Data Interpretation, Charts, and Exhibits",
+                difficulty: "Core",
+                question: "An exhibit graph illustrates market fragmentation where the top 4 competitors control just 15% of total industry revenue. What is your strategic diagnosis?",
+                conversational: "This data indicates a classic highly fragmented industry structure. Strategically, this represents a major operational opportunity to execute an asset roll-up strategy. Since no single player owns pricing power, our client can acquire small independent operators, centralize back-office costs, build a unified national brand, and expand margins by capturing structural economies of scale that independent competitors cannot match.",
+                deepdive: "Low concentration ratios (CR4 less than 15%) signal high fragmentation. This environment is perfect for private equity roll-up plays to capture procurement and operational efficiencies.",
+                coaching: "Connect the chart observation directly to a strategic framework. Fragmentation should immediately spark a conversation about asset roll-up economics and scale efficiencies.",
+                redFlag: "Concluding that a fragmented market is un-attractive simply because there are no giant companies dominating the space."
+            },
+            {
+                id: "s2_q_13",
+                category: "Consulting Fit & Motivation",
+                difficulty: "Advanced",
+                question: "Tell me about a time you had to guide a team through significant ambiguity when an initial investment model hypothesis proved completely incorrect.",
+                conversational: "We were evaluating an entry into a niche premium logistics space, hypothesizing that low regional competitor density would guarantee high margins. However, two weeks into diligence, our field data revealed that local fuel costs were double the national average, making our initial margin models completely unviable. The team was discouraged. I called a strategy pivot meeting, refocused our metrics away from high-volume routes, and realigned the target toward high-density local delivery loops, salvaging the project strategy.",
+                deepdive: "Consultants must pivot gracefully when initial data invalidates a hypothesis. Interviewers look for emotional resilience, rapid adaptation, and structured problem-solving under pressure.",
+                coaching: "Detail your individual leadership role during the pivot: how you kept the team organized, re-allocated data analysis tasks, and realigned the final strategic output.",
+                redFlag: "Hiding the fact that your initial hypothesis was wrong, or continuing to push a flawed strategy simply to avoid changing your original plan."
+            },
+            {
+                id: "s2_q_14",
+                category: "Case Interview Fundamentals",
+                difficulty: "Advanced",
+                question: "Our client is a traditional retail conglomerate considering launching a corporate venture capital (CVC) arm. What strategic tradeoffs must they manage?",
+                conversational: "They must manage three specific balances. Financial returns versus strategic insights—deciding whether to maximize fund ROI or protect the parent company from digital disruption. Ecosystem integration velocity—balancing the freedom early-stage startups need with the parent company's strict corporate compliance rules. Brand reputation risks if a portfolio startup fails publicly.",
+                deepdive: "Corporate Venture Capital structures must align minority tech investments with the core operating needs and digital modernization goals of the parent company.",
+                coaching: "Address the corporate alignment challenge. A successful CVC group must act as an early scouting mechanism for next-generation technology integration opportunities.",
+                redFlag: "Treating a corporate venture arm exactly like a standard financial VC fund without analyzing how it helps the parent company's core business strategy."
+            },
+            {
+                id: "s2_q_15",
+                category: "Consulting Math & Business Judgment",
+                difficulty: "Core",
+                question: "A target company has annual revenues of $100M. The buyer plans to clear out $5M in redundant corporate headquarters salaries while expanding marketing investments by $2M. What is the net impact on EBITDA?",
+                conversational: "This is a direct cost re-allocation calculation. Eliminating $5M in redundant executive salaries reduces our cost base, which adds $5M directly to operating profit. Meanwhile, expanding marketing investments adds $2M back into our expenses. Combining a positive $5M cost synergy with a negative $2M growth spend yields a net positive EBITDA expansion of exactly $3M for the client.",
+                deepdive: "Basic transaction synergies require adding cost reductions and subtracting corporate growth reinvestments to calculate true net margin impacts.",
+                coaching: "Keep your calculation presentation simple. Walk through the positive and negative adjustments in sequence to project clear, structured financial thinking.",
+                redFlag: "Confusing cost reductions with revenue growth metrics, or adding the marketing investment as a cost savings step."
+            },
+            {
+                id: "s2_q_16",
+                category: "Case Interview Fundamentals",
+                difficulty: "Advanced",
+                question: "A software provider client wants to execute an asset divestiture of its legacy consulting services group. What are the key strategic rationale pillars?",
+                conversational: "I would highlight three strategic reasons for this divestiture. First, margin optimization—legacy professional services are human-capital heavy and carry lower margins, dragging down the core company's software multiples. Second, management focus—allowing leadership to allocate 100% of their time to high-margin product scaling. Third, capital unlocking—using the cash proceeds from the sale to fund our product R&D pipeline.",
+                deepdive: "Divesting professional services arms allows technology companies to clean up their financial statements, expand valuation multiples, and transform into pure-play SaaS platforms.",
+                coaching: "Focus on valuation multiples. Tech investors pay a premium for high-margin scalable software revenue over linear, headcount-dependent consulting models.",
+                redFlag: "Recommending keeping the services group simply because it generates revenue, ignoring the structural margin drag it places on the software parent's valuation."
+            },
+            {
+                id: "s2_q_17",
+                category: "Consulting Fit & Motivation",
+                difficulty: "Expert",
+                question: "What specific operational metrics or analytical frameworks from your past career track will you find hardest to leave behind as a consultant?",
+                conversational: "In my previous engineering role, I relied heavily on long-term statistical process tracking charts to measure quality variations down to parts-per-million over six-month cycles. Moving to consulting means I have to trade that perfect statistical certainty for the speed of 8-week corporate strategy sprints. I've had to train myself to embrace the 80/20 rule—focusing on the highest-impact drivers to deliver actionable executive recommendations on time rather than getting bogged down in minor details.",
+                deepdive: "This prompt tests your self-awareness regarding the transition from deep technical roles into the fast-paced, high-level world of strategic business advisory.",
+                coaching: "Be authentic. Identify a real operational metric or way of working from your past, explain why it was useful, and show how you are adapting to match consulting speeds.",
+                redFlag: "Delivering a generic answer like 'I won't struggle with anything,' which demonstrates a lack of self-awareness and low professional maturity."
+            },
+            {
+                id: "s2_q_18",
+                category: "Personal Experience / Behavioral Interview",
+                difficulty: "Core",
+                question: "Tell me about a time you had to realign an underperforming deal integration team when project milestones were slipping. What was your leadership pivot?",
+                conversational: "During our post-merger ERP systems integration, our joint IT team fell three weeks behind schedule because the acquired company's engineers were pushing back against our data protocols. Instead of issuing a top-down mandate, I shifted my leadership approach and set up daily stand-up syncs. I paired engineers from both legacy teams to work on shared milestones and built a tracking dashboard to make progress visible. This clear communication realigned the team and allowed us to complete the migration on time.",
+                deepdive: "Post-merger integration requires deep empathy, cultural alignment, and clear tracking mechanisms to successfully merge separate legacy teams.",
+                coaching: "Focus on the interpersonal side of project management: how you listened to the team's concerns, built alignment, and used clear tracking metrics to drive performance.",
+                redFlag: "Claiming you solved the problem simply by working longer hours or re-allocating all the critical tasks to yourself, which fails to fix the underlying team alignment issue."
+            },
+            {
+                id: "s2_q_19",
+                category: "Case Interview Fundamentals",
+                difficulty: "Advanced",
+                question: "A retail client wants to acquire an e-commerce infrastructure target to build an omni-channel ecosystem. What are the core technology integration risks?",
+                conversational: "I would prioritize three major technology risk channels. First, data silo mismatch—verifying if legacy physical inventory management systems can sync in real-time with digital e-commerce engines. Second, order management system duplication—preventing double-bookings across retail locations and distribution hubs. Third, cyber-security compliance vulnerabilities across transaction channels.",
+                deepdive: "Omni-channel retail transformations require a modern technology foundation that connects legacy point-of-sale systems with real-time digital fulfillment data.",
+                coaching: "Frame your answer around the customer experience, detailing how technology mismatches can lead to inventory errors, shipping delays, and lost customer trust.",
+                redFlag: "Treating an omni-channel acquisition as a pure marketing strategy while ignoring the backend software integration challenges."
+            },
+            {
+                id: "s2_q_20",
+                category: "Case Interview Fundamentals",
+                difficulty: "Core",
+                question: "Our client is a tier-1 heavy commercial vehicle manufacturer considering an inorganic acquisition of a specialized autonomous driver software startup. How do you assess this move?",
+                conversational: "I would analyze this through three lenses: Speed-to-market advantage—evaluating if buying this startup allows us to deliver autonomous commercial models 2 years ahead of organic build timelines. IP durability—confirming the startup's patent strength and technical advantage over tech incumbents. Integration culture protection—ensuring the agile software engineering team doesn't churn post-acquisition due to corporate bureaucracy.",
+                deepdive: "Inorganic technology acquisitions are driven by a build-vs-buy logic: paying a premium to secure mission-critical capabilities and accelerate speed-to-market.",
+                coaching: "Highlight the talent retention challenge. In early-stage software acquisitions, the value of the transaction resides in the engineering team; talent protection is a non-negotiable step.",
+                redFlag: "Valuing a software startup based on their physical assets or current low revenues, completely missing the value of their core IP and engineering capabilities."
+            }
+        ];
+
+        function switchView(viewId, activeBtn) {
+            document.querySelectorAll('.section-container').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.toolbar-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            activeBtn.classList.add('active');
+            document.getElementById('header-display-title').innerText = viewId === 'cases-view' ? 'Sprint 2: Case Prompts' : 'Sprint 2: Paired Question Bank';
+        }
+
+        function populateSprintArchitecture() {
+            const casesAnchor = document.getElementById('cases-anchor'); casesAnchor.innerHTML = '';
+            SPRINT_CASES.forEach(c => {
+                casesAnchor.innerHTML += `
+                    <div class="card">
+                        <div class="card-header-row">
+                            <div>
+                                <h3 class="card-title">${c.title}</h3>
+                                <div class="tag-row"><span class="badge badge-category">${c.caseType}</span><span class="badge badge-difficulty">${c.difficulty}</span></div>
+                            </div>
+                        </div>
+                        <div class="content-block"><div class="content-block-title">Client Situation & Strategic Context</div><div class="content-block-text">${c.clientContext}</div></div>
+                        <div class="content-block"><div class="content-block-title">Interviewer Prompt Payload</div><div class="content-block-text" style="color:#fff; font-weight:600; font-style:italic;">"${c.interviewerPrompt}"</div></div>
+                        <div class="tabs-container">
+                            <div class="tab-headers">
+                                <button class="tab-btn active" onclick="toggleCardTab(event, 'objectives')">Objectives</button>
+                                <button class="tab-btn" onclick="toggleCardTab(event, 'structure')">Structure</button>
+                                <button class="tab-btn" onclick="toggleCardTab(event, 'data')">Data/Exhibit</button>
+                                <button class="tab-btn" onclick="toggleCardTab(event, 'path')">Ideal Solution</button>
+                                <button class="tab-btn" onclick="toggleCardTab(event, 'coaching')">Partner Notes</button>
+                            </div>
+                            <div class="tab-content active" data-tab="objectives">
+                                <strong>Candidate Milestones:</strong><br>${c.candidateObjectives}<br><br>
+                                <strong>Clarifying Entry Questions:</strong><br><span style="font-style:italic; color:var(--accent-gold);">"${c.clarifyingQuestions}"</span>
+                            </div>
+                            <div class="tab-content" data-tab="structure"><strong>Tailored MECE Framework:</strong><br>${c.suggestedStructure}<br><br><strong>Key Business Parameters:</strong><br>${c.keyBusinessIssues}</div>
+                            <div class="tab-content" data-tab="data"><strong>Quantitative Requirements:</strong><br>${c.mathRequired}<br><br><strong>Exhibit Reference:</strong><br><pre style="background:#111; padding:10px; border-radius:4px; color:#fff; font-family:sans-serif; white-space:pre-wrap;">${c.sampleDataOrExhibit}</pre></div>
+                            <div class="tab-content" data-tab="path"><strong>Elite Execution Path:</strong><br>${c.strongAnswerPath}<br><br><strong>Recommendation Blueprint:</strong><br><span style="color:var(--accent-gold); font-style:italic;">"${c.finalRecommendation}"</span></div>
+                            <div class="tab-content" data-tab="coaching"><span style="color:#4ecdc4;"><strong>Senior Coaching Note:</strong></span><br>${c.coachingNotes}<br><br><span style="color:#ff6b6b;"><strong>Fatal Red Flags:</strong></span><br>${c.redFlags}</div>
+                        </div>
+                        <button class="btn-action" onclick="openPracticeModal('${c.id}', 'case')">Practice Case Opening Remarks →</button>
+                    </div>`;
+            });
+
+            const questionsAnchor = document.getElementById('questions-anchor'); questionsAnchor.innerHTML = '';
+            SPRINT_QUESTIONS.forEach(q => {
+                questionsAnchor.innerHTML += `
+                    <div class="card">
+                        <div class="card-header-row">
+                            <div>
+                                <h3 class="card-title">${q.question}</h3>
+                                <div class="tag-row"><span class="badge badge-category">${q.category}</span><span class="badge badge-difficulty">${q.difficulty}</span></div>
+                            </div>
+                        </div>
+                        <div class="tabs-container">
+                            <div class="tab-headers">
+                                <button class="tab-btn active" onclick="toggleCardTab(event, 'conversational')">Conversational Answer</button>
+                                <button class="tab-btn" onclick="toggleCardTab(event, 'deepdive')">Strategic Deep-Dive</button>
+                                <button class="tab-btn" onclick="toggleCardTab(event, 'notes')">Coaching & Red Flags</button>
+                            </div>
+                            <div class="tab-content active" data-tab="conversational"><div style="font-style:italic; color:#e5c158; background:#1a1a1a; padding:15px; border-radius:4px; border-left:3px solid var(--accent-gold);">"${q.conversational}"</div></div>
+                            <div class="tab-content" data-tab="deepdive">${q.deepdive}</div>
+                            <div class="tab-content" data-tab="notes"><span style="color:#4ecdc4;"><strong>Delivery Coaching Note:</strong></span><br>${q.coaching}<br><br><span style="color:#ff6b6b;"><strong>Fatal Red Flag Boundary:</strong></span><br>${q.redFlag}</div>
+                        </div>
+                        <button class="btn-action" onclick="openPracticeModal('${q.id}', 'question')">Practice Live Verbalization →</button>
+                    </div>`;
+            });
+        }
+
+        function toggleCardTab(event, tabName) {
+            const container = event.target.closest('.tabs-container');
+            container.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            container.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            event.target.classList.add('active');
+            container.querySelector(`.tab-content[data-tab="${tabName}"]`).classList.add('active');
+        }
+
+        let recognition, isRecording = false, activeItemId = null, activeItemType = null;
+
+        function openPracticeModal(id, type) {
+            activeItemId = id; activeItemType = type;
+            let sourceItem = type === 'case' ? SPRINT_CASES.find(c => c.id === id) : SPRINT_QUESTIONS.find(q => q.id === id);
+            if (!sourceItem) return;
+            document.getElementById('practice-modal').classList.add('active');
+            document.getElementById('modal-title-header').innerText = type === 'case' ? 'Case Structuring Sprint' : 'Verbalization Sprint';
+            document.getElementById('modal-item-title').innerText = type === 'case' ? sourceItem.title : sourceItem.category;
+            document.getElementById('modal-context-label').innerText = type === 'case' ? 'Interviewer Case Prompt:' : 'Target Interview Question:';
+            document.getElementById('modal-prompt-text').innerText = type === 'case' ? sourceItem.interviewerPrompt : sourceItem.question;
+            document.getElementById('transcription-box').value = '';
+            document.getElementById('filler-words').innerText = 'Filler Words: 0';
+            document.getElementById('ai-prompt-output').style.display = 'none';
+            resetAnswerTimer();
+            lastFocusedElement = document.activeElement;
+            document.getElementById('btn-record').focus();
+        }
+
+        let lastFocusedElement = null;
+        function closeModal() { document.getElementById('practice-modal').classList.remove('active'); if (isRecording) stopRecordingEngine(); stopAnswerTimer(); if (lastFocusedElement) lastFocusedElement.focus(); }
+
+        function toggleRecordingEngine() {
+            if (!isRecording) {
+                if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) { alert("Requires Chrome/Edge browser speech engine."); return; }
+                const SpeechClass = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechClass(); recognition.continuous = true; recognition.interimResults = true; recognition.lang = 'en-US';
+                recognition.onresult = function(event) {
+                    let finalSegment = '';
+                    for (let i = event.resultIndex; i < event.results.length; ++i) { if (event.results[i].isFinal) finalSegment += event.results[i][0].transcript; }
+                    if (finalSegment) { const box = document.getElementById('transcription-box'); box.value += finalSegment + ' '; countTrackedFillers(box.value); }
+                };
+                // Chrome ends recognition on its own after silence or transient
+                // network errors. While the user still intends to record, restart
+                // instead of dying silently with a stale "Stop Recording" button.
+                recognition.onend = function() {
+                    if (isRecording) {
+                        try { recognition.start(); }
+                        catch (e) { stopRecordingEngine(); }
+                    }
+                };
+                recognition.onerror = function(event) {
+                    if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                        stopRecordingEngine();
+                        alert("Microphone access is blocked. Allow mic access for this site in your browser settings, then restart the recording.");
+                    }
+                    // 'no-speech', 'network', 'aborted' fall through to onend,
+                    // which restarts the session while isRecording is true.
+                };
+                recognition.start(); document.getElementById('btn-record').innerText = "🛑 Stop Recording"; document.getElementById('recording-status').style.display = "inline-flex"; isRecording = true; startAnswerTimer();
+            } else { stopRecordingEngine(); }
+        }
+
+        function stopRecordingEngine() { isRecording = false; if (recognition) recognition.stop(); document.getElementById('btn-record').innerText = "🎙️ Start Spoken Answer"; document.getElementById('recording-status').style.display = "none"; stopAnswerTimer(); }
+
+        function countTrackedFillers(text) {
+            const singles = ['um', 'uh', 'like', 'basically', 'actually'];
+            const phrases = [/\byou know\b/g, /\bsort of\b/g, /\bkind of\b/g];
+            const lower = text.toLowerCase();
+            let score = 0;
+            lower.split(/\s+/).forEach(p => { if (singles.includes(p.replace(/[^a-z]/g, ''))) score++; });
+            phrases.forEach(re => { const m = lower.match(re); if (m) score += m.length; });
+            document.getElementById('filler-words').innerText = `Filler Words: ${score}`;
+        }
+
+        /* ---- 2-minute answer timer (starts with recording) ---- */
+        const TIMER_LIMIT_SECONDS = 120;
+        let timerInterval = null, timerRemaining = TIMER_LIMIT_SECONDS;
+
+        function renderAnswerTimer() {
+            const el = document.getElementById('timer-display');
+            const overtime = timerRemaining < 0;
+            const t = Math.abs(timerRemaining);
+            const mm = Math.floor(t / 60), ss = String(t % 60).padStart(2, '0');
+            el.innerText = overtime ? `⏱ +${mm}:${ss} over` : `⏱ ${mm}:${ss}`;
+            el.style.color = overtime ? 'var(--mbb-red, #ff3333)' : (timerRemaining <= 30 ? 'var(--accent-gold)' : 'var(--text-muted)');
+        }
+
+        function startAnswerTimer() {
+            stopAnswerTimer();
+            timerRemaining = TIMER_LIMIT_SECONDS;
+            renderAnswerTimer();
+            timerInterval = setInterval(() => { timerRemaining--; renderAnswerTimer(); }, 1000);
+        }
+
+        function stopAnswerTimer() { if (timerInterval) { clearInterval(timerInterval); timerInterval = null; } }
+
+        function resetAnswerTimer() { stopAnswerTimer(); timerRemaining = TIMER_LIMIT_SECONDS; renderAnswerTimer(); }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && document.getElementById('practice-modal').classList.contains('active')) closeModal();
+        });
+
+function triggerAIFeedbackPayload() {
+    let item = activeItemType === 'case' ? SPRINT_CASES.find(c => c.id === activeItemId) : SPRINT_QUESTIONS.find(q => q.id === activeItemId);
+    const userSpeech = document.getElementById('transcription-box').value;
+    if (!item) return;
+
+    let payload = `
+[CONSULTING / MBB INTERVIEW COACHING — ECCLES MBA MODULE]
+Evaluate the candidate response to the following consulting tracking prompt using partner-level standards:
+
+${activeItemType === 'case' ? `CASE SCENARIO: ${item.title}\nPROMPT EXPECTATION: "${item.interviewerPrompt}"\nIDEAL FRAMEWORK PATH: "${item.suggestedStructure}"` : `INTERVIEW PROMPT: "${item.question}"\nEXPECTED MODEL DELIVERY: "${item.conversational}"`}
+
+CANDIDATE AUDIO TRANSCRIPT INPUT:
+"${userSpeech || "[No transcript provided. Evaluate parameters and provide an elite baseline model response.]"}"
+
+Provide deep structured metrics using exactly this markdown output schema:
+
+**What Worked**
+[Detail 1-2 key operational strengths from what the candidate said.]
+
+**Top 2 Areas for Improvement**
+1. [Identify the primary gap versus an elite MBB delivery and give specific replacement phrasing.]
+2. [Identify any logical gaps, calculation slips, or structural blind spots.]
+
+**Advanced Consulting Power Move**
+[Provide one custom partner-level business insight or analytical variable tailored to this specific scenario context.]
+
+**Dashboard Scorecard Matrix**
+Assign exactly one rubric score (1. Emerging | 2. Developing | 3. Interview-Ready | 4. MBB-Caliber) for each applicable competency based on this specific performance:
+* Case Structuring: [Score]
+* Business Judgment: [Score]
+* Math Accuracy: [Score]
+* Synthesis: [Score]
+* Fit / PEI Storytelling: [Score]
+* Executive Presence: [Score]
+* Communication Clarity: [Score]
+* Recommendation Strength: [Score]
+    `;
+
+    document.getElementById('ai-copy-text').innerText = payload.trim();
+    document.getElementById('ai-prompt-output').style.display = 'block';
+}
+
+        function copyPayloadToClipboard() { navigator.clipboard.writeText(document.getElementById('ai-copy-text').innerText); alert("Payload packed to clipboard!"); }
+        window.onload = () => { populateSprintArchitecture(); };
+    </script>
+</body>
+</html>
