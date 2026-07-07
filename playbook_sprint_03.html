@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eccles MBA — Consulting Practice Sprint 3</title>
+    <style>
+        :root {
+            --primary-red: #CC0000;
+            --accent-gold: #c9a84c;
+            --bg-dark: #121212;
+            --bg-card: #1e1e1e;
+            --bg-sidebar: #0a0a0a;
+            --text-main: #f5f5f5;
+            --text-muted: #a0a0a0;
+            --border-color: #333333;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            font-family: var(--font-family);
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* PERMANENT GLOBAL SIDEBAR */
+        aside {
+            width: 320px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            padding: 0 24px 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 15px;
+        }
+
+        .brand h2 {
+            color: var(--primary-red);
+            margin: 0 0 5px 0;
+            font-size: 1.3rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .brand p {
+            color: var(--accent-gold);
+            margin: 0;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .nav-label {
+            padding: 10px 24px 5px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        aside a {
+            text-decoration: none;
+            color: var(--text-muted);
+            padding: 12px 24px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-left: 4px solid transparent;
+        }
+
+        aside a:hover, aside a.active {
+            background-color: rgba(204, 0, 0, 0.1);
+            color: var(--primary-red);
+            border-left-color: var(--primary-red);
+        }
+
+        .count-badge {
+            background-color: #2a2a2a;
+            color: var(--accent-gold);
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        main {
+            flex: 1;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            background-color: rgba(18, 18, 18, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title-area h1 { margin: 0; font-size: 1.25rem; font-weight: 700; }
+        .header-subtitle { margin: 2px 0 0 0; font-size: 0.85rem; color: var(--accent-gold); text-transform: uppercase; letter-spacing: 1px; }
+
+        /* HORIZONTAL LOCAL TOOLBAR VIEW TOGGLE */
+        .local-toolbar {
+            background-color: #161616;
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 40px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .toolbar-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toolbar-btn:hover, .toolbar-btn.active {
+            background-color: rgba(204, 0, 0, 0.1);
+            color: white;
+        }
+
+        .section-container { padding: 40px; max-width: 1300px; width: calc(100% - 80px); margin: 0 auto; display: none; }
+        .section-container.active { display: block; }
+        .hero { margin-bottom: 40px; border-bottom: 1px solid var(--border-color); padding-bottom: 30px; }
+        .track-pill { display: inline-block; background-color: rgba(201, 168, 76, 0.1); color: var(--accent-gold); padding: 5px 14px; border-radius: 4px; font-size: 0.8rem; text-transform: uppercase; font-weight: 700; margin-bottom: 15px; letter-spacing: 1px; }
+        .hero h2 { font-size: 2.5rem; margin: 0 0 15px 0; font-weight: 800; }
+        .description { color: var(--text-muted); line-height: 1.6; font-size: 1.1rem; max-width: 900px; margin: 0; }
+        .content-grid { display: grid; grid-template-columns: 1fr; gap: 25px; }
+        .card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 28px; transition: all 0.25s ease; position: relative; }
+        .card-header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+        .card-title { font-size: 1.5rem; margin: 0; font-weight: 700; color: var(--text-main); }
+        .tag-row { display: flex; gap: 10px; margin-top: 5px; }
+        .badge { font-size: 0.75rem; padding: 4px 10px; border-radius: 4px; font-weight: bold; text-transform: uppercase; }
+        .badge-category { background-color: rgba(201, 168, 76, 0.1); color: var(--accent-gold); }
+        .badge-difficulty { background-color: rgba(204, 0, 0, 0.1); color: var(--primary-red); }
+
+        .content-block { margin-top: 15px; background-color: #161616; padding: 15px 20px; border-radius: 6px; border-left: 3px solid #333; }
+        .content-block-title { font-size: 0.85rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; letter-spacing: 0.5px; }
+        .content-block-text { font-size: 0.95rem; line-height: 1.5; color: #e0e0e0; white-space: pre-line; }
+
+        .tabs-container { margin-top: 20px; }
+        .tab-headers { display: flex; border-bottom: 1px solid var(--border-color); gap: 10px; }
+        .tab-btn { background: none; border: none; color: var(--text-muted); padding: 10px 15px; cursor: pointer; font-size: 0.9rem; font-weight: 600; transition: all 0.2s; border-bottom: 2px solid transparent; }
+        .tab-btn.active { color: var(--primary-red); border-bottom-color: var(--primary-red); }
+        .tab-content { display: none; padding: 15px 5px; font-size: 0.95rem; line-height: 1.5; }
+        .tab-content.active { display: block; }
+
+        .btn-action { background-color: var(--primary-red); color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-weight: 700; font-size: 0.9rem; transition: background-color 0.2s; display: inline-flex; align-items: center; gap: 8px; margin-top: 15px; }
+        .btn-action:hover { background-color: #a00000; }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .modal.active { display: flex; }
+        .modal-content { background-color: var(--bg-card); width: 90%; max-width: 850px; max-height: 85vh; overflow-y: auto; padding: 35px; border-radius: 8px; border: 1px solid var(--primary-red); position: relative; }
+        .close-modal { position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--text-muted); font-size: 2rem; cursor: pointer; }
+        textarea { width: 100%; box-sizing: border-box; height: 160px; background-color: #121212; color: white; border: 1px solid var(--border-color); border-radius: 4px; padding: 15px; margin-top: 15px; font-family: var(--font-family); font-size: 1rem; line-height: 1.5; resize: vertical; }
+        .copy-box { background-color: #121212; padding: 20px; border-left: 4px solid var(--accent-gold); font-family: monospace; margin-top: 15px; white-space: pre-wrap; font-size: 0.9rem; color: #dcdcdc; max-height: 250px; overflow-y: auto; }
+        .recording-indicator { display: none; color: var(--primary-red); font-weight: 700; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <!-- PERMANENT GLOBAL SIDEBAR -->
+    <aside>
+        <div class="brand">
+            <h2>Eccles MBA</h2>
+            <p>Consulting Command Center</p>
+        </div>
+        <div class="nav-label">Core Directory</div>
+        <a href="./index.html">Ecosystem Dashboard</a>
+        <a href="./playbook_frameworks.html">20 Case Frameworks</a>
+        <a href="./playbook_math.html">15 Analytics Math Drills</a>
+        <a href="./playbook_battlecard.html">MBB Battlecard Vault</a>
+        
+        <div class="nav-label">Practice Sprints</div>
+        <a href="./playbook_sprint_01.html">Sprint 1: Profitability</a>
+        <a href="./playbook_sprint_02.html">Sprint 2: M&A Strategy</a>
+        <a href="./playbook_sprint_03.html" class="active">Sprint 3: Operations</a>
+        <a href="./playbook_sprint_04.html">Sprint 4: Tech & SaaS</a>
+        <a href="./playbook_sprint_05.html">Sprint 5: GTM & Pricing</a>
+        <a href="./playbook_sprint_06.html">Sprint 6: Capstones</a>
+    </aside>
+
+    <main>
+        <header>
+            <div class="header-title-area">
+                <h1 id="header-display-title">Sprint 3: Case Prompts</h1>
+                <div class="header-subtitle">Supply Chain, Operations, and Cost Restructuring</div>
+            </div>
+        </header>
+
+        <!-- HORIZONTAL TOOLBAR VIEW TOGGLE -->
+        <div class="local-toolbar">
+            <button class="toolbar-btn active" id="btn-cases" onclick="switchView('cases-view', this)">MBB Case Prompts <span class="count-badge">5</span></button>
+            <button class="toolbar-btn" id="btn-questions" onclick="switchView('questions-view', this)">Paired Question Bank <span class="count-badge">20</span></button>
+        </div>
+
+        <!-- VIEW: CASES -->
+        <section id="cases-view" class="section-container active">
+            <div class="hero">
+                <span class="track-pill">Operations Strategy Block</span>
+                <h2>MBB Case Prompt Library</h2>
+                <p class="description">Master physical value chains, capacity constraints, manufacturing variance, and cost diagnostics across 5 high-impact corporate operations cases.</p>
+            </div>
+            <div class="content-grid" id="cases-anchor"></div>
+        </section>
+
+        <!-- VIEW: QUESTIONS -->
+        <section id="questions-view" class="section-container">
+            <div class="hero">
+                <span class="track-pill">Operations Logic Block</span>
+                <h2>Paired Question Bank</h2>
+                <p class="description">20 professional consulting questions engineered to test operational mechanics, process engineering terminology, and quantitative communication metrics.</p>
+            </div>
+            <div class="content-grid" id="questions-anchor"></div>
+        </section>
+
+        <!-- Global Interactive Modal Canvas -->
+        <div id="practice-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title-header">
+            <div class="modal-content">
+                <button class="close-modal" onclick="closeModal()" aria-label="Close practice modal">×</button>
+                <h2 style="color: var(--primary-red); margin-top: 0;" id="modal-title-header">Interactive Practice Arena</h2>
+                <h3 id="modal-item-title" style="color: var(--accent-gold); margin: 5px 0 15px 0;"></h3>
+                
+                <div style="background-color: #252525; padding: 15px; border-radius: 6px; border-left: 3px solid var(--primary-red);">
+                    <span style="font-size: 0.8rem; text-transform: uppercase; font-weight: 800; color: var(--text-muted); display: block;" id="modal-context-label">Context Prompt:</span>
+                    <p id="modal-prompt-text" style="margin: 5px 0 0 0; font-size: 1rem; line-height: 1.5; color: #fff;"></p>
+                </div>
+                
+                <div style="margin-top: 15px; display: flex; gap: 15px; align-items: center;">
+                    <button class="btn-action" onclick="toggleRecordingEngine()" id="btn-record">🎙️ Start Spoken Answer</button>
+                    <span class="recording-indicator" id="recording-status" role="status">🔴 Audio Pipeline Live...</span>
+                    <div id="filler-words" aria-live="polite" style="font-size: 0.9rem; font-weight:600; color:var(--accent-gold);">Filler Words: 0</div>
+                    <div id="timer-display" style="font-size: 0.9rem; font-weight:700; color:var(--text-muted); margin-left:auto;">⏱ 2:00</div>
+                </div>
+                
+                <textarea id="transcription-box" aria-label="Live speech transcript" placeholder="Your live recording speech transcript will populate here..."></textarea>
+                <button class="btn-action" style="background-color: var(--accent-gold); color: black; width: 100%; justify-content: center;" onclick="triggerAIFeedbackPayload()">Generate Rigorous AI Coaching Prompt</button>
+                
+                <div id="ai-prompt-output" style="display: none;">
+                    <p style="margin-top: 20px; font-weight: 700; font-size: 0.95rem;">Copy this payload directly into your AI assistant for partner-grade processing:</p>
+                    <div class="copy-box" id="ai-copy-text"></div>
+                    <button class="btn-action" onclick="copyPayloadToClipboard()">Copy Payload to Clipboard</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const SPRINT_CASES = [
+            {
+                id: "s3_case_01",
+                caseType: "Cost reduction",
+                difficulty: "Advanced",
+                title: "Global Petrochemical Plant Cost Rationalization",
+                clientContext: "Our client is a tier-1 global industrial chemical conglomerate. Severe commodity price shifts for crude naphtha feedstocks have squeezed their primary output margins, turning their flagship refinery from a historic 14% profit engine into a net negative 2% cash drain.",
+                interviewerPrompt: "The Head of Global Operations mandates a $40M reduction in localized annualized operational costs without compromising standard plant safety metrics. How do you structure your diagnostic review?",
+                candidateObjectives: "1. Separate fixed facility expenditures from variable energy and throughput inputs.\n2. Quantify efficiency leaks across catalytic chemical conversion workflows.\n3. Identify external logistics procurement volumes and contract consolidation targets.",
+                clarifyingQuestions: "Has the plant's production throughput dropped over this 12-month window, or are we processing identical volumes at an inflated cost profile? Secondly, are energy utilities sourced via variable spot markets or long-term fixed power purchase agreements?",
+                suggestedStructure: "Value Chain Cost Scaffolding:\n- Direct Sourcing & Variable Inputs: Naphtha feedstock pricing layers, catalytic breakdown yields, energy conversion efficiency parameters.\n- Factory Conversion Operations: Machine downtime, maintenance labor setups, raw material processing scrap indexes.\n- Outbound Supply Network: Freight lane densities, storage terminal leasing architectures, bulk distribution scales.",
+                keyBusinessIssues: "Legal chemical ovens operate at 68% heat-retention efficiency versus a modern 85% technical benchmark; outbound transport relies on un-optimized spot freight lanes costing 40% above long-term contract rates.",
+                mathRequired: "Calculate absolute financial savings realized if heat yield optimization cuts plant natural gas consumption volumes by 15%.",
+                sampleDataOrExhibit: "Exhibit 1: Annual Refinery Cost Allocation Base:\n- Feedstock Sourcing: $120M\n- Plant Utilities/Gas Energy: $80M\n- Direct Plant Labor: $60M\n- Logistics & Freight Distribution: $40M",
+                strongAnswerPath: "The candidate skips standard headcount reductions to target the massive energy cost bucket ($80M). They calculate that fixing the chemical ovens' heat efficiency yields the highest immediate impact, and recommend moving spot transport into fixed contracts to capture the remaining savings.",
+                finalRecommendation: "Launch an immediate thermal engineering insulation upgrade to lower gas energy spend by 15%, transition 80% of spot outbound freight distribution into competitive multi-year logistics SLAs, and optimize catalyst recycling pipelines to lower input costs.",
+                coachingNotes: "Remind candidates that high-value industrial turnarounds are driven by engineering economics and thermal efficiencies, not simple office headcount cuts.",
+                redFlags: "Proposing broad administrative layoffs or corporate marketing adjustments to fix a deep asset-heavy chemical energy efficiency crisis."
+            },
+            {
+                id: "s3_case_02",
+                caseType: "Operations improvement",
+                difficulty: "Expert",
+                title: "EV Automotive Assembly Line Throughput Bottleneck",
+                clientContext: "An electric vehicle automotive startup has secured 50,000 advanced consumer orders but is missing its manufacturing run rates. The main production facility averages an unacceptable 22% time-variance across vehicle chassis assembly stages.",
+                interviewerPrompt: "The COO needs to find the exact operational constraint holding back the line and wants an execution plan to hit a steady 45-second cycle-time target per chassis. How do you locate the bottleneck?",
+                candidateObjectives: "1. Audit workstation capacities to isolate the single gating asset (Theory of Constraints).\n2. Isolate individual labor process movements from automated robotic cycle speeds.\n3. Design a low-cost production layout realignment to eliminate line stoppages.",
+                clarifyingQuestions: "What are the standalone maximum design capacities per hour for each of the four primary sequential assembly line zones?",
+                suggestedStructure: "Manufacturing Flow Diagram Architecture:\n- Station 1: Robotic Steel Stamping & Frame Initialization.\n- Station 2: Automated Structural Battery Pack Integration.\n- Station 3: Manual Cabin Interior & Electronics Harnessing.\n- Station 4: Final Paint Layering & Inspection Alignment.",
+                keyBusinessIssues: "Station 3 features high manual complexity; temporary worker fatigue slows down work cycles during the second half of shifts, creating a backlog that shuts down Station 1 and 2.",
+                mathRequired: "Apply Little's Law to calculate work-in-progress levels and find the daily vehicle throughput loss caused by a 15-second delay at the manual workstation.",
+                sampleDataOrExhibit: "Exhibit 2: Standalone Hourly Station Production Capacities:\n- Frame Stamping: 85 chassis/hr\n- Battery Integration: 80 chassis/hr\n- Manual Cabin Harnessing: 42 chassis/hr\n- Paint & Inspection: 75 chassis/hr",
+                strongAnswerPath: "The candidate identifies that Manual Cabin Harnessing is the clear bottleneck node (42 chassis/hour). They focus all optimization efforts on this single constraint, rejecting changes to stamping or painting because modifying non-bottleneck zones will not increase overall factory output.",
+                finalRecommendation: "Divide the manual harnessing station into two parallel sub-stations to instantly double throughput capacity, implement kitted parts-delivery trays to minimize worker movement times, and add automated assistance tools to reduce fatigue.",
+                coachingNotes: "Candidates must know manufacturing physics cold. To increase output, you must identify and optimize the single gating bottleneck, and nothing else.",
+                redFlags: "Suggesting purchasing more automated software or expensive upgrades for robotic stamping blocks when the bottleneck is entirely located at the manual assembly station."
+            },
+            {
+                id: "s3_case_03",
+                caseType: "Supply chain optimization",
+                difficulty: "Core",
+                title: "Biologics Cold-Chain Pharmaceutical Freight Realignment",
+                clientContext: "Our client is a global life sciences innovator producing a highly sensitive specialized biologic oncology treatment. The product requires a strict cold-chain transit environment of exactly 2 to 8 degrees Celsius from factory to healthcare providers.",
+                interviewerPrompt: "The client faces an alarming 4.5% product spoilage rate during international distribution, leading to multi-million dollar waste and critical supply shortages. How do you realign their freight network?",
+                candidateObjectives: "1. Map the complete end-to-end global supply chain to isolate where temperature drops occur.\n2. Evaluate third-party logistics (3PL) carrier compliance performance metrics.\n3. Design a data-tracked distribution framework to bring spoilage below 0.5%.",
+                clarifyingQuestions: "Do the temperature variations occur during long-haul air transit, or do they happen during airport customs clearance periods and regional warehouse transfers?",
+                suggestedStructure: "Cold-Chain Logistics Framework:\n- Manufacturing & Packaging: Packaging validation, thermal monitoring device setups.\n- Primary International Transit: Long-haul air carrier compliance, tarmac exposure windows.\n- Customs Clearances & Logistics Hubs: Bonded cold-storage terminal access, customs documentation speed.\n- Last-Mile Regional Delivery: Specialized courier capabilities, local provider delivery protocols.",
+                keyBusinessIssues: "Shipments face average tarmac delays of 4 hours at international hubs without active temperature controls; customs clearance documents are manually processed, extending exposure times.",
+                mathRequired: "Calculate the net profit protection achieved by replacing standard packaging with premium active-cooling containers, offsetting the higher container cost against lower spoilage losses.",
+                sampleDataOrExhibit: "Table 3: Supply Chain Spoilage Event Distribution Matrix:\n- Stage 1 (Factory to Airport): 5% of total events\n- Stage 2 (Tarmac & Customs Hold): 70% of total events\n- Stage 3 (Regional Hub Storage): 10% of total events\n- Stage 4 (Last-Mile Delivery): 15% of total events",
+                strongAnswerPath: "The candidate utilizes the data table to isolate tarmac and customs holds as the root cause of 70% of spoilage events. They design an operational fix centered on customs document digitization and booking flights only with 3PL carriers that guarantee climate-controlled storage access.",
+                finalRecommendation: "Transition to 100% digital customs pre-clearance protocols to eliminate tarmac hold times, switch to certified 3PL air carriers with temperature-controlled logistics, and embed IoT tracking devices for real-time monitoring.",
+                coachingNotes: "Guide candidates to follow the data. When 70% of a problem is in one operational stage, focus entirely on that block and ignore minor variables.",
+                redFlags: "Recommending re-negotiating raw material chemical input costs when the problem is entirely caused by logistical distribution failures."
+            },
+            {
+                id: "s3_case_04",
+                caseType: "Cost reduction",
+                difficulty: "Advanced",
+                title: "Global Hospitality Brand Shared Services Migration",
+                clientContext: "A premier international resort hotel platform has seen its total corporate SG&A overhead expand to a heavy 18% of aggregate revenue, while its core competitors maintain a lean 11% average baseline.",
+                interviewerPrompt: "The executive committee wants to consolidate core administrative functions across their four separate regional headquarters into a single global shared services model. How do you evaluate the feasibility of this transition?",
+                candidateObjectives: "1. Identify and remove redundant human resource, finance, and procurement systems.\n2. Quantify the capital investment needed to unify separate digital operating networks.\n3. Manage organizational friction and change management risks to protect business operations.",
+                clarifyingQuestions: "Are the four regional business units running on separate legacy software systems, or do they share a central technology network?",
+                suggestedStructure: "SG&A Consolidation Architecture:\n- Functional Task Audit: Group tasks into Transactional (payroll, billing) vs Strategic (asset management, regional positioning).\n- Centralization Economics: Labor cost differences, software license savings, upfront migration expenses.\n- Operational Risks: System downtime, drop in customer support speed, loss of local market insights.\n- Change Management Blueprint: Leadership assignment timelines, milestone tracking metrics.",
+                keyBusinessIssues: "Each region uses a different software platform, which prevents automated reporting; regional executives are pushing back against losing control over local headcount choices.",
+                mathRequired: "Calculate the multi-year payback period for a $60M shared services migration project against a targeted $15M annual structural cost reduction.",
+                sampleDataOrExhibit: "Exhibit 4: Current Regional Administrative Headcounts & Software Costs:\n- North America: 400 FTEs, $12M software costs\n- Europe: 300 FTEs, $10M software costs\n- Asia-Pacific: 250 FTEs, $6M software costs\n- Latin America: 150 FTEs, $4M software costs\n*Note: Blended cost per corporate employee averages $100,000/year across regions.*",
+                strongAnswerPath: "The candidate categorizes tasks to isolate high-volume transactional work (payroll, billing) as the best targets for automation. They recommend a phased migration to a single software platform, using a clear financial model to prove the project will achieve a 4-year payback window.",
+                finalRecommendation: "Establish a single global shared services hub in a lower-cost region to handle all transactional accounting and HR tasks, standardize operations on a single unified software platform, and implement clear service level agreements (SLAs) to hold the hub accountable.",
+                coachingNotes: "Ensure students understand organizational design. Operational excellence requires dividing high-volume repetitive tasks from high-value localized strategic work.",
+                redFlags: "Suggesting immediate flat headcount cuts across all regions without first standardizing the underlying software platforms to enable that efficiency."
+            },
+            {
+                id: "s3_case_05",
+                caseType: "Operations improvement",
+                difficulty: "Expert",
+                title: "Mega-Container Port Terminal Dwell-Time Congestion",
+                clientContext: "A major commercial sea container port terminal is experiencing severe congestion. Average ship dwell times have increased by a costly 4 days over the past year, resulting in expensive maritime carrier fines and delayed supply chains.",
+                interviewerPrompt: "The Port Authority needs an immediate optimization plan to maximize daily container crane lift velocities and clean up yard storage congestion. How do you approach this asset utilization challenge?",
+                candidateObjectives: "1. Track container movement metrics from ship arrival to truck gate exit.\n2. Identify physical spacing bottlenecks across crane, stacking, and truck loading zones.\n3. Optimize truck slot booking systems to smooth out daily terminal traffic patterns.",
+                clarifyingQuestions: "Is the congestion caused by a shortage of physical container cranes, or are cranes slowing down because the yard lacks open space to stack incoming containers?",
+                suggestedStructure: "Port Logistics Yard Scaffolding:\n- Ship-to-Shore Offloading: Crane speed, operator scheduling, crane maintenance downtime.\n- Yard Container Stacking Operations: Stacking density limits, container rearrangement time patterns, specialized handling equipment availability.\n- Gate Pick-up Logistics: Truck queue times, gate clearance documentation speed, chassis equipment supply.",
+                keyBusinessIssues: "Import containers sit in high-value yard space for an average of 9 days because local import firms use the port as cheap storage; this inventory backup forces crane operators to constantly move containers around to reach specific units, slowing down unloading speeds.",
+                mathRequired: "Calculate yard capacity improvements if container storage duration limits drop from 9 days to 4 days.",
+                sampleDataOrExhibit: "Exhibit 5: Container Processing Times & Yard Stacking Statistics:\n- Total Daily Crane Design Capacity: 8,000 container lifts\n- Actual Realized Daily Lift Performance: 4,800 container lifts\n- Yard Spacing Utilization Rate: 94% of total capacity\n*Note: Crane operators spend 45% of total time moving containers around to clear paths for specific units.*",
+                strongAnswerPath: "The candidate connects the dots: the port doesn't need more expensive cranes; it needs to clear out the yard. At 94% utilization, operators waste half their time moving containers out of the way. Unlocking yard space will instantly restore crane speeds to design capacity.",
+                finalRecommendation: "Implement high congestion storage fees after 72 hours to force importers to pick up containers quickly, launch a digital truck appointment system to smooth out gate congestion, and re-zone yard space to separate long-term containers from fast-moving units.",
+                coachingNotes: "Look for candidates who can separate asset capacity from asset utilization barriers. High utilization of storage space often destroys the processing velocity of operational machinery.",
+                redFlags: "Recommending an immediate capital investment in expensive new sea cranes when current cranes are running at just 60% of design capacity."
+            }
+        ];
+
+        const SPRINT_QUESTIONS = [
+            { id: "s3_q_01", category: "Operations, Supply Chain, and Transformation Cases", difficulty: "Core", question: "Explain the strategic trade-offs a manufacturing enterprise faces when transitioning from a 'Just-in-Time' (JIT) inventory model to a 'Just-in-Case' (JIC) safety stock configuration.", conversational: "This is a classic operational balance between cost efficiency and network resilience. A Just-in-Time model maximizes capital efficiency and minimizes warehouse holding expenses by bringing components to the factory floor exactly when they are needed. However, it leaves the company exposed to supply chain shocks. Transitioning to a Just-in-Case model increases safety stock to protect production against vendor delays or transport disruptions, but it locks up cash in inventory and expands warehouse holding costs across the footprint.", deepdive: "JIT works flawlessly in low-volatility environments with reliable infrastructure. JIC acts as insurance, sacrificing near-term return on invested capital (ROIC) to protect against catastrophic facility closures during macro supply chain breakdowns.", coaching: "Use precise operations vocabulary. Mention terms like 'working capital optimization,' 'safety stock variations,' and 'supply chain resilience' to build professional credibility.", redFlag: "Claiming that holding more inventory is always a mistake, which completely ignores the cost of factory closures during supply chain disruptions." },
+            { id: "s3_q_02", category: "Consulting Fit & Motivation", difficulty: "Core", question: "Why does our firm's Operations and Supply Chain practice group appeal to your professional goals over joining a corporate logistics track?", conversational: "Working within a single corporate logistics team means optimizing a specific, established asset footprint over an extended multi-year horizon. I prefer the fast-paced nature of consulting, where I can jump into diverse, high-stakes operational turnarounds across multiple sectors. Consulting allows me to act as an objective transformation catalyst—helping client executive teams redesign global supply chains, remove complex plant bottlenecks, and apply the 80/20 rule to solve structural margin crises.", deepdive: "This prompt tests your understanding of the consultant role. You must show an appreciation for high-impact project advisory work over long-term single-company line management execution.", coaching: "Highlight your problem-solving adaptability. Explain how your skills allow you to quickly diagnose efficiency leaks across completely different business verticals.", redFlag: "Focusing entirely on travel opportunities or firm prestige rather than detailing a genuine passion for solving complex operational challenges." },
+            { id: "s3_q_03", category: "Data Interpretation, Charts, and Exhibits", difficulty: "Advanced", question: "If an operations exhibit shows a production plant's overall equipment effectiveness (OEE) is at 85% but its overall volume yield is falling, what levers would you check?", conversational: "I would check three operational levers. Since OEE balances availability, performance, and quality, a strong 85% score combined with falling net output suggests an issue with raw material input quality or scrap rates. First, I'd check raw material spec consistency to see if bad inputs are causing high scrap rates at the end of the line. Second, I'd look at downstream sorting bottlenecks that force workers to slow the line down. Third, I'd check for measurement gaps in how the plant tracks waste metrics.", deepdive: "OEE can look healthy if a machine runs at top speeds, but if it is processing low-quality raw inputs, the final output will drop due to downstream sorting rejections.", coaching: "Break down the metric. Show you know that OEE contains Availability, Performance, and Quality parameters, and isolate how input variance alters the final yield.", redFlag: "Recommending purchasing more machinery before understanding why current equipment is failing to turn inputs into high-quality final products." },
+            { id: "s3_q_04", category: "Consulting Math & Business Judgment", difficulty: "Advanced", question: "A factory produces 200,000 units per year with a fixed overhead of $4M. The variable unit cost is $30. A Lean automation project will add $1M in fixed annual depreciation costs but will cut variable unit expenses by 30%. Calculate the net savings.", conversational: "Let's run the operational economics. Current variable costs are $30 per unit, which totals $6M for 200,000 units. Adding $4M in fixed costs brings our baseline to $10M. The automation upgrade reduces the variable unit cost by 30%, which is a $9 savings per unit, lowering total variable costs by $1.8M down to $4.2M. Factoring in the $1M increase in fixed costs means our net annual operational savings are exactly $800,000.", deepdive: "This problem tests your understanding of cost tradeoffs. Increasing fixed depreciation to lower variable unit costs requires a clear volume baseline to achieve positive returns.", coaching: "Walk the interviewer through the calculations step-by-step: first calculate current total costs ($10M), then calculate the variable savings ($1.8M), and subtract the fixed cost increase ($1M) to reach the final $800,000 profit lift.", redFlag: "Applying the 30% savings rate directly to total operational expenses or failing to separate variable unit reductions from fixed capital updates." },
+            { id: "s3_q_05", category: "Personal Experience / Behavioral Interview", difficulty: "Advanced", question: "Tell me about a time you had to change an operational process when frontline employees were pushing back. How did you realign the team?", conversational: "At my previous logistics company, we introduced a automated inventory scanning system that our frontline facility team resisted because they felt it slowed down their packing routines. Instead of using a top-down mandate, I spent a shift working alongside them to find the friction points. I discovered the software required too many screen selections. I worked with engineering to simplify the interface down to a single click, which removed the delay, won over the team, and boosted facility tracking accuracy by 40%.", deepdive: "Frontline change management requires empathy, listening to operational feedback, and a willingness to adapt systems to match real floor workflows.", coaching: "Focus on your interpersonal strategy. Show how you listened to employee concerns and used collaborative system adjustments to build lasting operational alignment.", redFlag: "Claiming you resolved employee resistance simply by telling management to enforce the rules, which shows low emotional intelligence and weak leadership skills." },
+            { id: "s3_q_06", category: "Operations, Supply Chain, and Transformation Cases", difficulty: "Expert", question: "What is the concept of the 'Bullwhip Effect' in supply chain distribution networks, and how do you mitigate its impact?", conversational: "The bullwhip effect represents the progressive amplification of demand volatility as you move backward up the supply chain from the end consumer to primary raw material suppliers. A small shift in retail consumer demand forces retailers to over-order safety stock. Wholesalers and manufacturers repeat this pattern, causing suppliers to face massive, artificial demand spikes. We can mitigate this by integrating real-time retail point-of-sale data across all supply tiers, shortening production lead times, and using smaller batch sizes.", deepdive: "The bullwhip effect is driven by informational silos and batch-ordering habits. It creates expensive excess inventory backlogs and un-optimized factory production runs across the supply chain network.", coaching: "Isolate the root cause and provide clear mitigation steps. Focus your answer on 'data transparency integration' and 'lead-time compression models.'", redFlag: "Attributing demand volatility entirely to changing consumer preferences, ignoring the communication gaps that create artificial demand swings." },
+            { id: "s3_q_07", category: "Case Interview Fundamentals", difficulty: "Core", question: "Our manufacturing client faces a sudden 15% increase in direct material input costs. What are the operational steps to address this margin risk?", conversational: "I would structure our response around four operational tracks. First, procurement negotiations—consolidating our spend across fewer suppliers to secure volume discounts. Second, product engineering adjustments—checking if we can substitute cheaper alternative materials without reducing quality standards. Third, factory floor waste reduction—improving machine yields to get more out of our raw inputs. Fourth, logistics optimization—unifying inbound freight routes to cut transport costs.", deepdive: "Managing input cost inflation requires looking beyond simple price negotiation to optimize material use, product design, and distribution logistics across the value chain.", coaching: "Avoid simply suggesting raising prices. Show a consultant's mindset by focusing on internal operational improvements to offset external inflation pressures.", redFlag: "Assuming the client can easily pass 100% of cost increases on to customers, ignoring market competition and price sensitivity." },
+            { id: "s3_q_08", category: "Synthesis, Recommendation, and Executive Communication", difficulty: "Advanced", question: "Deliver a final 90-second executive recommendation to a manufacturing client on whether to close a legacy regional distribution hub.", conversational: "Our definitive recommendation is to proceed with closing the Atlanta regional distribution hub and consolidate operations into our modernized central facility. This choice is driven by three factors: First, a direct $4M annual reduction in fixed facility leasing and duplicate administrative costs. Second, inventory optimization—unifying safety stock under one roof to improve order fulfillment rates by 300 basis points. Third, low customer disruption—our logistics data confirms a central hub can still hit all 2-day delivery targets for 94% of our client base. The primary risk is carrier capacity constraints during peak periods, which we can mitigate by signing dedicated transport SLAs with regional freight lines. Next steps are to issue the lease termination notice and launch the inventory migration plan.", deepdive: "Elite meetings demand answer-first, quantified, structured summaries. Never review case history; lead with the final decision.", coaching: "Structure your final summary using the pyramid principle: state your recommendation first, support it with three clear pillars, provide a risk mitigation plan, and list immediate next steps.", redFlag: "Wandering through a loose list of case observations instead of delivering a bold, definitive operational decision." },
+            { id: "s3_q_09", category: "Consulting Fit & Motivation", difficulty: "Core", question: "How do you apply the 80/20 rule when analyzing an operational problem with overwhelming data but tight time deadlines?", conversational: "The 80/20 rule means focusing on the 20% of operational drivers that cause 80% of the business problems. In a fast-paced turnaround with massive datasets, I avoid chasing minor details. I build a high-level process map, segment costs or defects by absolute volume using a Pareto chart approach, and isolate the top two issues. This allows me to ignore the data noise and deliver actionable, high-impact recommendations to the client on schedule.", deepdive: "Consultants constantly manage information overflow. Success relies on prioritization—identifying and tracking the most critical metrics that dictate overall system behavior.", coaching: "Connect your explanation to a clear business framework. Mentioning 'Pareto distributions' or 'cost segmentation tracks' demonstrates a structured approach to problem solving.", redFlag: "Claiming you will read every single data row to achieve perfect certainty, which shows a lack of prioritization and leads to analysis paralysis." },
+            { id: "s3_q_10", category: "Case Interview Fundamentals", difficulty: "Advanced", question: "A client wants to consolidate its supplier network from 50 vendors down to just 3 strategic partners. What supply chain risks must they manage?", conversational: "They must manage three specific risk categories. First, single-point-of-failure exposure—if one partner experiences a factory fire or labor strike, our entire production line shuts down due to a lack of backup options. Second, loss of supplier pricing competition—reducing our long-term negotiation leverage once vendors realize we have no alternative outlets. Third, capacity limits—verifying the remaining 3 suppliers can handle our total volume expansion plans.", deepdive: "Supplier consolidation lowers administrative costs and secures volume discounts, but it dramatically elevates dependency risk and removes competitive pricing friction.", coaching: "Balance the benefits against the risks. Show how to de-risk the consolidation by recommending long-term capacity reservations and strict penalty clauses in vendor contracts.", redFlag: "Focusing entirely on purchasing discounts while completely ignoring the catastrophic operational risk of single-source disruptions." },
+            { id: "s3_q_11", category: "Operations, Supply Chain, and Transformation Cases", difficulty: "Expert", question: "What is 'Overall Equipment Effectiveness' (OEE) and how does it assist a consulting team in evaluating factory performance leaks?", conversational: "Overall Equipment Effectiveness is a comprehensive metric that measures how close a manufacturing asset is running to its true design potential. It is calculated by multiplying three factors: Availability, Performance, and Quality. It helps a consulting team because it looks past simple production totals to reveal hidden efficiency leaks—showing whether a factory is losing volume due to machine downtime, slow operating speeds, or high defect rates.", deepdive: "OEE standardizes efficiency analysis across asset-heavy operations, allowing consultants to identify and fix the root causes of production capacity drops.", coaching: "Break the formula down into its three components: Availability (runtime vs planned time), Performance (speed vs design target), and Quality (good units vs total units).", redFlag: "Confusing OEE with simple inventory turnover metrics or accounting asset depreciation schedules." },
+            { id: "s3_q_12", category: "Data Interpretation, Charts, and Exhibits", difficulty: "Core", question: "A process exhibit chart reveals that 80% of all customer delivery errors are caused by just two regional fulfillment warehouses. What is your immediate next step?", conversational: "This chart shows a classic Pareto distribution, which allows us to narrow our strategic focus. My immediate step is to bypass the high-performing warehouses and run an operational audit on those two underperforming facilities. I want to check for three root causes: localized workforce turnover rates, training gaps on sorting systems, or layout bottlenecks that lead to high picking errors under tight delivery windows.", deepdive: "Data prioritization prevents wasting time on healthy facilities. Isolate the operational outliers to locate and fix the root causes of localized efficiency leaks.", coaching: "State your data-driven prioritization strategy clearly: tell the interviewer you will focus 100% of your near-term analysis on the underperforming facilities to design targeted fixes.", redFlag: "Recommending an expensive nationwide retraining program for all warehouses when the data explicitly proves the issue is isolated to just two locations." },
+            { id: "s3_q_13", category: "Consulting Fit & Motivation", difficulty: "Advanced", question: "Tell me about a time you identified an unexpected operational bottleneck that was delaying a cross-functional project. How did you resolve it?", conversational: "During our product development loop, our launch timeline began slipping by two weeks because our marketing review phase consistently delayed the release. Instead of simply asking the team to work faster, I mapped the document approval path and found the bottleneck: all assets were stuck in a single vice president's email inbox for manual approval. I worked with the team to set up a digital tracking dashboard and delegated routine approvals to project managers, which cut review times by 70% and got our launch back on schedule.", deepdive: "Process bottlenecks exist in corporate administrative workflows just as they do on factory floors. Solving them requires clear process mapping and smart delegation systems.", coaching: "Structure your narrative around process improvement steps: detail how you mapped the workflow, located the single gating bottleneck, and redesigned the path to increase speed.", redFlag: "Blaming the executive for the delay without identifying and fixing the underlying process design flaw that caused the backlog." },
+            { id: "s3_q_14", category: "Case Interview Fundamentals", difficulty: "Advanced", question: "Our global retail client wants to outsource all warehouse shipping logistics to a third-party provider (3PL). What are the key operational tradeoffs?", conversational: "The choice balances cost flexibility against brand control. On the positive side, outsourcing converts high fixed real estate expenses into variable per-shipment fees, scales down corporate overhead, and leverages the 3PL's national delivery network. On the negative side, the client loses direct control over packaging quality, delivery speeds, and customer data, which risks hurting brand retention if the 3PL misses service targets.", deepdive: "Outsourcing logistics reduces capital expenditure requirements and builds operational agility, but it injects counterparty risk and creates organizational silos between production and delivery.", coaching: "Address customer experience management. Recommend structuring strict performance metrics and financial penalties into the 3PL contract to protect delivery standards.", redFlag: "Focusing entirely on near-term cost savings while ignoring the long-term risk of losing control over the customer delivery experience." },
+            { id: "s3_q_15", category: "Consulting Math & Business Judgment", difficulty: "Core", question: "A fleet company operates 1,000 trucks. Each truck averages 50,000 miles per year at an efficiency rating of 5 miles per gallon. If a dynamic software routing project improves fuel efficiency by 10%, calculate total annual fuel gallon savings.", conversational: "Let's calculate the logistics metrics in sequence. Current total fleet mileage is 1,000 trucks multiplied by 50,000 miles, which is 50 million miles per year. At 5 miles per gallon, the fleet consumes exactly 10 million gallons of fuel annually. Improving efficiency by 10% moves our rating to 5.5 miles per gallon. Dividing 50 million miles by 5.5 gallons yields roughly 9.09 million gallons. Therefore, the dynamic routing system saves the client approximately 910,000 gallons of fuel per year.", deepdive: "Logistics cost savings scale up rapidly across large vehicle fleets. Improving fuel efficiency metrics drops costs straight to the bottom line.", coaching: "Present your calculations clearly: find total fleet miles first, determine baseline fuel consumption, apply the efficiency lift, and deliver the final gallon savings.", redFlag: "Taking a simple 10% off the fuel efficiency rating and subtracting it from total miles, which is a mathematical logic error." },
+            { id: "s3_q_16", category: "Case Interview Fundamentals", difficulty: "Advanced", question: "An industrial manufacturing client wants to consolidate its production footprint by closing 3 of its 10 active assembly facilities. What capacity parameters must they verify first?", conversational: "They must verify three critical capacity metrics. First, remaining facility utilization capacity—confirming the remaining 7 factories have enough open asset space to absorb the 3 closing plants' volume. Second, tooling compatibility—ensuring equipment can process diverse product specs without long changeover delays. Third, regional labor supply—verifying remaining plants can scale up shifts without facing localized worker shortages.", deepdive: "Footprint consolidation saves fixed overhead costs, but pushing remaining facilities past 90% utilization risks creating production bottlenecks, extending customer lead times, and inflating labor overtime pay.", coaching: "Focus on asset capacity. Warn the interviewer that running factories at max capacity removes operational flexibility, making the network vulnerable to sudden machine failures.", redFlag: "Recommending facility closures based on corporate real estate values alone without checking if the remaining network can fulfill total market demand." },
+            { id: "s3_q_17", category: "Consulting Fit & Motivation", difficulty: "Expert", question: "What specific operational data sets or analytical approaches do you find most effective when diagnosing an underperforming client business model?", conversational: "I focus on unit economic granular data rather than high-level corporate income statements. I prioritize transaction logs, end-to-end process step cycle times, and facility asset utilization metrics. Breaking down data by product lines, customer cohorts, and processing nodes allows me to spot the exact friction points—revealing whether an underperforming business model is suffering from a structural margin problem or an operational bottleneck loop.", deepdive: "High-level accounting averages hide underlying operational issues. Success relies on granular data segmentation to find the specific products or nodes causing profit drops.", coaching: "Highlight your structured analytical approach: detail how you drill down into unit data fields to separate operational process errors from macro market shifts.", redFlag: "Relying on broad corporate statements or high-level summaries, which fails to expose the specific operational root causes of business drops." },
+            { id: "s3_q_18", category: "Personal Experience / Behavioral Interview", difficulty: "Core", question: "Tell me about a time you had to balance competing priorities across departments to deliver a major operational upgrade. What was your communication strategy?", conversational: "During our inventory software upgrade, our procurement team wanted to deploy all features on day one to maximize data capture, while our warehouse team wanted a slow, phased release to prevent shipping delays. I brought both directors together and refocused the conversation on a shared metric: keeping daily customer shipments on track. We designed a phased rollout strategy that launched non-critical data tracking first, keeping shipping running smoothly while hitting our data goals on time.", deepdive: "Cross-departmental projects require finding shared business goals to resolve competing priorities, build collaboration, and prevent operational silos.", coaching: "Emphasize your communication strategy: focus on how you brought departments together around a shared metric to resolve conflicting goals and build alignment.", redFlag: "Choosing one department's priorities entirely over another without creating a balanced plan, which creates long-term organizational silos." },
+            { id: "s3_q_19", category: "Case Interview Fundamentals", difficulty: "Advanced", question: "A commercial aviation client wants to transition to a predictive maintenance model using connected IoT sensors across its aircraft fleet. What are the operational challenges?", conversational: "They face three major operational adjustments. First, data orchestration scale—managing the massive volume of real-time sensor streams and connecting them with legacy engineering systems. Second, inventory repositioning rules—moving spare parts to regional hubs based on predictive alerts before components actually fail. Third, maintenance tech training—ensuring mechanics adopt the software alerts rather than relying on manual inspection schedules.", deepdive: "Predictive asset maintenance reduces unplanned aircraft groundings and extends component lifecycles, but it requires deep data infrastructure and a highly responsive parts supply chain.", coaching: "Focus on the execution path: explain how predictive data alerts are useless unless the spare parts inventory network can move components to the target aircraft on time.", redFlag: "Treating predictive maintenance as a basic software installation project, while ignoring the parts logistics network adjustments required to fulfill alerts." },
+            { id: "s3_q_20", category: "Case Interview Fundamentals", difficulty: "Core", question: "Our consumer goods client wants to cut packaging material weights by 20% to hit sustainability targets. What supply chain risks must they check?", conversational: "They must check three operational risks across the network. First, product protection durability—ensuring thinner packaging doesn't lead to higher shipping damage rates during transport. Second, factory machine compatibility—verifying packaging equipment can handle lighter materials without jammed queues or slower cycle speeds. Third, automated warehouse sorting visibility—confirming shipping barcodes still register cleanly on conveyor scanning arrays.", deepdive: "Lighter packaging lowers material costs and reduces transport fuel emissions, but it requires rigorous stress testing against mechanical speeds and freight transit parameters.", coaching: "Frame the problem across the end-to-end value chain, evaluating how a material update changes speeds from the factory floor to the final customer delivery.", redFlag: "Approving the material change based on packaging weight reductions alone without testing how it impacts final product breakage rates during freight transit." }
+        ];
+
+        function switchView(viewId, activeBtn) {
+            document.querySelectorAll('.section-container').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.toolbar-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            activeBtn.classList.add('active');
+            document.getElementById('header-display-title').innerText = viewId === 'cases-view' ? 'Sprint 3: Case Prompts' : 'Sprint 3: Paired Question Bank';
+        }
+
+        function populateSprintArchitecture() {
+            const casesAnchor = document.getElementById('cases-anchor'); casesAnchor.innerHTML = '';
+            SPRINT_CASES.forEach(c => {
+                casesAnchor.innerHTML += `
+                    <div class="card">
+                        <div class="card-header-row">
+                            <div>
+                                <h3 class="card-title">${c.title}</h3>
+                                <div class="tag-row"><span class="badge badge-category">${c.caseType}</span><span class="badge badge-difficulty">${c.difficulty}</span></div>
+                            </div>
+                        </div>
+                        <div class="content-block"><div class="content-block-title">Situation & Strategic Context</div><div class="content-block-text">${c.clientContext}</div></div>
+                        <div class="content-block"><div class="content-block-title">Interviewer Prompt</div><div class="content-block-text" style="color:#fff; font-weight:600; font-style:italic;">"${c.interviewerPrompt}"</div></div>
+                        <div class="tabs-container">
+                            <div class="tab-headers">
+                                <button class="tab-btn active" onclick="toggleCardTab(event, 'objectives')">Objectives</button>
+                                <button class="tab-btn" onclick="toggleCardTab(event, 'structure')">Structure</button>
+                                <button class="tab-btn" onclick="toggleCardTab(event, 'data')">Data/Exhibit</button>
+                                <button class="tab-btn" onclick="toggleCardTab(event, 'path')">Ideal Solution</button>
+                                <button class="tab-btn" onclick="toggleCardTab(event, 'coaching')">Partner Notes</button>
+                            </div>
+                            <div class="tab-content active" data-tab="objectives">
+                                <strong>Candidate Milestones:</strong><br>${c.candidateObjectives}<br><br>
+                                <strong>Clarifying Entry Questions:</strong><br><span style="font-style:italic; color:var(--accent-gold);">"${c.clarifyingQuestions}"</span>
+                            </div>
+                            <div class="tab-content" data-tab="structure"><strong>Tailored MECE Framework:</strong><br>${c.suggestedStructure}<br><br><strong>Key Parameters:</strong><br>${c.keyBusinessIssues}</div>
+                            <div class="tab-content" data-tab="data"><strong>Quantitative Requirements:</strong><br>${c.mathRequired}<br><br><strong>Exhibit Reference:</strong><br><pre style="background:#111; padding:10px; border-radius:4px; color:#fff; font-family:sans-serif; white-space:pre-wrap;">${c.sampleDataOrExhibit}</pre></div>
+                            <div class="tab-content" data-tab="path"><strong>Elite Execution Path:</strong><br>${c.strongAnswerPath}<br><br><strong>Recommendation Blueprint:</strong><br><span style="color:var(--accent-gold); font-style:italic;">"${c.finalRecommendation}"</span></div>
+                            <div class="tab-content" data-tab="coaching"><span style="color:#4ecdc4;"><strong>Coaching Note:</strong></span><br>${c.coachingNotes}<br><br><span style="color:#ff6b6b;"><strong>Fatal Red Flags:</strong></span><br>${c.redFlags}</div>
+                        </div>
+                        <button class="btn-action" onclick="openPracticeModal('${c.id}', 'case')">Practice Case Opening Remarks →</button>
+                    </div>`;
+            });
+
+            const questionsAnchor = document.getElementById('questions-anchor'); questionsAnchor.innerHTML = '';
+            SPRINT_QUESTIONS.forEach(q => {
+                questionsAnchor.innerHTML += `
+                    <div class="card">
+                        <div class="card-header-row">
+                            <div>
+                                <h3 class="card-title">${q.question}</h3>
+                                <div class="tag-row"><span class="badge badge-category">${q.category}</span><span class="badge badge-difficulty">${q.difficulty}</span></div>
+                            </div>
+                        </div>
+                        <div class="tabs-container">
+                            <div class="tab-headers">
+                                <button class="tab-btn active" onclick="toggleCardTab(event, 'conversational')">Conversational Answer</button>
+                                <button class="tab-btn" onclick="toggleCardTab(event, 'deepdive')">Strategic Deep-Dive</button>
+                                <button class="tab-btn" onclick="toggleCardTab(event, 'notes')">Coaching & Red Flags</button>
+                            </div>
+                            <div class="tab-content active" data-tab="conversational"><div style="font-style:italic; color:#e5c158; background:#1a1a1a; padding:15px; border-radius:4px; border-left:3px solid var(--accent-gold);">"${q.conversational}"</div></div>
+                            <div class="tab-content" data-tab="deepdive">${q.deepdive}</div>
+                            <div class="tab-content" data-tab="notes"><span style="color:#4ecdc4;"><strong>Delivery Coaching Note:</strong></span><br>${q.coaching}<br><br><span style="color:#ff6b6b;"><strong>Fatal Red Flag Boundary:</strong></span><br>${q.redFlag}</div>
+                        </div>
+                        <button class="btn-action" onclick="openPracticeModal('${q.id}', 'question')">Practice Live Verbalization →</button>
+                    </div>`;
+            });
+        }
+
+        function toggleCardTab(event, tabName) {
+            const container = event.target.closest('.tabs-container');
+            container.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            container.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            event.target.classList.add('active');
+            container.querySelector(`.tab-content[data-tab="${tabName}"]`).classList.add('active');
+        }
+
+        let recognition, isRecording = false, activeItemId = null, activeItemType = null;
+
+        function openPracticeModal(id, type) {
+            activeItemId = id; activeItemType = type;
+            let sourceItem = type === 'case' ? SPRINT_CASES.find(c => c.id === id) : SPRINT_QUESTIONS.find(q => q.id === id);
+            if (!sourceItem) return;
+            document.getElementById('practice-modal').classList.add('active');
+            document.getElementById('modal-title-header').innerText = type === 'case' ? 'Case Structuring Sprint' : 'Verbalization Sprint';
+            document.getElementById('modal-item-title').innerText = type === 'case' ? sourceItem.title : sourceItem.category;
+            document.getElementById('modal-context-label').innerText = type === 'case' ? 'Interviewer Case Prompt:' : 'Target Interview Question:';
+            document.getElementById('modal-prompt-text').innerText = type === 'case' ? sourceItem.interviewerPrompt : sourceItem.question;
+            document.getElementById('transcription-box').value = '';
+            document.getElementById('filler-words').innerText = 'Filler Words: 0';
+            document.getElementById('ai-prompt-output').style.display = 'none';
+            resetAnswerTimer();
+            lastFocusedElement = document.activeElement;
+            document.getElementById('btn-record').focus();
+        }
+
+        let lastFocusedElement = null;
+        function closeModal() { document.getElementById('practice-modal').classList.remove('active'); if (isRecording) stopRecordingEngine(); stopAnswerTimer(); if (lastFocusedElement) lastFocusedElement.focus(); }
+
+        function toggleRecordingEngine() {
+            if (!isRecording) {
+                if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) { alert("Requires Chrome/Edge browser speech engine."); return; }
+                const SpeechClass = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechClass(); recognition.continuous = true; recognition.interimResults = true; recognition.lang = 'en-US';
+                recognition.onresult = function(event) {
+                    let finalSegment = '';
+                    for (let i = event.resultIndex; i < event.results.length; ++i) { if (event.results[i].isFinal) finalSegment += event.results[i][0].transcript; }
+                    if (finalSegment) { const box = document.getElementById('transcription-box'); box.value += finalSegment + ' '; countTrackedFillers(box.value); }
+                };
+                // Chrome ends recognition on its own after silence or transient
+                // network errors. While the user still intends to record, restart
+                // instead of dying silently with a stale "Stop Recording" button.
+                recognition.onend = function() {
+                    if (isRecording) {
+                        try { recognition.start(); }
+                        catch (e) { stopRecordingEngine(); }
+                    }
+                };
+                recognition.onerror = function(event) {
+                    if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                        stopRecordingEngine();
+                        alert("Microphone access is blocked. Allow mic access for this site in your browser settings, then restart the recording.");
+                    }
+                    // 'no-speech', 'network', 'aborted' fall through to onend,
+                    // which restarts the session while isRecording is true.
+                };
+                recognition.start(); document.getElementById('btn-record').innerText = "🛑 Stop Recording"; document.getElementById('recording-status').style.display = "inline-flex"; isRecording = true; startAnswerTimer();
+            } else { stopRecordingEngine(); }
+        }
+
+        function stopRecordingEngine() { isRecording = false; if (recognition) recognition.stop(); document.getElementById('btn-record').innerText = "🎙️ Start Spoken Answer"; document.getElementById('recording-status').style.display = "none"; stopAnswerTimer(); }
+
+        function countTrackedFillers(text) {
+            const singles = ['um', 'uh', 'like', 'basically', 'actually'];
+            const phrases = [/\byou know\b/g, /\bsort of\b/g, /\bkind of\b/g];
+            const lower = text.toLowerCase();
+            let score = 0;
+            lower.split(/\s+/).forEach(p => { if (singles.includes(p.replace(/[^a-z]/g, ''))) score++; });
+            phrases.forEach(re => { const m = lower.match(re); if (m) score += m.length; });
+            document.getElementById('filler-words').innerText = `Filler Words: ${score}`;
+        }
+
+        /* ---- 2-minute answer timer (starts with recording) ---- */
+        const TIMER_LIMIT_SECONDS = 120;
+        let timerInterval = null, timerRemaining = TIMER_LIMIT_SECONDS;
+
+        function renderAnswerTimer() {
+            const el = document.getElementById('timer-display');
+            const overtime = timerRemaining < 0;
+            const t = Math.abs(timerRemaining);
+            const mm = Math.floor(t / 60), ss = String(t % 60).padStart(2, '0');
+            el.innerText = overtime ? `⏱ +${mm}:${ss} over` : `⏱ ${mm}:${ss}`;
+            el.style.color = overtime ? 'var(--mbb-red, #ff3333)' : (timerRemaining <= 30 ? 'var(--accent-gold)' : 'var(--text-muted)');
+        }
+
+        function startAnswerTimer() {
+            stopAnswerTimer();
+            timerRemaining = TIMER_LIMIT_SECONDS;
+            renderAnswerTimer();
+            timerInterval = setInterval(() => { timerRemaining--; renderAnswerTimer(); }, 1000);
+        }
+
+        function stopAnswerTimer() { if (timerInterval) { clearInterval(timerInterval); timerInterval = null; } }
+
+        function resetAnswerTimer() { stopAnswerTimer(); timerRemaining = TIMER_LIMIT_SECONDS; renderAnswerTimer(); }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && document.getElementById('practice-modal').classList.contains('active')) closeModal();
+        });
+
+       function triggerAIFeedbackPayload() {
+    let item = activeItemType === 'case' ? SPRINT_CASES.find(c => c.id === activeItemId) : SPRINT_QUESTIONS.find(q => q.id === activeItemId);
+    const userSpeech = document.getElementById('transcription-box').value;
+    if (!item) return;
+
+    let payload = `
+[CONSULTING / MBB INTERVIEW COACHING — ECCLES MBA MODULE]
+Evaluate the candidate response to the following consulting tracking prompt using partner-level standards:
+
+${activeItemType === 'case' ? `CASE SCENARIO: ${item.title}\nPROMPT EXPECTATION: "${item.interviewerPrompt}"\nIDEAL FRAMEWORK PATH: "${item.suggestedStructure}"` : `INTERVIEW PROMPT: "${item.question}"\nEXPECTED MODEL DELIVERY: "${item.conversational}"`}
+
+CANDIDATE AUDIO TRANSCRIPT INPUT:
+"${userSpeech || "[No transcript provided. Evaluate parameters and provide an elite baseline model response.]"}"
+
+Provide deep structured metrics using exactly this markdown output schema:
+
+**What Worked**
+[Detail 1-2 key operational strengths from what the candidate said.]
+
+**Top 2 Areas for Improvement**
+1. [Identify the primary gap versus an elite MBB delivery and give specific replacement phrasing.]
+2. [Identify any logical gaps, calculation slips, or structural blind spots.]
+
+**Advanced Consulting Power Move**
+[Provide one custom partner-level business insight or analytical variable tailored to this specific scenario context.]
+
+**Dashboard Scorecard Matrix**
+Assign exactly one rubric score (1. Emerging | 2. Developing | 3. Interview-Ready | 4. MBB-Caliber) for each applicable competency based on this specific performance:
+* Case Structuring: [Score]
+* Business Judgment: [Score]
+* Math Accuracy: [Score]
+* Synthesis: [Score]
+* Fit / PEI Storytelling: [Score]
+* Executive Presence: [Score]
+* Communication Clarity: [Score]
+* Recommendation Strength: [Score]
+    `;
+
+    document.getElementById('ai-copy-text').innerText = payload.trim();
+    document.getElementById('ai-prompt-output').style.display = 'block';
+}
+
+        function copyPayloadToClipboard() { navigator.clipboard.writeText(document.getElementById('ai-copy-text').innerText); alert("Payload packed to clipboard!"); }
+        window.onload = () => { populateSprintArchitecture(); };
+    </script>
+</body>
+</html>
