@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eccles MBA — Consulting Practice Sprint 1</title>
+    <style>
+        :root {
+            --primary-red: #CC0000;
+            --accent-gold: #c9a84c;
+            --bg-dark: #121212;
+            --bg-card: #1e1e1e;
+            --bg-sidebar: #0a0a0a;
+            --text-main: #f5f5f5;
+            --text-muted: #a0a0a0;
+            --border-color: #333333;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            font-family: var(--font-family);
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* PERMANENT GLOBAL SIDEBAR */
+        aside {
+            width: 320px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            padding: 0 24px 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 15px;
+        }
+
+        .brand h2 {
+            color: var(--primary-red);
+            margin: 0 0 5px 0;
+            font-size: 1.3rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .brand p {
+            color: var(--accent-gold);
+            margin: 0;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .nav-label {
+            padding: 10px 24px 5px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        aside a {
+            text-decoration: none;
+            color: var(--text-muted);
+            padding: 12px 24px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-left: 4px solid transparent;
+        }
+
+        aside a:hover, aside a.active {
+            background-color: rgba(204, 0, 0, 0.1);
+            color: var(--primary-red);
+            border-left-color: var(--primary-red);
+        }
+
+        .count-badge {
+            background-color: #2a2a2a;
+            color: var(--accent-gold);
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        main {
+            flex: 1;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            background-color: rgba(18, 18, 18, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title-area h1 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        
+        .header-subtitle {
+            margin: 2px 0 0 0;
+            font-size: 0.85rem;
+            color: var(--accent-gold);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* HORIZONTAL LOCAL TOOLBAR VIEW TOGGLE */
+        .local-toolbar {
+            background-color: #161616;
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 40px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .toolbar-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toolbar-btn:hover, .toolbar-btn.active {
+            background-color: rgba(204, 0, 0, 0.1);
+            color: white;
+        }
+
+        .section-container {
+            padding: 40px;
+            max-width: 1300px;
+            width: calc(100% - 80px);
+            margin: 0 auto;
+            display: none;
+        }
+
+        .section-container.active {
+            display: block;
+        }
+
+        .hero {
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 30px;
+        }
+
+        .track-pill {
+            display: inline-block;
+            background-color: rgba(201, 168, 76, 0.1);
+            color: var(--accent-gold);
+            padding: 5px 14px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .hero h2 {
+            font-size: 2.5rem;
+            margin: 0 0 15px 0;
+            font-weight: 800;
+        }
+
+        .description {
+            color: var(--text-muted);
+            line-height: 1.6;
+            font-size: 1.1rem;
+            max-width: 900px;
+            margin: 0;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 28px;
+            transition: all 0.25s ease;
+            position: relative;
+        }
+
+        .card-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            margin: 0;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .tag-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .badge-category { background-color: rgba(201, 168, 76, 0.1); color: var(--accent-gold); }
+        .badge-difficulty { background-color: rgba(204, 0, 0, 0.1); color: var(--primary-red); }
+
+        .content-block {
+            margin-top: 15px;
+            background-color: #161616;
+            padding: 15px 20px;
+            border-radius: 6px;
+            border-left: 3px solid #333;
+        }
+
+        .content-block-title {
+            font-size: 0.85rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .content-block-text {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #e0e0e0;
+            white-space: pre-line;
+        }
+
+        .tabs-container { margin-top: 20px; }
+        .tab-headers { display: flex; border-bottom: 1px solid var(--border-color); gap: 10px; }
+        
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab-btn.active { color: var(--primary-red); border-bottom-color: var(--primary-red); }
+        .tab-content { display: none; padding: 15px 5px; font-size: 0.95rem; line-height: 1.5; }
+        .tab-content.active { display: block; }
+
+        .btn-action {
+            background-color: var(--primary-red);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .btn-action:hover { background-color: #a00000; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal.active { display: flex; }
+        
+        .modal-content {
+            background-color: var(--bg-card);
+            width: 90%;
+            max-width: 850px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 35px;
+            border-radius: 8px;
+            border: 1px solid var(--primary-red);
+            position: relative;
+        }
+
+        .close-modal { position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--text-muted); font-size: 2rem; cursor: pointer; }
+        textarea { width: 100%; box-sizing: border-box; height: 160px; background-color: #121212; color: white; border: 1px solid var(--border-color); border-radius: 4px; padding: 15px; margin-top: 15px; font-family: var(--font-family); font-size: 1rem; line-height: 1.5; resize: vertical; }
+        .copy-box { background-color: #121212; padding: 20px; border-left: 4px solid var(--accent-gold); font-family: monospace; margin-top: 15px; white-space: pre-wrap; font-size: 0.9rem; color: #dcdcdc; max-height: 250px; overflow-y: auto; }
+        .recording-indicator { display: none; color: var(--primary-red); font-weight: 700; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <!-- PERMANENT GLOBAL SIDEBAR -->
+    <aside>
+        <div class="brand">
+            <h2>Eccles MBA</h2>
+            <p>Consulting Command Center</p>
+        </div>
+        <div class="nav-label">Core Directory</div>
+        <a href="./index.html">Ecosystem Dashboard</a>
+        <a href="./playbook_frameworks.html">20 Case Frameworks</a>
+        <a href="./playbook_math.html">15 Analytics Math Drills</a>
+        <a href="./playbook_battlecard.html">MBB Battlecard Vault</a>
+        
+        <div class="nav-label">Practice Sprints</div>
+        <a href="./playbook_sprint_01.html" class="active">Sprint 1: Profitability</a>
+        <a href="./playbook_sprint_02.html">Sprint 2: M&A Strategy</a>
+        <a href="./playbook_sprint_03.html">Sprint 3: Operations</a>
+        <a href="./playbook_sprint_04.html">Sprint 4: Tech & SaaS</a>
+        <a href="./playbook_sprint_05.html">Sprint 5: GTM & Pricing</a>
+        <a href="./playbook_sprint_06.html">Sprint 6: Capstones</a>
+    </aside>
+
+    <main>
+        <header>
+            <div class="header-title-area">
+                <h1 id="header-display-title">Sprint 1: Case Prompts</h1>
+                <div class="header-subtitle">Profitability Decline & Market Entry Essentials</div>
+            </div>
+        </header>
+
+        <!-- REGIONAL HORIZONTAL VIEW TOOLBAR TOOLBAR -->
+        <div class="local-toolbar">
+            <button class="toolbar-btn active" id="btn-cases" onclick="switchView('cases-view', this)">MBB Case Prompts <span class="count-badge">5</span></button>
+            <button class="toolbar-btn" id="btn-questions" onclick="switchView('questions-view', this)">Paired Question Bank <span class="count-badge">20</span></button>
+        </div>
+
+        <!-- VIEW: CASES -->
+        <section id="cases-view" class="section-container active">
+            <div class="hero">
+                <span class="track-pill">Case Mastery Block</span>
+                <h2>MBB Case Prompt Library</h2>
+                <p class="description">Practice deep analytical structuring, case layouts, and recommendations across 5 high-fidelity cases mirroring McKinsey, Bain, and BCG operational evaluations.</p>
+            </div>
+            <div class="content-grid" id="cases-anchor"></div>
+        </section>
+
+        <!-- VIEW: QUESTIONS -->
+        <section id="questions-view" class="section-container">
+            <div class="hero">
+                <span class="track-pill">Core Question Block</span>
+                <h2>Paired Question Bank</h2>
+                <p class="description">20 target interview questions spanning fit, motivation, behavioral metrics, and operational sizing basics to test your delivery speed and structural consistency.</p>
+            </div>
+            <div class="content-grid" id="questions-anchor"></div>
+        </section>
+
+        <!-- Global Interactive Modal Canvas -->
+        <div id="practice-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title-header">
+            <div class="modal-content">
+                <button class="close-modal" onclick="closeModal()" aria-label="Close practice modal">×</button>
+                <h2 style="color: var(--primary-red); margin-top: 0;" id="modal-title-header">Interactive Practice Arena</h2>
+                <h3 id="modal-item-title" style="color: var(--accent-gold); margin: 5px 0 15px 0;"></h3>
+                
+                <div style="background-color: #252525; padding: 15px; border-radius: 6px; border-left: 3px solid var(--primary-red);">
+                    <span style="font-size: 0.8rem; text-transform: uppercase; font-weight: 800; color: var(--text-muted); display: block;" id="modal-context-label">Context Prompt:</span>
+                    <p id="modal-prompt-text" style="margin: 5px 0 0 0; font-size: 1rem; line-height: 1.5; color: #fff;"></p>
+                </div>
+                
+                <div style="margin-top: 15px; display: flex; gap: 15px; align-items: center;">
+                    <button class="btn-action" onclick="toggleRecordingEngine()" id="btn-record">🎙️ Start Spoken Answer</button>
+                    <span class="recording-indicator" id="recording-status" role="status">🔴 Audio Pipeline Live...</span>
+                    <div id="filler-words" aria-live="polite" style="font-size: 0.9rem; font-weight:600; color:var(--accent-gold);">Filler Words: 0</div>
+                    <div id="timer-display" style="font-size: 0.9rem; font-weight:700; color:var(--text-muted); margin-left:auto;">⏱ 2:00</div>
+                </div>
+                
+                <textarea id="transcription-box" aria-label="Live speech transcript" placeholder="Your live recording speech transcript will populate here..."></textarea>
+                <button class="btn-action" style="background-color: var(--accent-gold); color: black; width: 100%; justify-content: center;" onclick="triggerAIFeedbackPayload()">Generate Rigorous AI Coaching Prompt</button>
+                
+                <div id="ai-prompt-output" style="display: none;">
+                    <p style="margin-top: 20px; font-weight: 700; font-size: 0.95rem;">Copy this payload directly into your AI assistant for partner-grade processing:</p>
+                    <div class="copy-box" id="ai-copy-text"></div>
+                    <button class="btn-action" onclick="copyPayloadToClipboard()">Copy Payload to Clipboard</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const SPRINT_CASES = [
+            {
+                id: "s1_case_01",
+                caseType: "Profitability decline",
+                difficulty: "Advanced",
+                title: "Global Airline Catering Margin Compression",
+                clientContext: "Our client is a global premium airline catering business. While top-line revenues post-pandemic scaled up by 10% due to increased flight routes, their historical operational net profit margins collapsed drastically from 12% down to an unsustainable 4%.",
+                interviewerPrompt: "The CEO needs to pinpoint the operational and contract drivers behind this margin erosion and wants a structured turnaround plan. How would you approach this problem?",
+                candidateObjectives: "1. Isolate cost centers outstripping revenue growth.\n2. Diagnose pricing lock-ins within long-term enterprise SLAs.\n3. Formulate an actionable optimization and negotiation roadmap.",
+                clarifyingQuestions: "Are these compressed margin dynamics visible across the entire airline catering competitive footprint, or is it unique to our client? Secondly, did the 10% revenue lift come from pure ticket volume expansion or baseline pricing adjustments?",
+                suggestedStructure: "Profitability Tree:\n- Revenue: Segment by customer mix (Premium vs Economy flag carriers) and pricing architecture.\n- Costs: Separate cleanly into Fixed Assets (kitchen real estate, equipment fleets) and Variable Inputs (raw food inflation, unionized driver/logistics labor).",
+                keyBusinessIssues: "Static long-term corporate SLAs preventing immediate price increases; severe raw commodity food inflation running at 18% YoY; critical logistics driver shortages inflating overtime premiums by 35%.",
+                mathRequired: "Calculate absolute revenue vs cost gap variations. Identify percentage increase in long-term contract pricing models required to balance raw food input spikes.",
+                sampleDataOrExhibit: "Exhibit 1: Base Cost Architecture breakdown:\n- Raw Ingredients: 40%\n- Logistics/Fleet Labor: 35%\n- Facility Overhead: 15%\n- Corporate SG&A: 10%\n*Note: Raw material commodity indexes scaled up 1.5% consistently month-over-month for 12 consecutive months.*",
+                strongAnswerPath: "The candidate notes that because revenues scaled up, the issue is entirely on the cost side outstripping volume adjustments. They immediately look at raw food inputs and logistics labor, discover that fixed pricing contracts block immediate cost pass-through, and target upcoming contract renewals for adjustments.",
+                finalRecommendation: "Introduce mandatory dynamic inflation indexing escalators into all upcoming carrier contracts, optimize supply lanes via unified central procurement, and automate repetitive kitchen plating workflows to lower labor costs.",
+                coachingNotes: "Make sure students do not wait for data. A strong candidate builds a clear hypothesis early: 'Given the macro landscape, I hypothesize that input asset inflation is outpacing static B2B contract pricing systems.'",
+                redFlags: "Suggesting retail branding or consumer marketing strategies for a business-to-business infrastructure contract crisis."
+            },
+            {
+                id: "s1_case_02",
+                caseType: "Market entry",
+                difficulty: "Expert",
+                title: "Legacy OEM EV Charging Infrastructure Move",
+                clientContext: "Our client is a legacy domestic automotive manufacturing titan assessing an entry into the premium electric vehicle (EV) fast-charging infrastructure network space across North America.",
+                interviewerPrompt: "The executive board wants to know if they should build out an independent network proprietary to their brand, partner with existing utility platforms, or bypass entry entirely. How would you structure your feasibility framework?",
+                candidateObjectives: "1. Evaluate absolute market sizing capacity and margin potential.\n2. Quantify required capital deployment schedules against payback targets.\n3. Isolate the operational 'right to win' over existing infrastructure incumbents.",
+                clarifyingQuestions: "What is the primary goal of this entry—is it to operate a profitable stand-alone business unit, or to drive adoption and sales of our premium EV fleet models?",
+                suggestedStructure: "Market Entry Scaffolding:\n- Economics of Target Space: Size, growth rates, utilization thresholds needed for unit breakeven.\n- Internal Core Strengths: Current dealer property footprints, fleet brand equity, power grid access.\n- Competitive Footprint: ChargePoint, Tesla Superchargers, utility networks.\n- Strategic Implementation Models: Organic build vs Joint Venture vs Asset Acquisition.",
+                keyBusinessIssues: "Extremely high initial CapEx requirements; long grid-interconnection regulatory delays; low initial asset utilization rates during early fleet deployment cycles.",
+                mathRequired: "Determine network utilization rates required to cover upfront installation capital ($150,000 per station) given electricity pricing spreads.",
+                sampleDataOrExhibit: "Table 2: Regional Fast-Charger Operational Performance Metrics:\n- Upfront CapEx per Bay: $150,000\n- Average Electricity Input Cost: $0.12 per kWh\n- Average Retail Charging Price: $0.45 per kWh\n- Target Payback Period Constraint: 4 Years",
+                strongAnswerPath: "The candidate structures a framework looking at monetization pathways. They realize that standalone charging margins are highly sensitive to asset utilization metrics and deduce that the true value lies in ecosystem stickiness—driving vehicle sales margins rather than simple electricity sales.",
+                finalRecommendation: "Form a joint venture with a premium localized utility operator to minimize upfront CapEx exposure, place fast-charging hubs at existing tier-1 dealerships to capture immediate customer traffic, and subsidize charging for car buyers to accelerate vehicle sales velocities.",
+                coachingNotes: "Push the candidate to look beyond electricity unit margins and evaluate ecosystem economics and structural customer stickiness drivers.",
+                redFlags: "Failing to evaluate localized power grid connectivity realities or ignoring the massive cash runway advantage of established charging networks."
+            },
+            {
+                id: "s1_case_03",
+                caseType: "Revenue growth",
+                difficulty: "Core",
+                title: "Premium DTC Apparel Growth Plateau",
+                clientContext: "A digitally native, high-end direct-to-consumer athletic wear brand grew rapidly to a $150M revenue run-rate, but top-line growth has completely plateaued over the past 6 quarters.",
+                interviewerPrompt: "The private equity sponsors have mandated a return to a 25% YoY growth trajectory. The management team wants an evaluation of growth pathways. How would you advise them?",
+                candidateObjectives: "1. Diagnose the baseline causes of the customer acquisition velocity drop.\n2. Quantify monetization potential across product expansion vs brick-and-mortar retail.\n3. Optimize internal customer lifetime value (LTV) and cohort repeat purchase mechanics.",
+                clarifyingQuestions: "Has this growth slowdown occurred equally across all historical product segments, or is it isolated to core menswear? Additionally, how has our Customer Acquisition Cost (CAC) trended over this 6-quarter horizon?",
+                suggestedStructure: "Revenue Scaling Framework:\n- Organic Optimization: Price optimization, bundle configurations, increasing order frequency.\n- Footprint Expansion: Retail partner channels (Wholesale vs Corporate stores), geographic expansion.\n- Offering Evolution: Product line extensions (footwear, gear) or subscription curation layers.",
+                keyBusinessIssues: "Saturated digital ad channels doubling customer acquisition costs (CAC); rising returns eating into net realized revenue yields; customer lifetime value plateauing due to lack of product catalog variety.",
+                mathRequired: "Calculate the shifting LTV-to-CAC ratio to prove the decay of digital customer acquisition efficiency across paid social channels.",
+                sampleDataOrExhibit: "Exhibit 3: Marketing Performance Dashboard:\n- Q1 Year-1: CAC = $40, LTV = $160\n- Q4 Year-2: CAC = $85, LTV = $170\n*Note: Paid social media ad spend accounts for 85% of total digital marketing budgets.*",
+                strongAnswerPath: "The candidate establishes that paid digital marketing channels have reached a point of diminishing returns. They pivot the growth strategy away from expensive online ad acquisition toward high-margin brick-and-mortar wholesale channels (e.g., Nordstrom, REI) to unlock offline customer bases at a lower cost.",
+                finalRecommendation: "Launch a selective wholesale partnership with top-tier physical specialty retailers, expand the product line into adjacent categories to boost repeat purchase rates, and roll out an omnichannel loyalty program to maximize core cohort LTV.",
+                coachingNotes: "Ensure the student connects marketing metrics directly to financial statements. Falling conversion efficiency requires alternative channel strategies.",
+                redFlags: "Recommending an increase in online ad spend when the data explicitly proves digital channels are reaching saturation points."
+            },
+            {
+                id: "s1_case_04",
+                caseType: "Pricing strategy",
+                difficulty: "Advanced",
+                title: "Curative Biotech Therapeutics Valuation",
+                clientContext: "A clinical-stage biotech innovator has developed a revolutionary single-infusion genetic therapy that completely cures a rare chronic blood disease, saving patients from lifelong medical management.",
+                interviewerPrompt: "The asset is approaching commercial launch. Traditional chronic treatments cost insurers $200,000 annually per patient over an average 15-year survival window. How would you design the pricing architecture for this curative asset?",
+                candidateObjectives: "1. Quantify total Economic Value to the Customer (EVC) across payor segments.\n2. Evaluate value-based pricing strategies versus political and societal risk constraints.\n3. Formulate alternative risk-sharing or installment-based reimbursement mechanisms.",
+                clarifyingQuestions: "What are the direct manufacturing, handling, and logistics costs per patient infusion? Also, how large is the total addressable annual patient cohort size?",
+                suggestedStructure: "Pricing Design System:\n- Value-Based Architecture: Quantified lifetime cost avoidance for healthcare providers (EVC floor vs ceiling).\n- Competitor/Substitute Benchmarking: Cost and efficacy comparisons with existing disease management therapies.\n- Cost-Plus Realities: Total R&D cost amortization plus specialized manufacturing variable expenses.\n- Payor Adoption Dynamics: Insurance coverage, government reimbursement models, and political constraints.",
+                keyBusinessIssues: "High sticker shock risks leading to potential political and public backlash; payor cash-flow constraints if hit with large upfront payouts; managing manufacturing capacity constraints during launch year.",
+                mathRequired: "Calculate the total present value of lifetime chronic costs ($200k/year × 15 years) to establish the maximum baseline Economic Value to the Customer.",
+                sampleDataOrExhibit: "Table 4: Lifetime Chronic Treatment Economic Matrix:\n- Average Annual Management Cost: $200,000 per patient\n- Average Survival Timeline: 15 Years\n- Direct Specialized Cure Production Cost: $50,000 per dose\n*Assume a 0% discount rate for initial baseline simplicity calculations.*",
+                strongAnswerPath: "The candidate instantly passes over cost-plus logic as irrelevant for a cure. They calculate the gross lifetime cost savings of $3M per patient. They price the treatment at a premium level (e.g., $1.5M), capturing a large share of the value while still saving insurers 50% over long-term management.",
+                finalRecommendation: "Price the asset at $1.5M per single infusion using a value-based model, structure an outcome-linked payment framework over a 5-year period to reduce risk for insurers, and build a dedicated patient-access program to manage regulatory and public pricing pressures.",
+                coachingNotes: "Check for candidates who use cost-plus models on high-value innovations. Guide them to shift toward economic value capture systems.",
+                redFlags: "Pricing the cure close to the $50,000 production cost, leaving billions in value capture on the table and failing to recoup high R&D investments."
+            },
+            {
+                id: "s1_case_05",
+                caseType: "Operations improvement",
+                difficulty: "Expert",
+                title: "E-Commerce Fulfillment Center Bottleneck Optimization",
+                clientContext: "A major logistics provider operating a 500,000 square foot e-commerce fulfillment engine failed to hit its 2-day delivery SLAs during peak holiday demand rushes, triggering costly shipping chargebacks.",
+                interviewerPrompt: "The Chief Operating Officer needs to isolate the processing constraint holding back throughput and wants a facility redesign plan before the next volume surge. How do you trace and eliminate this operational bottleneck?",
+                candidateObjectives: "1. Map step-by-step processing capacities across the facility workflow.\n2. Isolate the single gating step limiting overall throughput (Theory of Constraints).\n3. Design a low-cost operational fix to maximize daily shipping metrics.",
+                clarifyingQuestions: "What is the exact physical layout of the processing sequence, and what are the hourly design capacities for the picking, packing, sorting, and loading zones?",
+                suggestedStructure: "Throughput Optimization System:\n- Process Audit Mapping: Volume capacity per hour at each workstation block.\n- Variable Inefficiencies: Staffing misalignments, mechanical downtime, or software routing delays.\n- Physical Layout Logistics: Travel times between storage bays and packing zones.\n- Financial Implications: Savings from fewer chargebacks versus the capital cost of automation tools.",
+                keyBusinessIssues: "Unbalanced workstation capacities causing inventory backlogs; picking paths layout adding excessive foot travel times; high turnover rates among temporary holiday staff.",
+                mathRequired: "Apply the principles of Little's Law and calculate workstation processing limits per hour to identify the bottleneck node.",
+                sampleDataOrExhibit: "Exhibit 5: Hourly Workstation Maximum Capacities:\n- Item Inbound Receiving: 5,000 items/hr\n- Picking Bays: 4,500 items/hr\n- Packing Stations: 3,200 items/hr\n- Sorting Conveyors: 6,000 items/hr\n- Outbound Truck Loading: 4,000 items/hr",
+                strongAnswerPath: "The candidate avoids broad generalizations by looking at unit throughput metrics. They isolate the Packing Stations as the primary facility bottleneck (gated at 3,200 items/hour). They reject expensive conveyor upgrades in favor of a low-cost solution: moving staff from high-capacity areas to packing blocks.",
+                finalRecommendation: "Implement a cross-training framework to flexibly move labor from sorting over to packing during demand surges, update picking bin layouts to minimize foot travel times, and deploy basic barcode scan upgrades to eliminate manual entry steps at packing stations.",
+                coachingNotes: "Look for candidates who apply manufacturing rules (like the Theory of Constraints) to supply chain problems. They must fix the true bottleneck first.",
+                redFlags: "Recommending an investment in truck loading automation when packing throughput is the clear limiting constraint for the facility."
+            }
+        ];
+
+        const SPRINT_QUESTIONS = [
+            {
+                id: "s1_q_01",
+                category: "Consulting Fit & Motivation",
+                difficulty: "Core",
+                question: "Why management consulting now, and why do you want to join McKinsey / Bain / BCG specifically over an industry leadership development track?",
+                conversational: "While an industry rotational program offers solid leadership exposure within a single firm, I thrive on high-stakes, cross-functional problem solving. I want to join Bain because of your collaborative approach to client challenges and your deep expertise in private equity and commercial due diligence. In an industry track, execution often moves within narrow tracks; at your firm, I can act as an objective catalyst for change on a client's most critical business priorities.",
+                deepdive: "A strong response avoids generic praise ('I like smart people' or 'I want variety'). It must highlight specific elements of the firm’s operating model, practice groups, or culture, and connect them directly to the candidate’s personal career path.",
+                coaching: "Make your answer firm-specific. If your response could be given at a competitor firm without changing a single sentence, it is too generic. Inject genuine, researched details.",
+                redFlag: "Sounding like you are just looking for a prestigious resume stamp, or failing to differentiate the chosen firm from its competitors."
+            },
+            {
+                id: "s1_q_02",
+                category: "McKinsey PEI / Behavioral Interview",
+                difficulty: "Advanced",
+                question: "Tell me about a time you managed a major conflict within a cross-functional project team when the stakes were high.",
+                conversational: "During my previous product launch, our lead data architect and corporate risk VP reached a complete standstill on database access boundaries, threatening to delay our launch by a month. Instead of forcing a top-down compromise, I sat down with each stakeholder individually to understand their underlying concerns—data security rules versus processing speed requirements. I proposed a phased compliance test model that satisfied our security parameters while keeping data access speeds on track, allowing us to hit our original launch deadline.",
+                deepdive: "The McKinsey Personal Experience Interview (PEI) evaluates personal impact, drive, and leadership. The response must focus heavily on your individual thoughts, words, and actions ('I'), rather than hiding behind team achievements ('We').",
+                coaching: "Break down your story to show your specific actions: what you said, how you structured individual conversations, and the emotional intelligence you used to resolve the issue.",
+                redFlag: "Focusing too much on general project mechanics or using 'We' throughout the story, which leaves your personal contribution unclear to the interviewer."
+            },
+            {
+                id: "s1_q_03",
+                category: "Case Interview Fundamentals",
+                difficulty: "Core",
+                question: "An institutional healthcare network client is experiencing an unexpected 12% drop in operating profitability. Walk me through the initial questions you would ask to structure your approach.",
+                conversational: "To build a tailored framework, I need to isolate the root cause across three areas. First, on the revenue side, I want to see if this 12% profit drop is driven by lower patient volumes or changes in insurance reimbursement rates. Second, on the cost side, I need to check for spikes in clinical labor costs or supply chain inflation. Finally, I want to know if this decline is matching an industry-wide trend or if it's isolated entirely to our client's operations.",
+                deepdive: "First-class case openings avoid generic framework templates. They customize their categories around the client's industry terminology (e.g., using 'reimbursement rates' and 'clinical labor' instead of generic prices and costs).",
+                coaching: "Always signpost your thoughts clearly using the 'Rule of 3' to project structure, executive presence, and professional credibility from the opening minutes.",
+                redFlag: "Reciting a memorized framework like Porter's Five Forces or the 4Ps without tailoring the categories to healthcare operations."
+            },
+            {
+                id: "s1_q_04",
+                category: "Case Interview Fundamentals",
+                difficulty: "Advanced",
+                question: "Our client is a large regional grocery retailer considering a home delivery subscription launch. How would you estimate the market size for this service?",
+                conversational: "I would use a bottom-up approach focused on household density. I'll start with the total population in the client's footprint, convert that into households, and filter by income levels that can afford a premium subscription. Next, I'll estimate penetration rates across urban versus rural segments and apply an average order frequency. Multiplying these active subscribers by the annual fee gives us the addressable market size.",
+                deepdive: "Market sizing questions test estimation logic and calculation clarity. A premier response establishes a clean mathematical path before jumping into the actual numbers.",
+                coaching: "State your assumptions clearly, round numbers to clean benchmarks, and always explain how the final market size maps back to the client's investment decision.",
+                redFlag: "Throwing out random percentages without giving a logical explanation, or making careless math errors by failing to use shorthand notation."
+            },
+            {
+                id: "s1_q_05",
+                category: "Consulting Fit & Motivation",
+                difficulty: "Core",
+                question: "Walk me through your resume, highlighting the strategic pivot points that led you to pursue an MBA at the David Eccles School of Business.",
+                conversational: "I started my career in operational engineering, where I mastered process optimization and quantitative diagnostics on the factory floor. While I loved solving technical challenges, I realized I wanted to drive high-level corporate strategy rather than localized implementations. This pivot led me to the Eccles MBA program, where I've focused on corporate finance and data analytics to complement my engineering background, preparing me to tackle complex problems at an MBB level.",
+                deepdive: "A professional resume walk should not be a chronological reading of your history. It must be structured as a compelling story driven by deliberate career choices, achievements, and future goals.",
+                coaching: "Keep your overview under 2 minutes. Focus on your career transitions, quantify your past impact, and connect your narrative back to the needs of elite consulting firms.",
+                redFlag: "Reciting your resume bullet-by-bullet, which lacks a clear narrative thread and fails to show strategic self-awareness."
+            },
+            {
+                id: "s1_q_06",
+                category: "McKinsey PEI / Behavioral Interview",
+                difficulty: "Expert",
+                question: "Describe a situation where you had to persuade a highly skeptical senior stakeholder to approve an unconventional strategy.",
+                conversational: "Our division VP was set on expanding our legacy product line, but our market data showed consumer demand shifting rapidly to digital options. To shift their perspective, I avoided high-level presentations and built an interactive prototype showing our competitors' digital market share growth. I coupled this with a financial model showing the risk of inaction. By framing the shift as a necessary risk-mitigation step, I secured the budget for our digital pilot.",
+                deepdive: "Persuasion prompts test your data-driven communication, emotional intelligence, and professional maturity when pushing back against senior leadership.",
+                coaching: "Highlight how you listened to the stakeholder's concerns, used data to address their objections, and aligned your final proposal with their top priorities.",
+                redFlag: "Claiming you won the argument simply by being right or using a loud approach, which shows a lack of corporate diplomacy and stakeholder empathy."
+            },
+            {
+                id: "s1_q_07",
+                category: "Case Interview Fundamentals",
+                difficulty: "Advanced",
+                question: "A Tier-1 private equity firm client wants to acquire a regional specialized logistics provider. What are the top three things you would evaluate during commercial due diligence?",
+                conversational: "I would target three operational lenses: First, target asset customer concentration risk—verifying if a single client accounts for more than 20% of revenues. Second, contract durability and margin stability across inflation cycles. Third, capacity utilization scale—checking if the current warehouse and truck fleets can support expansion without immediate CapEx infusions.",
+                deepdive: "Commercial due diligence requests require a focus on investment returns, cash flow stability, exit options, and operational scalability.",
+                coaching: "Avoid generic business checklists. Align your metrics directly with private equity investment goals: risk mitigation, EBITDA growth, and clear paths to valuation expansion.",
+                redFlag: "Ignoring customer concentration risks or failing to analyze the capital expenditures needed to achieve growth targets."
+            },
+            {
+                id: "s1_q_08",
+                category: "Case Interview Fundamentals",
+                difficulty: "Core",
+                question: "Our client is an international luxury hotel platform assessing an asset divestiture of an underperforming resort property. How do you evaluate this decision?",
+                conversational: "I would analyze this via three tracks: Financial performance trends—checking if the resort's cash flows are below our cost of capital benchmarks. Opportunity costs—evaluating if divested capital can yield higher returns in other markets. Brand alignment—determining if the property's lower performance is hurting our core global brand premium.",
+                deepdive: "Divestiture frameworks require balancing short-term cash inflows from an asset sale against long-term strategic positioning and lost recurring revenue streams.",
+                coaching: "Make sure to evaluate non-financial variables like brand dilution, channel relationships, and employee transition costs alongside capital returns.",
+                redFlag: "Basing your recommendation solely on past accounting losses without considering future market growth trends or turnaround potential."
+            },
+            {
+                id: "s1_q_09",
+                category: "Consulting Fit & Motivation",
+                difficulty: "Advanced",
+                question: "What is the most complex professional failure you have faced, and what did it teach you about your leadership style?",
+                conversational: "Early in my career, I led a technology migration project where I focused entirely on technical system readiness but overlooked comprehensive team training. On launch day, operational speeds dropped by 30% because the staff struggled with the new interface. We had to roll back the launch. This taught me that technical solutions are only as good as the team's readiness to adopt them. Since then, I build change management tracking directly into my project plans.",
+                deepdive: "Elite consulting firms value self-awareness, resilience, and your ability to learn from professional failures and adapt your leadership approach.",
+                coaching: "Own the mistake completely without making excuses. Spend 30% of your time on the problem and 70% on the lessons learned and how you've applied them since.",
+                redFlag: "Sharing a 'fake' failure (like being too detail-oriented) or blaming team members, which demonstrates low self-awareness and poor maturity."
+            },
+            {
+                id: "s1_q_10",
+                category: "McKinsey PEI / Behavioral Interview",
+                difficulty: "Core",
+                question: "Tell me about a time you had to deliver an ambitious project under tight timelines with highly ambiguous or incomplete data parameters.",
+                conversational: "We were evaluating an entry into a niche chemical space with no published market reports. With an investment board deadline 10 days away, I couldn't wait for perfect data. I gathered data from adjacent markets, interviewed independent industry experts, and built an assumptions-driven model. I ran sensitivity analyses to stress-test our assumptions, giving the board a clear, risk-adjusted investment recommendation on schedule.",
+                deepdive: "Consultants constantly navigate ambiguity. Interviewers look for your ability to make structured decisions using incomplete data without getting stuck in analysis paralysis.",
+                coaching: "Emphasize your structured approach: how you validated your assumptions, used proxy data effectively, and used sensitivity analysis to de-risk the final decision.",
+                redFlag: "Waiting for perfect data or missing project deadlines, which shows a lack of adaptability and weak performance under pressure."
+            },
+            {
+                id: "s1_q_11",
+                category: "Case Interview Fundamentals",
+                difficulty: "Expert",
+                question: "A client produces consumer electronics and wants to move from upfront hardware sales to a recurring software subscription model. What operational risks must they manage?",
+                conversational: "They must manage three shifts: Financial cash-flow cycles—transitioning from high upfront revenues to small monthly subscription fees, which creates short-term working capital gaps. Product capabilities—shifting from hardware design cycles to continuous software delivery models. Customer success operations—building out support teams to maximize long-term retention and minimize churn.",
+                deepdive: "Transitioning to a SaaS business model requires a deep look at cash flow management, user churn metrics, recurring customer acquisition costs, and structural team reorganizations.",
+                coaching: "Focus on the transition period, detailing how the company will balance traditional product lines while standing up new subscription capabilities.",
+                redFlag: "Overlooking the short-term working capital drop that occurs when moving away from upfront hardware sales models."
+            },
+            {
+                id: "s1_q_12",
+                category: "Case Interview Fundamentals",
+                difficulty: "Core",
+                question: "Our client is a global commercial airline facing an 8% increase in jet fuel input expenses. How would you mitigate this margin risk?",
+                conversational: "I would look at short-term and long-term levers. In the short term, I'd check our fuel hedging strategy to lock in prices and look at ticket price adjustments across high-demand routes. In the long term, I'd focus on fleet modernization—replacing older aircraft with fuel-efficient models—and route optimization models to reduce flight times and fuel burn.",
+                deepdive: "Commodity cost spikes require balancing immediate risk-mitigation steps (like hedging or pricing adjustments) with structural efficiency gains.",
+                coaching: "A premier response avoids relying solely on raising ticket prices, acknowledging that competitive pressures can limit pricing power in the airline sector.",
+                redFlag: "Assuming an airline can easily pass 100% of fuel price increases on to customers without hurting travel demand."
+            },
+            {
+                id: "s1_q_13",
+                category: "Consulting Fit & Motivation",
+                difficulty: "Core",
+                question: "What unique professional expertise or perspective will you bring to our cohort and client project teams on day one?",
+                conversational: "I bring a data-driven operational background from my engineering career, combined with advanced corporate finance training from my Eccles MBA. This allows me to jump into client teams and translate complex operational problems into clear financial impacts. On day one, I can build robust valuation models while ensuring the operational assumptions behind them match floor realities.",
+                deepdive: "Your value proposition should be memorable, authentic, and directly applicable to the fast-paced world of cross-functional client engagements.",
+                coaching: "Avoid generic skills like 'hard-working' or 'personable'. Focus on your unique intersection of skills and explain exactly how it helps a project team under tight deadlines.",
+                redFlag: "Delivering an overly humble or generic response that fails to articulate your individual strengths and value."
+            },
+            {
+                id: "s1_q_14",
+                category: "McKinsey PEI / Behavioral Interview",
+                difficulty: "Advanced",
+                question: "Tell me about a time you led a team through a significant pivot when project parameters changed completely mid-stream.",
+                conversational: "Midway through a system migration, our vendor unexpectedly went bankrupt, making our initial software platform unusable. The team was frustrated and ready to pause the project. I called an immediate reset meeting, broke down our remaining options, and realigned workloads to focus on an alternative open-source engine. By keeping communication clear and breaking down the pivot into manageable steps, we delivered the migration on schedule.",
+                deepdive: "Change management prompts evaluate your emotional resilience, structured communication, and ability to keep a team focused during unexpected project disruptions.",
+                coaching: "Focus on the interpersonal side of leadership: how you handled team frustration, communicated the new direction, and kept performance high through a chaotic period.",
+                redFlag: "Complaining about the unexpected change or focusing entirely on technical patches without detailing how you managed the team through the transition."
+            },
+            {
+                id: "s1_q_15",
+                category: "Case Interview Fundamentals",
+                difficulty: "Core",
+                question: "A major commercial coffee shop chain faces dropping traffic at its drive-thru windows. How do you structure an investigation into this?",
+                conversational: "I will isolate the issue across three tracks: Drive-thru operational speeds—checking if order processing times have lengthened, causing customers to leave the queue. Shifting local competition—identifying if new mobile-ordering options or boutique drive-thrus are drawing customers away. Local traffic changes—determining if changing commuting patterns have reduced overall vehicle flow past our stores.",
+                deepdive: "Retail drive-thru performance relies heavily on processing speed, queue visibility, neighborhood commuting habits, and digital convenience options.",
+                coaching: "Use terms specific to the business vertical (e.g., 'processing speed', 'queue abandonment', and 'commuter workflows') to build immediate credibility.",
+                redFlag: "Proposing broad corporate restructuring plans before diagnosing basic localized store operations and processing bottlenecks."
+            },
+            {
+                id: "s1_q_16",
+                category: "Case Interview Fundamentals",
+                difficulty: "Advanced",
+                question: "Our client is a premium real estate developer assessing whether to add solar storage grids across its commercial buildings. What is the financial framework?",
+                conversational: "The financial framework requires an ROI analysis comparing upfront costs against ongoing savings. On the investment side, I'll calculate hardware procurement, installation capital, and tax incentives. On the return side, I'll project utility bill savings, revenue from selling excess power back to the grid, and the potential rent premiums tenants will pay for a sustainable building.",
+                deepdive: "Sustainability investments should be evaluated using standard capital allocation metrics: CapEx, cash flows, net present value (NPV), and internal rate of return (IRR).",
+                coaching: "A high-fidelity answer goes beyond environmental benefits to focus on hard financial returns, risk mitigation, and asset value appreciation.",
+                redFlag: "Basing your recommendation entirely on environmental public relations without proving the project hits the client's internal hurdle rates."
+            },
+            {
+                id: "s1_q_17",
+                category: "Consulting Fit & Motivation",
+                difficulty: "Expert",
+                question: "Where do you expect to face the steepest learning curve when transitioning from your past career into management consulting?",
+                conversational: "The biggest adjustment will be moving from deep, long-term engineering design timelines to the rapid pace of 8-week consulting sprints. In my past role, I could spend months refining a technical solution. In consulting, I need to apply the 80/20 rule—focusing on the highest-impact drivers to deliver actionable executive recommendations under tight timelines without chasing unnecessary details.",
+                deepdive: "This question tests your self-awareness and understanding of the unique professional demands of elite consulting environments.",
+                coaching: "Identify a genuine professional challenge, show you understand why it matters in consulting, and detail the specific steps you are taking to manage the transition.",
+                redFlag: "Giving a generic or defensive response like 'I work too hard,' which shows a lack of self-awareness and low professional maturity."
+            },
+            {
+                id: "s1_q_18",
+                category: "McKinsey PEI / Behavioral Interview",
+                difficulty: "Advanced",
+                question: "Tell me about a time you mentored an underperforming colleague and successfully elevated their professional performance trajectory.",
+                conversational: "A junior analyst on my project team was consistently missing data deadlines, which was slowing down our client deliverables. Instead of scaling back their responsibilities, I sat down with them to find the roadblock. I discovered they were stuck on complex financial modeling structures but were hesitant to ask for help. I ran daily 30-minute training sessions for two weeks and paired them with a senior analyst. They built their confidence and delivered their next three sprint tasks ahead of schedule.",
+                deepdive: "Consulting relies heavily on team development. Leaders must show empathy, clear performance coaching, and a commitment to growing junior talent.",
+                coaching: "Clearly explain how you diagnosed the performance root cause, developed a structured improvement plan, and measured the positive outcome.",
+                redFlag: "Taking over the underperforming colleague's work yourself, which fixes the short-term problem but fails to develop the team member."
+            },
+            {
+                id: "s1_q_19",
+                category: "Case Interview Fundamentals",
+                difficulty: "Advanced",
+                question: "A dominant consumer packaged goods client wants to cut its product SKUs by 30% to streamline logistics. What strategic tradeoffs must they manage?",
+                conversational: "They must balance inventory cost savings against market risk. On the positive side, cutting slow-moving SKUs lowers warehouse holding costs and simplifies manufacturing setup times. On the negative side, they risk losing shelf space to competitors, lowering brand visibility, and frustrating loyal customers who buy those niche products.",
+                deepdive: "SKU rationalization requires balancing operational improvements against commercial retail sales risks and customer retention goals.",
+                coaching: "Address the risk of cannibalization, explaining how customers might switch to alternative products within the client's portfolio versus leaving for a competitor.",
+                redFlag: "Focusing entirely on manufacturing cost savings while ignoring the risk of losing retail shelf space and market share."
+            },
+            {
+                id: "s1_q_20",
+                category: "Case Interview Fundamentals",
+                difficulty: "Core",
+                question: "Our client is a traditional newspaper publisher facing a steady 10% annual decline in print advertising revenues. How do you approach this challenge?",
+                conversational: "I would divide the strategy into defensive and offensive tracks. Defensively, I'd look to optimize print operations—consolidating printing schedules and reducing distribution footprints to protect margins. Offensively, I'd focus on scaling digital monetization channels—building tiered metered paywalls, growing digital newsletter sponsorships, and exploring targeted digital ad options.",
+                deepdive: "Legacy media turnarounds require managing declining print assets to fund and accelerate digital growth channels.",
+                coaching: "Frame the problem around the customer transition, analyzing how to migrate legacy print readers over to higher-margin digital subscription platforms.",
+                redFlag: "Suggesting short-term cost cuts that damage editorial quality, which accelerates subscriber losses and hurts long-term growth."
+            }
+        ];
+
+        function switchView(viewId, activeBtn) {
+            document.querySelectorAll('.section-container').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.toolbar-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            activeBtn.classList.add('active');
+            document.getElementById('header-display-title').innerText = viewId === 'cases-view' ? 'Sprint 1: Case Prompts' : 'Sprint 1: Paired Question Bank';
+        }
+
+        function populateSprintArchitecture() {
+            const casesAnchor = document.getElementById('cases-anchor'); casesAnchor.innerHTML = '';
+            SPRINT_CASES.forEach(c => {
+                casesAnchor.innerHTML += `
+                    <div class="card">
+                        <div class="card-header-row">
+                            <div>
+                                <h3 class="card-title">${c.title}</h3>
+                                <div class="tag-row"><span class="badge badge-category">${c.caseType}</span><span class="badge badge-difficulty">${c.difficulty}</span></div>
+                            </div>
+                        </div>
+                        <div class="content-block"><div class="content-block-title">Client Situation & Strategic Context</div><div class="content-block-text">${c.clientContext}</div></div>
+                        <div class="content-block"><div class="content-block-title">Interviewer Prompt Payload</div><div class="content-block-text" style="color:#fff; font-weight:600; font-style:italic;">"${c.interviewerPrompt}"</div></div>
+                        <div class="tabs-container">
+                            <div class="tab-headers">
+                                <button class="tab-btn active" onclick="toggleCardTab(event, 'objectives')">Objectives</button>
+                                <button class="tab-btn" onclick="toggleCardTab(event, 'structure')">Structure</button>
+                                <button class="tab-btn" onclick="toggleCardTab(event, 'data')">Data/Exhibit</button>
+                                <button class="tab-btn" onclick="toggleCardTab(event, 'path')">Ideal Solution</button>
+                                <button class="tab-btn" onclick="toggleCardTab(event, 'coaching')">Partner Notes</button>
+                            </div>
+                            <div class="tab-content active" data-tab="objectives">
+                                <strong>Candidate Milestones:</strong><br>${c.candidateObjectives}<br><br>
+                                <strong>Clarifying Entry Questions:</strong><br><span style="font-style:italic; color:var(--accent-gold);">"${c.clarifyingQuestions}"</span>
+                            </div>
+                            <div class="tab-content" data-tab="structure"><strong>Tailored MECE Framework:</strong><br>${c.suggestedStructure}<br><br><strong>Key Business Parameters:</strong><br>${c.keyBusinessIssues}</div>
+                            <div class="tab-content" data-tab="data"><strong>Quantitative Requirements:</strong><br>${c.mathRequired}<br><br><strong>Exhibit Reference:</strong><br><pre style="background:#111; padding:10px; border-radius:4px; color:#fff; font-family:sans-serif; white-space:pre-wrap;">${c.sampleDataOrExhibit}</pre></div>
+                            <div class="tab-content" data-tab="path"><strong>Elite Execution Path:</strong><br>${c.strongAnswerPath}<br><br><strong>Recommendation Blueprint:</strong><br><span style="color:var(--accent-gold); font-style:italic;">"${c.finalRecommendation}"</span></div>
+                            <div class="tab-content" data-tab="coaching"><span style="color:#4ecdc4;"><strong>Senior Coaching Note:</strong></span><br>${c.coachingNotes}<br><br><span style="color:#ff6b6b;"><strong>Fatal Red Flags:</strong></span><br>${c.redFlags}</div>
+                        </div>
+                        <button class="btn-action" onclick="openPracticeModal('${c.id}', 'case')">Practice Case Opening Remarks →</button>
+                    </div>`;
+            });
+
+            const questionsAnchor = document.getElementById('questions-anchor'); questionsAnchor.innerHTML = '';
+            SPRINT_QUESTIONS.forEach(q => {
+                questionsAnchor.innerHTML += `
+                    <div class="card">
+                        <div class="card-header-row">
+                            <div>
+                                <h3 class="card-title">${q.question}</h3>
+                                <div class="tag-row"><span class="badge badge-category">${q.category}</span><span class="badge badge-difficulty">${q.difficulty}</span></div>
+                            </div>
+                        </div>
+                        <div class="tabs-container">
+                            <div class="tab-headers">
+                                <button class="tab-btn active" onclick="toggleCardTab(event, 'conversational')">Conversational Answer</button>
+                                <button class="tab-btn" onclick="toggleCardTab(event, 'deepdive')">Strategic Deep-Dive</button>
+                                <button class="tab-btn" onclick="toggleCardTab(event, 'notes')">Coaching & Red Flags</button>
+                            </div>
+                            <div class="tab-content active" data-tab="conversational"><div style="font-style:italic; color:#e5c158; background:#1a1a1a; padding:15px; border-radius:4px; border-left:3px solid var(--accent-gold);">"${q.conversational}"</div></div>
+                            <div class="tab-content" data-tab="deepdive">${q.deepdive}</div>
+                            <div class="tab-content" data-tab="notes"><span style="color:#4ecdc4;"><strong>Delivery Coaching Note:</strong></span><br>${q.coaching}<br><br><span style="color:#ff6b6b;"><strong>Fatal Red Flag Boundary:</strong></span><br>${q.redFlag}</div>
+                        </div>
+                        <button class="btn-action" onclick="openPracticeModal('${q.id}', 'question')">Practice Live Verbalization →</button>
+                    </div>`;
+            });
+        }
+
+        function toggleCardTab(event, tabName) {
+            const container = event.target.closest('.tabs-container');
+            container.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            container.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            event.target.classList.add('active');
+            container.querySelector(`.tab-content[data-tab="${tabName}"]`).classList.add('active');
+        }
+
+        let recognition, isRecording = false, activeItemId = null, activeItemType = null;
+
+        function openPracticeModal(id, type) {
+            activeItemId = id; activeItemType = type;
+            let sourceItem = type === 'case' ? SPRINT_CASES.find(c => c.id === id) : SPRINT_QUESTIONS.find(q => q.id === id);
+            if (!sourceItem) return;
+            document.getElementById('practice-modal').classList.add('active');
+            document.getElementById('modal-title-header').innerText = type === 'case' ? 'Case Structuring Sprint' : 'Verbalization Sprint';
+            document.getElementById('modal-item-title').innerText = type === 'case' ? sourceItem.title : sourceItem.category;
+            document.getElementById('modal-context-label').innerText = type === 'case' ? 'Interviewer Case Prompt:' : 'Target Interview Question:';
+            document.getElementById('modal-prompt-text').innerText = type === 'case' ? sourceItem.interviewerPrompt : sourceItem.question;
+            document.getElementById('transcription-box').value = '';
+            document.getElementById('filler-words').innerText = 'Filler Words: 0';
+            document.getElementById('ai-prompt-output').style.display = 'none';
+            resetAnswerTimer();
+            lastFocusedElement = document.activeElement;
+            document.getElementById('btn-record').focus();
+        }
+
+        let lastFocusedElement = null;
+        function closeModal() { document.getElementById('practice-modal').classList.remove('active'); if (isRecording) stopRecordingEngine(); stopAnswerTimer(); if (lastFocusedElement) lastFocusedElement.focus(); }
+
+        function toggleRecordingEngine() {
+            if (!isRecording) {
+                if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) { alert("Requires Chrome/Edge browser speech engine."); return; }
+                const SpeechClass = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechClass(); recognition.continuous = true; recognition.interimResults = true; recognition.lang = 'en-US';
+                recognition.onresult = function(event) {
+                    let finalSegment = '';
+                    for (let i = event.resultIndex; i < event.results.length; ++i) { if (event.results[i].isFinal) finalSegment += event.results[i][0].transcript; }
+                    if (finalSegment) { const box = document.getElementById('transcription-box'); box.value += finalSegment + ' '; countTrackedFillers(box.value); }
+                };
+                // Chrome ends recognition on its own after silence or transient
+                // network errors. While the user still intends to record, restart
+                // instead of dying silently with a stale "Stop Recording" button.
+                recognition.onend = function() {
+                    if (isRecording) {
+                        try { recognition.start(); }
+                        catch (e) { stopRecordingEngine(); }
+                    }
+                };
+                recognition.onerror = function(event) {
+                    if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                        stopRecordingEngine();
+                        alert("Microphone access is blocked. Allow mic access for this site in your browser settings, then restart the recording.");
+                    }
+                    // 'no-speech', 'network', 'aborted' fall through to onend,
+                    // which restarts the session while isRecording is true.
+                };
+                recognition.start(); document.getElementById('btn-record').innerText = "🛑 Stop Recording"; document.getElementById('recording-status').style.display = "inline-flex"; isRecording = true; startAnswerTimer();
+            } else { stopRecordingEngine(); }
+        }
+
+        function stopRecordingEngine() { isRecording = false; if (recognition) recognition.stop(); document.getElementById('btn-record').innerText = "🎙️ Start Spoken Answer"; document.getElementById('recording-status').style.display = "none"; stopAnswerTimer(); }
+
+        function countTrackedFillers(text) {
+            const singles = ['um', 'uh', 'like', 'basically', 'actually'];
+            const phrases = [/\byou know\b/g, /\bsort of\b/g, /\bkind of\b/g];
+            const lower = text.toLowerCase();
+            let score = 0;
+            lower.split(/\s+/).forEach(p => { if (singles.includes(p.replace(/[^a-z]/g, ''))) score++; });
+            phrases.forEach(re => { const m = lower.match(re); if (m) score += m.length; });
+            document.getElementById('filler-words').innerText = `Filler Words: ${score}`;
+        }
+
+        /* ---- 2-minute answer timer (starts with recording) ---- */
+        const TIMER_LIMIT_SECONDS = 120;
+        let timerInterval = null, timerRemaining = TIMER_LIMIT_SECONDS;
+
+        function renderAnswerTimer() {
+            const el = document.getElementById('timer-display');
+            const overtime = timerRemaining < 0;
+            const t = Math.abs(timerRemaining);
+            const mm = Math.floor(t / 60), ss = String(t % 60).padStart(2, '0');
+            el.innerText = overtime ? `⏱ +${mm}:${ss} over` : `⏱ ${mm}:${ss}`;
+            el.style.color = overtime ? 'var(--mbb-red, #ff3333)' : (timerRemaining <= 30 ? 'var(--accent-gold)' : 'var(--text-muted)');
+        }
+
+        function startAnswerTimer() {
+            stopAnswerTimer();
+            timerRemaining = TIMER_LIMIT_SECONDS;
+            renderAnswerTimer();
+            timerInterval = setInterval(() => { timerRemaining--; renderAnswerTimer(); }, 1000);
+        }
+
+        function stopAnswerTimer() { if (timerInterval) { clearInterval(timerInterval); timerInterval = null; } }
+
+        function resetAnswerTimer() { stopAnswerTimer(); timerRemaining = TIMER_LIMIT_SECONDS; renderAnswerTimer(); }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && document.getElementById('practice-modal').classList.contains('active')) closeModal();
+        });
+
+       function triggerAIFeedbackPayload() {
+    let item = activeItemType === 'case' ? SPRINT_CASES.find(c => c.id === activeItemId) : SPRINT_QUESTIONS.find(q => q.id === activeItemId);
+    const userSpeech = document.getElementById('transcription-box').value;
+    if (!item) return;
+
+    let payload = `
+[CONSULTING / MBB INTERVIEW COACHING — ECCLES MBA MODULE]
+Evaluate the candidate response to the following consulting tracking prompt using partner-level standards:
+
+${activeItemType === 'case' ? `CASE SCENARIO: ${item.title}\nPROMPT EXPECTATION: "${item.interviewerPrompt}"\nIDEAL FRAMEWORK PATH: "${item.suggestedStructure}"` : `INTERVIEW PROMPT: "${item.question}"\nEXPECTED MODEL DELIVERY: "${item.conversational}"`}
+
+CANDIDATE AUDIO TRANSCRIPT INPUT:
+"${userSpeech || "[No transcript provided. Evaluate parameters and provide an elite baseline model response.]"}"
+
+Provide deep structured metrics using exactly this markdown output schema:
+
+**What Worked**
+[Detail 1-2 key operational strengths from what the candidate said.]
+
+**Top 2 Areas for Improvement**
+1. [Identify the primary gap versus an elite MBB delivery and give specific replacement phrasing.]
+2. [Identify any logical gaps, calculation slips, or structural blind spots.]
+
+**Advanced Consulting Power Move**
+[Provide one custom partner-level business insight or analytical variable tailored to this specific scenario context.]
+
+**Dashboard Scorecard Matrix**
+Assign exactly one rubric score (1. Emerging | 2. Developing | 3. Interview-Ready | 4. MBB-Caliber) for each applicable competency based on this specific performance:
+* Case Structuring: [Score]
+* Business Judgment: [Score]
+* Math Accuracy: [Score]
+* Synthesis: [Score]
+* Fit / PEI Storytelling: [Score]
+* Executive Presence: [Score]
+* Communication Clarity: [Score]
+* Recommendation Strength: [Score]
+    `;
+
+    document.getElementById('ai-copy-text').innerText = payload.trim();
+    document.getElementById('ai-prompt-output').style.display = 'block';
+}
+
+        function copyPayloadToClipboard() { navigator.clipboard.writeText(document.getElementById('ai-copy-text').innerText); alert("Payload packed to clipboard!"); }
+        window.onload = () => { populateSprintArchitecture(); };
+    </script>
+</body>
+</html>
