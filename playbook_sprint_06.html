@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eccles MBA — Consulting Practice Sprint 6</title>
+    <style>
+        :root {
+            --primary-red: #CC0000;
+            --accent-gold: #c9a84c;
+            --bg-dark: #121212;
+            --bg-card: #1e1e1e;
+            --bg-sidebar: #0a0a0a;
+            --text-main: #f5f5f5;
+            --text-muted: #a0a0a0;
+            --border-color: #333333;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            font-family: var(--font-family);
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* PERMANENT GLOBAL SIDEBAR */
+        aside {
+            width: 320px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            padding: 0 24px 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 15px;
+        }
+
+        .brand h2 {
+            color: var(--primary-red);
+            margin: 0 0 5px 0;
+            font-size: 1.3rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .brand p {
+            color: var(--accent-gold);
+            margin: 0;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .nav-label {
+            padding: 10px 24px 5px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        aside a {
+            text-decoration: none;
+            color: var(--text-muted);
+            padding: 12px 24px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-left: 4px solid transparent;
+        }
+
+        aside a:hover, aside a.active {
+            background-color: rgba(204, 0, 0, 0.1);
+            color: var(--primary-red);
+            border-left-color: var(--primary-red);
+        }
+
+        .count-badge {
+            background-color: #2a2a2a;
+            color: var(--accent-gold);
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        main {
+            flex: 1;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            background-color: rgba(18, 18, 18, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title-area h1 { margin: 0; font-size: 1.25rem; font-weight: 700; }
+        .header-subtitle { margin: 2px 0 0 0; font-size: 0.85rem; color: var(--accent-gold); text-transform: uppercase; letter-spacing: 1px; }
+
+        /* HORIZONTAL LOCAL TOOLBAR VIEW TOGGLE */
+        .local-toolbar {
+            background-color: #161616;
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 40px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .toolbar-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toolbar-btn:hover, .toolbar-btn.active {
+            background-color: rgba(204, 0, 0, 0.1);
+            color: white;
+        }
+
+        .section-container { padding: 40px; max-width: 1300px; width: calc(100% - 80px); margin: 0 auto; display: none; }
+        .section-container.active { display: block; }
+        .hero { margin-bottom: 40px; border-bottom: 1px solid var(--border-color); padding-bottom: 30px; }
+        .track-pill { display: inline-block; background-color: rgba(201, 168, 76, 0.1); color: var(--accent-gold); padding: 5px 14px; border-radius: 4px; font-size: 0.8rem; text-transform: uppercase; font-weight: 700; margin-bottom: 15px; letter-spacing: 1px; }
+        .hero h2 { font-size: 2.5rem; margin: 0 0 15px 0; font-weight: 800; }
+        .description { color: var(--text-muted); line-height: 1.6; font-size: 1.1rem; max-width: 900px; margin: 0; }
+        .content-grid { display: grid; grid-template-columns: 1fr; gap: 25px; }
+        .card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 28px; transition: all 0.25s ease; position: relative; }
+        .card-header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+        .card-title { font-size: 1.5rem; margin: 0; font-weight: 700; color: var(--text-main); }
+        .tag-row { display: flex; gap: 10px; margin-top: 5px; }
+        .badge { font-size: 0.75rem; padding: 4px 10px; border-radius: 4px; font-weight: bold; text-transform: uppercase; }
+        .badge-category { background-color: rgba(201, 168, 76, 0.1); color: var(--accent-gold); }
+        .badge-difficulty { background-color: rgba(204, 0, 0, 0.1); color: var(--primary-red); }
+
+        .content-block { margin-top: 15px; background-color: #161616; padding: 15px 20px; border-radius: 6px; border-left: 3px solid #333; }
+        .content-block-title { font-size: 0.85rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; letter-spacing: 0.5px; }
+        .content-block-text { font-size: 0.95rem; line-height: 1.5; color: #e0e0e0; white-space: pre-line; }
+
+        .tabs-container { margin-top: 20px; }
+        .tab-headers { display: flex; border-bottom: 1px solid var(--border-color); gap: 10px; }
+        .tab-btn { background: none; border: none; color: var(--text-muted); padding: 10px 15px; cursor: pointer; font-size: 0.9rem; font-weight: 600; transition: all 0.2s; border-bottom: 2px solid transparent; }
+        .tab-btn.active { color: var(--primary-red); border-bottom-color: var(--primary-red); }
+        .tab-content { display: none; padding: 15px 5px; font-size: 0.95rem; line-height: 1.5; }
+        .tab-content.active { display: block; }
+
+        .btn-action { background-color: var(--primary-red); color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-weight: 700; font-size: 0.9rem; transition: background-color 0.2s; display: inline-flex; align-items: center; gap: 8px; margin-top: 15px; }
+        .btn-action:hover { background-color: #a00000; }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .modal.active { display: flex; }
+        .modal-content { background-color: var(--bg-card); width: 90%; max-width: 850px; max-height: 85vh; overflow-y: auto; padding: 35px; border-radius: 8px; border: 1px solid var(--primary-red); position: relative; }
+        .close-modal { position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--text-muted); font-size: 2rem; cursor: pointer; }
+        textarea { width: 100%; box-sizing: border-box; height: 160px; background-color: #121212; color: white; border: 1px solid var(--border-color); border-radius: 4px; padding: 15px; margin-top: 15px; font-family: var(--font-family); font-size: 1rem; line-height: 1.5; resize: vertical; }
+        .copy-box { background-color: #121212; padding: 20px; border-left: 4px solid var(--accent-gold); font-family: monospace; margin-top: 15px; white-space: pre-wrap; font-size: 0.9rem; color: #dcdcdc; max-height: 250px; overflow-y: auto; }
+        .recording-indicator { display: none; color: var(--primary-red); font-weight: 700; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <!-- PERMANENT GLOBAL SIDEBAR -->
+    <aside>
+        <div class="brand">
+            <h2>Eccles MBA</h2>
+            <p>Consulting Command Center</p>
+        </div>
+        <div class="nav-label">Core Directory</div>
+        <a href="./index.html">Ecosystem Dashboard</a>
+        <a href="./playbook_frameworks.html">20 Case Frameworks</a>
+        <a href="./playbook_math.html">15 Analytics Math Drills</a>
+        <a href="./playbook_battlecard.html">MBB Battlecard Vault</a>
+        
+        <div class="nav-label">Practice Sprints</div>
+        <a href="./playbook_sprint_01.html">Sprint 1: Profitability</a>
+        <a href="./playbook_sprint_02.html">Sprint 2: M&A Strategy</a>
+        <a href="./playbook_sprint_03.html">Sprint 3: Operations</a>
+        <a href="./playbook_sprint_04.html">Sprint 4: Tech & SaaS</a>
+        <a href="./playbook_sprint_05.html">Sprint 5: GTM & Pricing</a>
+        <a href="./playbook_sprint_06.html" class="active">Sprint 6: Capstones</a>
+    </aside>
+
+    <main>
+        <header>
+            <div class="header-title-area">
+                <h1 id="header-display-title">Sprint 6: Case Prompts</h1>
+                <div class="header-subtitle">Advanced Estimation, Standalone Market Sizing, and Partner Edge Cases</div>
+            </div>
+        </header>
+
+        <!-- HORIZONTAL LOCAL TOOLBAR VIEW TOGGLE -->
+        <div class="local-toolbar">
+            <button class="toolbar-btn active" id="btn-cases" onclick="switchView('cases-view', this)">MBB Case Prompts <span class="count-badge">5</span></button>
+            <button class="toolbar-btn" id="btn-questions" onclick="switchView('questions-view', this)">Paired Question Bank <span class="count-badge">20</span></button>
+        </div>
+
+        <!-- VIEW: CASES -->
+        <section id="cases-view" class="section-container active">
+            <div class="hero">
+                <span class="track-pill">Advanced Capstone Block</span>
+                <h2>MBB Case Prompt Library</h2>
+                <p class="description">Master highly ambiguous estimations, advanced multi-axis exhibit charts, candidate-led strategy shifts, and conversational partner-level pushback scenarios across the final 5 capstone cases.</p>
+            </div>
+            <div class="content-grid" id="cases-anchor"></div>
+        </section>
+
+        <!-- VIEW: QUESTIONS -->
+        <section id="questions-view" class="section-container">
+            <div class="hero">
+                <span class="track-pill">Executive Communication Block</span>
+                <h2>Paired Question Bank</h2>
+                <p class="description">The final 20 core interview questions mapped to test complex data interpretation, corporate math delivery, synthesis, and senior partner round defense protocols.</p>
+            </div>
+            <div class="content-grid" id="questions-anchor"></div>
+        </section>
+
+        <!-- Global Interactive Modal Canvas -->
+        <div id="practice-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title-header">
+            <div class="modal-content">
+                <button class="close-modal" onclick="closeModal()" aria-label="Close practice modal">×</button>
+                <h2 style="color: var(--primary-red); margin-top: 0;" id="modal-title-header">Interactive Practice Arena</h2>
+                <h3 id="modal-item-title" style="color: var(--accent-gold); margin: 5px 0 15px 0;"></h3>
+                
+                <div style="background-color: #252525; padding: 15px; border-radius: 6px; border-left: 3px solid var(--primary-red);">
+                    <span style="font-size: 0.8rem; text-transform: uppercase; font-weight: 800; color: var(--text-muted); display: block;" id="modal-context-label">Context Prompt:</span>
+                    <p id="modal-prompt-text" style="margin: 5px 0 0 0; font-size: 1rem; line-height: 1.5; color: #fff;"></p>
+                </div>
+                
+                <div style="margin-top: 15px; display: flex; gap: 15px; align-items: center;">
+                    <button class="btn-action" onclick="toggleRecordingEngine()" id="btn-record">🎙️ Start Spoken Answer</button>
+                    <span class="recording-indicator" id="recording-status" role="status">🔴 Audio Pipeline Live...</span>
+                    <div id="filler-words" aria-live="polite" style="font-size: 0.9rem; font-weight:600; color:var(--accent-gold);">Filler Words: 0</div>
+                    <div id="timer-display" style="font-size: 0.9rem; font-weight:700; color:var(--text-muted); margin-left:auto;">⏱ 2:00</div>
+                </div>
+                
+                <textarea id="transcription-box" aria-label="Live speech transcript" placeholder="Your live recording speech transcript will populate here..."></textarea>
+                <button class="btn-action" style="background-color: var(--accent-gold); color: black; width: 100%; justify-content: center;" onclick="triggerAIFeedbackPayload()">Generate Rigorous AI Coaching Prompt</button>
+                
+                <div id="ai-prompt-output" style="display: none;">
+                    <p style="margin-top: 20px; font-weight: 700; font-size: 0.95rem;">Copy this payload directly into your AI assistant for partner-grade processing:</p>
+                    <div class="copy-box" id="ai-copy-text"></div>
+                    <button class="btn-action" onclick="copyPayloadToClipboard()">Copy Payload to Clipboard</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const SPRINT_CASES = [
+            {
+                id: "s6_case_01",
+                caseType: "Market sizing standalone case",
+                difficulty: "Advanced",
+                title: "Tokyo Premium Medical Pet Insurance Sizing",
+                clientContext: "Our client is a premier global insurance conglomerate assessing whether to launch a highly specialized, premium medical insurance product line tailored exclusively for domestic pets across the Tokyo metropolitan area.",
+                interviewerPrompt: "We lack verified local market reports. The investment board needs a rigorous, bottom-up estimation of the total annual addressable market size in US dollars. How do you construct this estimation model from scratch?",
+                candidateObjectives: "1. Build a clean, structured mathematical path starting from Tokyo population demographics.\n2. Apply logical filters for household income brackets and pet ownership penetration.\n3. Determine realistic pricing premiums across distinct dog and cat coverage segments.",
+                clarifyingQuestions: "Should we model the entire pet population or limit our calculation strictly to domestic cats and dogs? Secondly, what is our target pricing benchmark relative to average local veterinary care costs?",
+                suggestedStructure: "Bottom-Up Estimation Architecture:\n- Population Baseline: Total Tokyo population -> average household sizing factor -> total household footprint.\n- Penetration Filters: Split households by income tier -> apply pet ownership percentages -> segment by pet category (Dogs vs Cats).\n- Insurance Adoption Layer: Filter for premium willingness-to-pay tiers -> attach annual policy premium prices.\n- Market Total Aggregation: Sum individual segments to cross-verify the aggregate market capacity.",
+                keyBusinessIssues: "High-density urban living in Tokyo limits large dog ownership, causing a structural shift toward smaller cats and miniature dogs; veterinary cost inflation is high, making insurance highly attractive to affluent pet owners.",
+                mathRequired: "Execute multi-stage household filtering. Calculate total premium revenues across 14M population base given 35% pet ownership and a 10% insurance adoption rate.",
+                sampleDataOrExhibit: "Table 1: Tokyo Population and Operational Proxies:\n- Total Tokyo Population: 14,000,000 individuals\n- Average Household Size: 2 persons per household\n- General Pet Ownership Penetration: 35% of total households\n- Cat vs Dog Split: 60% Cats, 40% Dogs\n- Average Annual Premium Price: $500 per pet",
+                strongAnswerPath: "The candidate starts with 14M population / 2 people per household = 7M households. 35% ownership = 2.45M pet-owning households. They apply a conservative 10% insurance penetration layer = 245,000 insured households. Assuming 1.2 pets per household gives roughly 300,000 insured pets. At a $500 annual premium, they reach a total addressable market size of exactly $150M.",
+                finalRecommendation: "Launch the premium pet line in Tokyo targeting a $150M addressable market. Drive customer acquisition by cross-selling through premium veterinary clinic networks and high-end pet product boutiques, bypassing traditional ad channels.",
+                coachingNotes: "Watch for candidates who drop zeroes or pick random percentages. Premier responses require stating the business rationale behind every assumption and cross-checking the final result against macro indicators.",
+                redFlags: "Throwing out random percentage guesses without giving logical operational context, or making basic calculation errors that alter the market size by billions."
+            },
+            {
+                id: "s6_case_02",
+                caseType: "Chart and exhibit interpretation case",
+                difficulty: "Expert",
+                title: "Multi-Tier Enterprise Cloud Compliance Software Matrix",
+                clientContext: "Our client is an enterprise software provider. They recently launched a modern cloud compliance tracking suite, but sales pipelines are stalling because accounts are struggling to identify their ideal cost tier configuration.",
+                interviewerPrompt: "Look at Exhibit 2, which illustrates total platform implementation costs across three distinct scale options. A strategic enterprise customer has exactly 40 active operational users. How do you evaluate the most cost-effective tier configuration for this client, and what strategic advice do you give our sales team?",
+                candidateObjectives: "1. Calculate the exact fully loaded platform cost across all three software tiers for a 40-user baseline.\n2. Isolate the mathematical crossover points where tier advantages shift.\n3. Redesign the sales team pricing presentation to remove buyer friction.",
+                clarifyingQuestions: "Does the client plan to expand their active user base over the next 12 months, or is the 40-user count a stable long-term ceiling?",
+                suggestedStructure: "Quantitative Pricing Matrix Framework:\n- Cost Architecture per Tier: Build linear equations matching [Fixed Fee + (Variable Rate * Users)] across all options.\n- Multi-Tier Cost Evaluation: Calculate individual absolute expenses for exactly 40 active users.\n- Crossover Optimization: Locate the user count thresholds where Tier 1 beats Tier 2, and Tier 2 beats Tier 3.\n- Commercial Sales Playbook: Redesign sales presentations from technical pricing tables to focus on clear user scaling brackets.",
+                keyBusinessIssues: "The current pricing presentation forces customers to execute complex algebra to compare options, causing lengthy sales cycles and high pipeline abandonment rates.",
+                mathRequired: "Formulate and solve individual cost functions. Compare absolute outputs: Small ($50k + $5k*40 = $250k) vs Medium ($100k + $3k*40 = $220k) vs Large ($200k + $2k*40 = $280k).",
+                sampleDataOrExhibit: "Exhibit 2: Multi-Tier Architecture Pricing Parameters:\n- Small Tier: Fixed Setup $50,000 | Variable Rate: $5,000 per user\n- Medium Tier: Fixed Setup $100,000 | Variable Rate: $3,000 per user\n- Large Tier: Fixed Setup $200,000 | Variable Rate: $2,000 per user",
+                strongAnswerPath: "The candidate writes out the math: Small tier = $250k; Medium tier = $220k; Large tier = $280k. They isolate the Medium tier as the lowest-cost option for 40 users, saving the client $30k over Small. They calculate the crossover point between Small and Medium at exactly 25 users, showing that any client with more than 25 users should automatically move to Medium.",
+                finalRecommendation: "Recommend the Medium tier to the 40-user client to secure an immediate $30,000 cost advantage. Redesign our global sales playbook to feature simple user brackets (e.g., 'Choose Medium if your team has 25 to 100 users') to remove buyer math confusion and close deals faster.",
+                coachingNotes: "Ensure candidates speak their math aloud in clear sequences. Don't just deliver a number; explain the crossover dynamics and state the strategic business advice for the sales team.",
+                redFlags: "Picking a tier based on the lowest fixed setup fee alone or the lowest variable user rate without calculating the total combined cost structure."
+            },
+            {
+                id: "s6_case_03",
+                caseType: "Candidate-led full case",
+                difficulty: "Advanced",
+                title: "Swiss Luxury Watch Manufacturer Grey Market Disruption",
+                clientContext: "Our client is an ultra-premium Swiss luxury watch manufacturer. Over the past 8 quarters, unauthorized digital grey-market platforms have been acquiring authentic inventory from struggling regional dealers and selling them online at a 25% discount, diluting our client's brand equity and compressing their authorized retail margins.",
+                interviewerPrompt: "The CEO has given you complete leadership over this assignment. They want a comprehensive strategy to locate the leakage channels, wipe out gray-market online listings, and restore their global pricing premium. How do you drive this case?",
+                candidateObjectives: "1. Locate the exact operational leaks allowing authentic watches to hit unauthorized channels.\n2. Design pricing and inventory tracking controls to monitor authorized dealer behaviors.\n3. Formulate an execution strategy to manage or exit underperforming dealer relationships.",
+                clarifyingQuestions: "Which specific geographic regions show the highest variance between wholesale inventory shipments and authorized retail sales volumes?",
+                suggestedStructure: "Candidate-Driven Brand Protection Framework:\n- Supply Chain Tracking: Wholesale shipment volumes vs authorized sales registries, tracking luxury watch serial codes.\n- Dealer Distribution Analytics: Margin structures, inventory holding costs, identifying dealers clearing excess stock to gray platforms.\n- Legal & Digital Defenses: Online listing monitoring, global authorized pricing rules, buyback programs for gray stock.\n- Strategic Retail Realignment: Transitioning to exclusive corporate-owned boutiques, dropping uncooperative retail dealers.",
+                keyBusinessIssues: "Independent dealers in Southern Europe are secretly unloading unsold watches to gray-market wholesalers at cost to generate quick liquidity to cover their overhead expenses.",
+                mathRequired: "Calculate the financial ROI of establishing a corporate inventory buyback program to reclaim gray market stock versus the margin losses caused by global brand dilution.",
+                sampleDataOrExhibit: "Table 3: Regional Wholesale Disconnect and Inventory Allocations:\n- North America: Wholesaled 10,000 units | Registered Retail Sales: 9,800 units\n- Southern Europe: Wholesaled 15,000 units | Registered Retail Sales: 9,500 units\n- Asia-Pacific: Wholesaled 8,000 units | Registered Retail Sales: 7,900 units",
+                strongAnswerPath: "The candidate takes the driver's seat. They highlight Southern Europe as the clear problem area, noting a massive 5,500 unit gap between wholesale shipments and registered consumer sales. They deduce that dealers are dumping this excess stock to gray market platforms, and design a strict inventory quota system to stop the leakage.",
+                finalRecommendation: "Cut wholesale inventory allocations to Southern Europe by 35% to immediately halt grey-market supply, embed blockchain serial codes into frames for real-time tracking, and terminate contracts with any independent dealer caught dumping stock.",
+                coachingNotes: "In candidate-led cases, do not wait for questions. Assert control, state your hypotheses clearly, analyze data proactively, and lead the interviewer through your issue tree.",
+                redFlags: "Waiting passive for data inputs, or suggesting broad consumer ad campaigns to fix what is a structural dealer supply chain leakage crisis."
+            },
+            {
+                id: "s6_case_04",
+                caseType: "Interviewer-led full case",
+                difficulty: "Expert",
+                title: "Global Conglomerate Green Hydrogen Capital Allocation",
+                clientContext: "Our client is a massive industrial energy conglomerate evaluating a major capital transition project: a proposed $400M investment to build utility-scale green hydrogen production assets.",
+                interviewerPrompt: "I need you to test the financial durability of this project. The executive committee is highly skeptical of green energy returns. I will provide data as we progress. First, evaluate the core financial levers and explain how you will test if this asset can clear our strict 14% internal hurdle rate.",
+                candidateObjectives: "1. Build an uncompromised project financial model balancing upfront CapEx against long-term cash flows.\n2. Stress-test project returns against volatile input electricity pricing models.\n3. Evaluate long-term commercial off-take agreements with industrial buyers to secure revenues.",
+                clarifyingQuestions: "What specific government green energy subsidies are locked in, and how do they alter our net initial capital expenditures?",
+                suggestedStructure: "Interviewer-Gated Hurdle System:\n- Capital Expenditure Economics: Upfront asset assembly costs, infrastructure grants, debt-to-equity financing costs.\n- Operating Cash Flow Drivers: Variable input electricity rates (largest cost driver), facility conversion yields, infrastructure maintenance costs.\n- Commercial Off-Take Architecture: Long-term fixed corporate contracts vs variable spot market energy pricing sales.\n- Macro Sensitivity Testing: Hurdle rate adjustments across severe inflation and regulatory subsidy scenarios.",
+                keyBusinessIssues: "Green hydrogen production requires immense electrical power; variable grid electricity prices fluctuate wildly, meaning a spike in input power costs can quickly destroy project returns.",
+                mathRequired: "Calculate project net present value (NPV) and cash flows across alternative electricity input rates to find the maximum power cost the asset can tolerate.",
+                sampleDataOrExhibit: "Exhibit 4: Project Financial and Operating Parameters:\n- Initial Gross Capital Investment: $400M\n- Long-Term Industrial B2B Off-Take Contracts Secured: 100% of volume at a fixed price\n- Project Cash Inflow Run-Rate (At $0.04/kWh electricity cost): $60M/year over 10 years\n- Profit Compression: Every $0.01/kWh lift in input electricity cost reduces annual cash inflows by $8M",
+                strongAnswerPath: "The candidate follows the interviewer's guidance. They use the data to prove that if power costs stay at $0.04/kWh, a $60M annual cash flow yields a 15% return, clearing the 14% hurdle rate. However, they note that a tiny $0.01 spike in electricity prices drops cash flows down to $52M, pushing project returns safely below the required hurdle limit.",
+                finalRecommendation: "Proceed with the green hydrogen investment *only* if we can sign a 10-year fixed power purchase agreement (PPA) with a regional utility at or below $0.04/kWh to completely de-risk our input electricity costs and protect our 14% hurdle rate.",
+                coachingNotes: "In interviewer-led cases (McKinsey style), answer the specific question pitched immediately. Don't wander into broad structures; focus entirely on the operational data parameters provided in the prompt step.",
+                redFlags: "Failing to calculate how electricity price shifts alter cash flows, or delivering an un-quantified energy summary that ignores the strict 14% hurdle rate constraint."
+            },
+            {
+                id: "s6_case_05",
+                caseType: "Turnaround strategy",
+                difficulty: "Expert",
+                title: "Autonomous Long-Haul Freight Network Ecosystem Alignment",
+                clientContext: "Our client is a venture-backed autonomous trucking technology developer. They have deployed an asset-light software platform designed to manage long-haul freight loops for corporate shipping clients, but localized transit delays and stakeholder misalignments have stalled their rollout velocity.",
+                interviewerPrompt: "We are facing partner-level pushback. Shippers complain that our software route allocations extend pickup delays by 2 hours, truck fleet operators are refusing to install our telemetry tracking kits due to maintenance downtime, and investors are threatening to freeze funding. You have 2 minutes to pitch a complete strategic turnaround to the board. Go.",
+                candidateObjectives: "1. Resolve structural route latency blockages across tracking software layers.\n2. Realign fleet operator incentives to accelerate telemetry hardware installation speeds.\n3. Deliver a high-impact, partner-round final summary to secure the next venture capital funding round.",
+                clarifyingQuestions: "What is the primary root cause behind the 2-hour pickup delay—is it a software algorithmic matching lag or communication breakdowns at physical loading docks?",
+                suggestedStructure: "Partner Round Emergency Framework:\n- Software & Algorithmic Diagnostics: Route optimization code efficiencies, API update speeds, location tracking accuracy rules.\n- Fleet Partner Incentive Models: Telemetry kit installation subsidies, down-time compensation guarantees, per-mile software profit shares.\n- Shipping Care Management: Warehouse slot scheduling integration, real-time arrival notifications, loading dock process optimization.\n- Financial Runway Security: Capital deployment timelines, cash burn optimization tracks, investor milestone tracking.",
+                keyBusinessIssues: "Fleet operators reject the technology because installing the hardware takes trucks off the road for 3 days without compensation; pickup delays occur because shipping warehouses rely on manual check-in logs that don't sync with our digital app.",
+                mathRequired: "Calculate the capital allocation required to fully subsidize operator downtime during telemetry installation, offsetting that cost against higher platform transaction volumes.",
+                sampleDataOrExhibit: "Exhibit 5: Operational Delay and Fleet Performance Metrics:\n- Total Active Fleet Size: 500 trucks | Telemetry Installation Penetration: 20%\n- Lost Operator Fleet Revenue per Day of Maintenance Down-Time: $1,000\n- Telemetry Installation Window Requirement: 3 Days per truck\n- Targeted Platform Transaction Lift Post-Telemetry Installation: +40% volume matrix",
+                strongAnswerPath: "The candidate delivers under intense final-round pressure. They identify that low telemetry installation (20%) is destroying network efficiency. They re-allocate venture capital to fully cover operators' $3,000 downtime costs during installation, recognizing that accelerating fleet deployment is the only way to build network scale and secure investor trust.",
+                finalRecommendation: "Launch a comprehensive fleet realign infrastructure play: fully subsidize the $3,000 operator downtime cost during hardware installation to push telemetry penetration past 85% within 90 days. Integrate warehouse check-in logs with our cloud API to wipe out pickup delays, and pitch this data-driven execution roadmap to investors to secure the funding round.",
+                coachingNotes: "Partner rounds test mature business judgment, poise under pushback, and executive presence. Bypassing minor details to lead with a bold, quantified financial turnaround strategy is essential.",
+                redFlags: "Delivering a slow, academic review of software engineering code parameters when the board explicitly demanded an immediate, high-level business turnaround plan."
+            }
+        ];
+
+        const SPRINT_QUESTIONS = [
+            { id: "s6_q_01", category: "Market Sizing & Estimation", difficulty: "Core", question: "How do you establish clear, defensible demographic proxy metrics when a case drops you into an unfamiliar international city without historical data parameters?", conversational: "I use a known macro benchmark as an anchor and adjust it based on local characteristics. For example, if I'm analyzing an unfamiliar international capital city, I anchor my thoughts on a known dense city like New York or London, which has roughly 8 to 10 million people. I then adjust this baseline population down or up based on the country's macro profile, and use a standard 2 to 3 person household sizing rule to build a clean, bottom-up estimation path.", deepdive: "Anchoring prevents estimation paralysis. Candidates should use standard baseline anchors (US population = 330M, households = 110M; city hubs = 10M) and apply simple rounding shortcuts to keep calculation layers clear and manageable.", coaching: "Explain your logic clearly before jumping into the math: tell the interviewer exactly what anchor you are using and why you are adjusting the parameters for the target market.", redFlag: "Claiming you cannot solve the estimation without verified government statistics, which demonstrates a lack of adaptability and poor resourcefulness." },
+            { id: "s6_q_02", category: "Market Sizing & Estimation", difficulty: "Advanced", question: "Walk me through a bottom-up estimation framework to calculate the total annual volume of commercial aviation jet engines manufactured across North America.", conversational: "I will build this model based on fleet replacement cycles. I'll start with the total count of active commercial aircraft in North America, which I estimate at roughly 6,000 planes. Since each commercial jet utilizes 2 engines, that represents a baseline of 12,000 active engines in the sky. Assuming an average aircraft lifecycle of 20 years means roughly 5% of the fleet is replaced annually, translating to 300 new planes or 600 engines. Factoring in an extra 50% for spare inventory and maintenance rotations yields an annual manufacturing volume of exactly 900 commercial jet engines.", deepdive: "Bottom-up operational builds use physical asset counts and clear engineering lifecycle assumptions, which creates a highly robust and defensible estimation model compared to top-down population splits.", coaching: "Signpost your calculation steps in sequence: frame aircraft counts first, multiply by the asset density factor (2 engines/plane), apply the lifecycle replacement rate (5%), and add the maintenance spare buffer.", redFlag: "Sizing commercial jet engine production starting from a macro consumer population split, which is an incorrect framework choice for an industrial asset vertical." },
+            { id: "s6_q_03", category: "Data Interpretation, Charts, and Exhibits", difficulty: "Advanced", question: "When an interviewer hands you a complex chart featuring multiple axes and non-linear trend curves, what is your step-by-step interpretation checklist?", conversational: "I use a strict four-step review protocol to stay organized. First, I read the chart title and explicitly identify the vertical and horizontal axes, checking the units carefully. Second, I isolate the main data trend lines, noting intercept points or steep shifts. Third, I deliver a concise data summary sentence to the interviewer to confirm my reading is accurate. Fourth, and most importantly, I pivot to the business value—explaining exactly what the chart data means for our client's strategic choices.", deepdive: "Average candidates simply read data points off a page, which adds zero value. Elite candidates treat exhibits as strategic assets, instantly linking chart inflections to client cost, capacity, or margin choices.", coaching: "Never analyze a chart in silence. Walk the interviewer through your checklist out loud, and always conclude with a definitive strategic takeaway for the case.", redFlag: "Staring silently at an exhibit for an extended period or reciting a string of raw numbers without explaining what the data means for the client's business strategy." },
+            { id: "s6_q_04", category: "Data Interpretation, Charts, and Exhibits", difficulty: "Expert", question: "If a scatter plot graph reveals an industry's top performers achieve high margins at low volumes while mid-sized companies face heavy losses, what is your strategic diagnosis?", conversational: "This pattern indicates a classic 'Stuck in the Middle' industry structure, often driven by intense scale economics. The top performers are likely premium, specialized players who can charge high prices to capture niche value pools. The large volume players capture margins through massive procurement and operational efficiencies. Mid-sized players fail because they lack the unique branding to charge premium prices, yet lack the scale volume to compete on cost, leaving them trapped in a high-expense, low-margin position.", deepdive: "Fragmented mid-market corporate profiles highlight intense consolidation pressures. In this environment, a business must choose a clear strategic track: execute an asset roll-up to capture scale or focus on a high-end specialty niche.", coaching: "Link chart distributions to clear competitive frameworks. Use precise vocabulary like 'scale efficiency thresholds,' 'value partition models,' and 'margin compression zones.'", redFlag: "Concluding that mid-sized companies simply need to launch a new marketing campaign, ignoring the underlying scale economics driving the industry structure." },
+            { id: "s6_q_05", category: "Consulting Math & Business Judgment", difficulty: "Advanced", question: "A client platform records $50M in sales. Their variable contribution margin is 40%. They are assessing a restructuring project that will lower fixed overhead by $4M but will cause variable input costs to rise by 10% across their entire volume footprint. Evaluate this trade-off.", conversational: "Let's run the financial trade-off. At $50M in revenue and a 40% margin, their current variable contribution is $20M. A 10% spike in variable input costs means their contribution margin drops from 40% down to 36%, lowering their absolute contribution by $2M down to $18M. Comparing a $2M loss in variable contribution against a $4M reduction in fixed overhead yields a net profit expansion of exactly $2M. Therefore, the restructuring project is highly viable.", deepdive: "Restructuring choices require balancing fixed cost improvements against changes in unit economics. Pushing fixed overhead lower improves safety margins, but compressing unit contribution margins lowers scalability.", coaching: "Walk the interviewer through the calculations sequentially: first calculate the current contribution dollar value ($20M), apply the margin compression drop ($2M cost), compare it against the fixed overhead savings ($4M), and state the final net profit gain ($2M).", redFlag: "Subtracting the 10% variable cost increase directly from the fixed overhead savings baseline, which is a fundamental financial logic error." },
+            { id: "s6_q_06", category: "Consulting Math & Business Judgment", difficulty: "Expert", question: "Explain the strategic utility of running a 'Sensitivity Analysis' model when presenting an investment valuation package to an executive board.", conversational: "A sensitivity analysis allows us to stress-test our financial valuation models by tracking how variations in critical, high-risk operational assumptions alter our net returns. Instead of presenting a single, optimistic future forecast, a sensitivity matrix maps out project internal rate of return (IRR) outputs across changing input parameters, such as a 15% spike in raw commodity prices or a 6-month launch delay. This allows the board to see exactly where our financial vulnerabilities reside and design targeted risk mitigation steps before allocating capital.", deepdive: "Sensitivity models de-risk capital deployment choices by shifting presentations away from static data to focus on risk-adjusted outcome distributions, protecting return pipelines against market volatility.", coaching: "Frame your answer around risk management. Focus on how tracking input variances helps executive teams identify high-risk drivers and establish clear financial safety boundaries.", redFlag: "Defining sensitivity analysis as a basic audit of past accounting entries or assuming it represents a standard spreadsheet error-check routine." },
+            { id: "s6_q_07", category: "Synthesis, Recommendation, and Executive Communication", difficulty: "Advanced", question: "Deliver an executive-level final case synthesis when the data proves a retail client should *not* proceed with an international expansion plan into South Korea.", conversational: "Our clear, definitive recommendation is to halt the proposed retail expansion into South Korea and re-allocate that capital to optimize our domestic digital portal. This decision is driven by three factors: First, intense local competitive concentration—entrenched domestic retail giants control over 85% of prime shelf space, driving user acquisition costs 60% above our initial targets. Second, regulatory entry barriers—complex local sourcing laws add a heavy 15% operational compliance premium to imported inventory footprints. Third, financial unviability—our updated models show project returns peaking at just 6%, falling safely below our strict 12% internal hurdle rate. The primary risk of halting entry is losing regional brand visibility, which we can easily mitigate by expanding wholesale cross-border digital channels. Next steps are to wind down the local real estate evaluations and terminate the interim regional office leases.", deepdive: "Elite final summaries are answer-first, quantified, structured, and action-oriented. Never summarize the history of your case work; lead directly with the definitive strategic decision.", coaching: "Apply the classic pyramid principle structure: state your definitive recommendation first, back it with three clear pillars, provide a risk mitigation plan, and list immediate next steps.", redFlag: "Wandering through a loose summary of case observations or listing pros and cons instead of delivering a bold, definitive strategic decision." },
+            { id: "s6_q_08", category: "Synthesis, Recommendation, and Executive Communication", difficulty: "Expert", question: "How do you structure an executive summary presentation when a case contains highly conflicting quantitative data and incomplete market inputs?", conversational: "I follow a strict structured presentation framework designed to handle data gaps. I lead with our clear, data-backed strategic recommendation, explicitly stating the baseline scenario our choice assumes. Next, I present our three core structural pillars, using clear ranges to reflect data uncertainties rather than single numbers. I follow this with a detailed risk mitigation track that highlights our top 2 data blind spots, and conclude with a concrete 30-day action plan to execute field tests to validate our model assumptions and update our strategy.", deepdive: "Business leaders respect transparency regarding data gaps. Presenting ranges and sensitivity boundaries projects professional maturity and protects project credibility far better than pretending data is complete.", coaching: "Focus on your risk mitigation framework and detail how you use targeted short-term testing sprints to validate assumptions and de-risk your final strategy.", redFlag: "Delivering a loose, indecisive summary that fails to make a clear recommendation because the data is incomplete, which demonstrates a lack of executive presence." },
+            { id: "s6_q_09", category: "Partner Round Preparation", difficulty: "Expert", question: "What would your past professional peers or teammates say is the most challenging aspect of your leadership or execution style under tight deadlines?", conversational: "My past teammates would say that my steepest curve under tight deadlines is my intense focus on execution velocity, which can sometimes lead me to push ahead with data analysis before checking if the entire cross-functional team is fully aligned on the target. In my pre-MBA engineering career, I focused heavily on hitting project milestones quickly. I've learned that taking an extra 10 minutes up front to signpost targets and assign clear roles preserves team alignment, prevents duplicate work, and increases our overall delivery speed.", deepdive: "Partner round fit questions evaluate self-awareness, professional maturity, and how well you can critique your own performance without defaulting to fake, defensive clichés.", coaching: "Be authentic. Identify a genuine professional challenge, explain why it occurs under stress, and detail the concrete leadership steps you use to manage it effectively.", redFlag: "Giving a defensive, cliché answer like 'I care too much about perfection' or 'I work too hard,' which demonstrates low self-awareness and poor maturity." },
+            { id: "s6_q_10", category: "Partner Round Preparation", difficulty: "Expert", question: "If you are delivering a final strategy recommendation to a senior client CEO and they aggressively push back, claiming your framework ignores local operating realities, how do you handle it?", conversational: "I stay calm, protect my professional poise, and treat their pushback as a valuable data input rather than a personal challenge. I validate their industry expertise immediately, saying: 'That localized operational context is exactly the nuance we need to test.' I will not defend my structure blindly. Instead, I open the model up and show them exactly how adjusting our core assumptions to match their feedback alters our cash flow projections and risk profile, co-creating an updated strategy with them live.", deepdive: "Partners look for coachability, intellectual curiosity, and executive presence under fire. Defending an abstract model against a CEO's real-world feedback breaks trust; use collaboration to test assumptions live.", coaching: "Emphasize your emotional intelligence and collaborative approach: explain how you integrate client feedback to stress-test your models and protect project alignment.", redFlag: "Getting defensive, arguing blindly based on theoretical business concepts, or folding completely without showing how the feedback alters the financial model." },
+            { id: "s6_q_11", category: "Market Sizing & Estimation", difficulty: "Advanced", question: "Walk me through a top-down estimation model to calculate the total annual revenue generated by commercial fitness gyms across the state of Utah.", conversational: "I will use a population segmentation approach. I'll start with the state population of Utah, which is roughly 3.4 million people. To simplify our math, I'll round this baseline to 3.3 million. I'll assume an average of 3 individuals per household, giving us 1.1 million households. Filtering for middle-to-high income households that can afford gym memberships gives us a 60% pool, or 660,000 households. Assuming a conservative 25% active gym adoption rate yields 165,000 active household memberships. At an average subscription cost of $50 per month, or $600 per year, we reach a total annual gym market revenue footprint of exactly $99M across Utah.", deepdive: "Top-down market sizing requires clear population filters based on demographic and economic realities, combined with clean rounding shortcuts to keep math delivery smooth and authoritative.", coaching: "Speak your intermediate calculations clearly: establish your population base ($3.3M), reduce to households ($1.1M), apply the income and adoption discounts, and deliver the final market revenue footprint ($99M).", redFlag: "Throwing out a final market size number without mapping out the structural demographic and pricing filters used to reach the calculation." },
+            { id: "s6_q_12", category: "Data Interpretation, Charts, and Exhibits", difficulty: "Core", question: "An exhibit matrix maps out 20 separate product lines. The data reveals that the lowest-margin 5% of products generate 90% of your client's warehouse handling friction. What is your recommendation?", conversational: "This data reveals a massive operational inefficiency. We have a tail of low-margin products that are placing a disproportionate burden on our warehouse logistics and infrastructure. My definitive recommendation is to launch an immediate SKU rationalization project: we should eliminate or outsource that low-performing 5% product tail. This will instantly clear up warehouse capacity, lower fixed facility holding costs, and allow our logistics teams to focus entirely on scaling our highest-margin product lines.", deepdive: "SKU rationalization cleans up operational complexity. Paring down low-margin product lines reduces facility travel times, lowers inventory handling costs, and expands bottom-line returns.", coaching: "Focus on operational physics: explain how removing low-value catalog items simplifies inventory tracking and boosts fulfillment speeds across remaining high-value product lines.", redFlag: "Recommending an expensive warehouse expansion project before using SKU rationalization to clear out the low-performing inventory tail." },
+            { id: "s6_q_13", category: "Consulting Math & Business Judgment", difficulty: "Advanced", question: "A manufacturing client produces 50,000 units at a fully loaded cost of $200 per unit. Their fixed overhead is $4M per year. If they expand production volume by 20%, calculate the reduction in average fixed cost per unit and the new total unit cost baseline.", conversational: "Let's track the fixed cost economics. Pushing production volume up by 20% expands output from 50,000 units to exactly 60,000 units. Our fixed overhead remains constant at $4M. Under our initial baseline, spreading $4M over 50,000 units yields a fixed cost allocation of $80 per unit, meaning our variable unit cost is $120. Under our new 60,000 volume base, dividing $4M by 60,000 drops the fixed cost allocation down to $66.67 per unit. Therefore, average fixed cost per unit falls by $13.33, moving our new total unit cost baseline down to $186.67.", deepdive: "Expanding production volume dilutes fixed overhead allocations across a larger base, improving unit economics and expanding absolute competitive cost advantages.", coaching: "Walk the interviewer through the calculations step-by-step: determine the variable cost base first ($120), calculate the new compressed fixed allocation ($66.67), and deliver the final total unit cost baseline ($186.67).", redFlag: "Applying the 20% volume expansion rate as a flat discount across the entire unit cost baseline, ignoring the distinct behavior of variable vs fixed expenses." },
+            { id: "s6_q_14", category: "Synthesis, Recommendation, and Executive Communication", difficulty: "Core", question: "Deliver a final 60-second summary wrap-up presentation to an e-commerce client on whether to acquire an independent regional delivery network.", conversational: "Our definitive recommendation is to proceed with the acquisition of the regional delivery network at the proposed $45M valuation. This choice is driven by three factors: First, margin protection—integrating an internal fleet cuts our dependency on third-party couriers, expanding our average delivery margins by 300 basis points. Second, speed-to-market advantages—bringing last-mile logistics in-house shortens our regional delivery timelines from 48 hours down to guaranteed same-day shipping across prime hubs. Third, asset utilization—fleet data confirms the target network has 35% open capacity to absorb our upcoming holiday volume expansion. The primary risk is high driver turnover rates, which we can mitigate by assigning safety incentive bonuses. Next steps are to finalize the asset purchase contract and launch the routing software integration sprints.", deepdive: "Elite final summaries are answer-first, quantified, structured, and action-oriented. Never summarize the history of your case work; lead directly with the definitive strategic decision.", coaching: "Structure your final summary using the pyramid principle: state your recommendation first, support it with three clear pillars, provide a risk mitigation plan, and list immediate next steps.", redFlag: "Wandering through a loose summary of case observations or listing pros and cons instead of delivering a bold, definitive operational decision." },
+            { id: "s6_q_15", category: "Partner Round Preparation", difficulty: "Expert", question: "What specific macro business problem or industry vertical trend are you most interested in solving post-MBA, and why does our firm provide the best platform for that focus?", conversational: "I am deeply focused on the intersection of industrial manufacturing value chains and cloud data infrastructure. Over the next decade, legacy heavy industries must modernize their data frameworks to deploy predictive AI maintenance and protect their supply chains against macro geopolitical shocks. Your firm's specialized industrial practice group provides the absolute gold standard platform for this focus, allowing me to sit down with Fortune 500 manufacturing primes and design the actual technology-to-operations strategies that secure global margin resilience.", deepdive: "Firms look for an authentic, tailored professional focus that proves you understand the real-world impact consulting teams deliver for clients.", coaching: "Be specific and ambitious. Connect your answer to a complex industry challenge, and explain how the firm's specialized practice groups help you solve it.", redFlag: "Delivering an overly humble or generic response like 'I just want to solve interesting problems,' which lacks a clear professional direction and narrative weight." },
+            { id: "s6_q_16", category: "Market Sizing & Estimation", difficulty: "Advanced", question: "Walk me through an estimation model to calculate the total annual revenue generated by commercial window washing services across all high-rise office skyscrapers in downtown Chicago.", conversational: "I will use a building density model. I'll estimate that downtown Chicago features roughly 400 high-rise office skyscrapers. On average, let's assume each building has 30 floors, and each floor features approximately 50 exterior glass window units, translating to 1,500 windows per skyscraper. Across our 400 building base, that represents a total market inventory of 600,000 windows. Assuming each commercial high-rise executes a full cleaning cycle 4 times per year gives an annual volume of 2.4 million window washes. At an average commercial contract price of $5 per window wash, we reach an annual market size of exactly $12M.", deepdive: "Industrial estimation cases rely on physical asset density mappings and realistic commercial operational frequency assumptions to build a defensible bottom-up model.", coaching: "Signpost your steps clearly: establish building counts first, multiply by the architectural density factors (floors * windows), apply the operational cleaning frequency (4x/year), and attach the commercial contract unit price ($5).", redFlag: "Sizing a commercial skyscraper service market starting from a macro consumer residential population baseline, which is an incorrect framework choice." },
+            { id: "s6_q_17", category: "Data Interpretation, Charts, and Exhibits", difficulty: "Advanced", question: "An exhibit bar chart reveals that your client's core product segment achieved 40% market share volume but generated just 5% of total industry profit pools. What is your diagnostic assessment?", conversational: "This data reveals a classic low-value commoditization trap. While our client has successfully built a dominant market share volume, they are operating in a highly commoditized segment where intense price competition has destroyed industry profitability. This indicates that their current volume strategy is failing to deliver real bottom-line value. My strategic recommendation is to halt investment in this low-margin product line and pivot corporate resources to develop premium, high-margin premium offerings where pricing power is protected.", deepdive: "High volume share combined with low profit capture proves a product has lost its differentiation, turning it into a low-value commodity vulnerable to low-cost international competitors.", coaching: "Contrast volume dominance against value capture. Show a consultant's mindset by recommending shifting resources away from high-volume commodities to target high-margin premium value pools.", redFlag: "Concluding that the client is winning simply because their market share volume is high, completely missing the fact that the segment captures almost zero profit." },
+            { id: "s6_q_18", category: "Consulting Math & Business Judgment", difficulty: "Advanced", question: "A financial services client manages an active asset portfolio of $1B. Their baseline annual management fee rate is 1.5%. They want to invest $3M upfront to install an automated data portfolio optimization software platform. Calculate the minimum asset growth rate required to break even on this software expenditure within year 1.", conversational: "Let's run the portfolio math. Our current annual management fee revenue footprint is $1B multiplied by 1.5%, which equals exactly $15M. To break even on a $3M software capital expenditure within the first year, our fee revenue must expand from $15M up to $18M, requiring an extra $3M in fee collections. Dividing that target $3M revenue lift by our 1.5% management fee rate tells us the client must expand their total active asset portfolio base by exactly $200M. This translates to a minimum asset growth rate target of 20% over the baseline.", deepdive: "Asset management monetization engines multiply total assets under management (AUM) by fixed fee percentages. Capital investments inside this vertical require clear asset growth milestones to achieve positive returns.", coaching: "Walk the interviewer through the calculations sequentially: find the baseline fee revenue first ($15M), determine the required revenue lift ($3M), divide by the fee percentage (1.5%), and state the final asset expansion milestone ($200M / 20% growth).", redFlag: "Applying the software cost percentage directly to the fee rate or failing to link revenue generation requirements back to the core AUM asset baseline." },
+            { id: "s6_q_19", category: "Synthesis, Recommendation, and Executive Communication", difficulty: "Expert", question: "Deliver a final 90-second case summary presentation when the data indicates a manufacturing client should execute a joint venture partnership over an organic build strategy.", conversational: "Our definitive recommendation is to proceed with forming a strategic joint venture partnership with our regional infrastructure partner rather than executing an expensive organic factory build. This choice is driven by three factors: First, speed-to-market advantages—the joint venture allows us to launch production within 6 months by leveraging their active facility assets, bypassing a 36-month construction delay. Second, capital risk mitigation—cutting our upfront capital investment exposure by 50%, saving $100M in initial CapEx. Third, regulatory compliance channels—our partner holds established local environmental permits, completely eliminating project approval risks. The primary risk is shared operational control, which we can mitigate by structuring clear buy-out clauses in the definitive agreements. Next steps are to initialize the joint venture governance terms and kick off phase-1 operational planning.", deepdive: "Elite final joint venture summaries must lead with a clear strategic decision, back it with quantified timing, financial, and regulatory metrics, manage governance risks, and outline clear execution next steps.", coaching: "Apply the pyramid principle structure: state your definitive recommendation first, back it with three clear pillars, provide a risk mitigation plan, and list immediate next steps.", redFlag: "Listing vague observations about partnerships instead of delivering a bold, data-backed business recommendation for the client board." },
+            { id: "s6_q_20", category: "Partner Round Preparation", difficulty: "Expert", question: "If a senior client advisor or partner looks you in the eye and asks, 'Why should our client pay our firm $2M for this strategy when they can buy a standard industry software template for a fraction of the cost?', what is your response?", conversational: "I look them in the eye and tell them that a software template is just a static tool, whereas our strategy is an execution engine built to transform their business. A template can track data fields, but it cannot realign underperforming dealer networks, resolve deep internal channel conflicts, or change organizational culture to adopt new workflows. Our $2M strategy focuses entirely on the technology-to-business handoff—delivering the precise operational changes required to unlock a proven $40M in structural cost savings and protect their core margins across global volatility cycles.", deepdive: "Partner rounds test your absolute conviction regarding the premium value management consulting delivers to corporate clients. You must focus your answer on execution, change enablement, and hard financial ROI over basic software assets.", coaching: "Be bold and professional. Focus your response on execution capabilities and connect the consulting fee directly to the massive financial profit protection delivered to the client.", redFlag: "Delivering a humble, defensive explanation about how hard your team works, which fails to articulate the real financial value and strategic impact consulting delivers." }
+        ];
+
+        let activeView = 'cases-view';
+
+        function switchView(viewId, activeBtn) {
+            document.querySelectorAll('.section-container').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.toolbar-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            activeBtn.classList.add('active');
+            document.getElementById('header-display-title').innerText = viewId === 'cases-view' ? 'Sprint 6: Case Prompts' : 'Sprint 6: Paired Question Bank';
+        }
+
+        function populateSprintArchitecture() {
+            const casesAnchor = document.getElementById('cases-anchor'); casesAnchor.innerHTML = '';
+            SPRINT_CASES.forEach(c => {
+                casesAnchor.innerHTML += `
+                    <div class="card">
+                        <div class="card-header-row">
+                            <div>
+                                <h3 class="card-title">${c.title}</h3>
+                                <div class="tag-row"><span class="badge badge-category">${c.caseType}</span><span class="badge badge-difficulty">${c.difficulty}</span></div>
+                            </div>
+                        </div>
+                        <div class="content-block"><div class="content-block-title">Situation & Strategic Context</div><div class="content-block-text">${c.clientContext}</div></div>
+                        <div class="content-block"><div class="content-block-title">Interviewer Prompt</div><div class="content-block-text" style="color:#fff; font-weight:600; font-style:italic;">"${c.interviewerPrompt}"</div></div>
+                        <div class="tabs-container">
+                            <div class="tab-headers">
+                                <button class="tab-btn active" onclick="toggleCardTab(event, 'objectives')">Objectives</button>
+                                <button class="tab-btn" onclick="toggleCardTab(event, 'structure')">Structure</button>
+                                <button class="tab-btn" onclick="toggleCardTab(event, 'data')">Data/Exhibit</button>
+                                <button class="tab-btn" onclick="toggleCardTab(event, 'path')">Ideal Solution</button>
+                                <button class="tab-btn" onclick="toggleCardTab(event, 'coaching')">Partner Notes</button>
+                            </div>
+                            <div class="tab-content active" data-tab="objectives">
+                                <strong>Candidate Milestones:</strong><br>${c.candidateObjectives}<br><br>
+                                <strong>Clarifying Entry Questions:</strong><br><span style="font-style:italic; color:var(--accent-gold);">"${c.clarifyingQuestions}"</span>
+                            </div>
+                            <div class="tab-content" data-tab="structure"><strong>Tailored Framework:</strong><br>${c.suggestedStructure}<br><br><strong>Key Parameters:</strong><br>${c.keyBusinessIssues}</div>
+                            <div class="tab-content" data-tab="data"><strong>Quantitative Requirements:</strong><br>${c.mathRequired}<br><br><strong>Data Model:</strong><br><pre style="background:#111; padding:10px; border-radius:4px; color:#fff; font-family:sans-serif; white-space:pre-wrap;">${c.sampleDataOrExhibit}</pre></div>
+                            <div class="tab-content" data-tab="path"><strong>Execution Path:</strong><br>${c.strongAnswerPath}<br><br><strong>Recommendation Blueprint:</strong><br><span style="color:var(--accent-gold); font-style:italic;">"${c.finalRecommendation}"</span></div>
+                            <div class="tab-content" data-tab="coaching"><span style="color:#4ecdc4;"><strong>Coaching Note:</strong></span><br>${c.coachingNotes}<br><br><span style="color:#ff6b6b;"><strong>Fatal Red Flags:</strong></span><br>${c.redFlags}</div>
+                        </div>
+                        <button class="btn-action" onclick="openPracticeModal('${c.id}', 'case')">Practice Case Opening Remarks →</button>
+                    </div>`;
+            });
+
+            const questionsAnchor = document.getElementById('questions-anchor'); questionsAnchor.innerHTML = '';
+            SPRINT_QUESTIONS.forEach(q => {
+                questionsAnchor.innerHTML += `
+                    <div class="card">
+                        <div class="card-header-row">
+                            <div>
+                                <h3 class="card-title">${q.question}</h3>
+                                <div class="tag-row"><span class="badge badge-category">${q.category}</span><span class="badge badge-difficulty">${q.difficulty}</span></div>
+                            </div>
+                        </div>
+                        <div class="tabs-container">
+                            <div class="tab-headers">
+                                <button class="tab-btn active" onclick="toggleCardTab(event, 'conversational')">Conversational Answer</button>
+                                <button class="tab-btn" onclick="toggleCardTab(event, 'deepdive')">Strategic Deep-Dive</button>
+                                <button class="tab-btn" onclick="toggleCardTab(event, 'notes')">Coaching & Red Flags</button>
+                            </div>
+                            <div class="tab-content active" data-tab="conversational"><div style="font-style:italic; color:#e5c158; background:#1a1a1a; padding:15px; border-radius:4px; border-left:3px solid var(--accent-gold);">"${q.conversational}"</div></div>
+                            <div class="tab-content" data-tab="deepdive">${q.deepdive}</div>
+                            <div class="tab-content" data-tab="notes"><span style="color:#4ecdc4;"><strong>Delivery Coaching Note:</strong></span><br>${q.coaching}<br><br><span style="color:#ff6b6b;"><strong>Fatal Red Flag Boundary:</strong></span><br>${q.redFlag}</div>
+                        </div>
+                        <button class="btn-action" onclick="openPracticeModal('${q.id}', 'question')">Practice Live Verbalization →</button>
+                    </div>`;
+            });
+        }
+
+        function toggleCardTab(event, tabName) {
+            const container = event.target.closest('.tabs-container');
+            container.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            container.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            event.target.classList.add('active');
+            container.querySelector(`.tab-content[data-tab="${tabName}"]`).classList.add('active');
+        }
+
+        let recognition, isRecording = false, activeItemId = null, activeItemType = null;
+
+        function openPracticeModal(id, type) {
+            activeItemId = id; activeItemType = type;
+            let sourceItem = type === 'case' ? SPRINT_CASES.find(c => c.id === id) : SPRINT_QUESTIONS.find(q => q.id === id);
+            if (!sourceItem) return;
+            document.getElementById('practice-modal').classList.add('active');
+            document.getElementById('modal-title-header').innerText = type === 'case' ? 'Case Structuring Sprint' : 'Verbalization Sprint';
+            document.getElementById('modal-item-title').innerText = type === 'case' ? sourceItem.title : sourceItem.category;
+            document.getElementById('modal-context-label').innerText = type === 'case' ? 'Interviewer Case Prompt:' : 'Target Interview Question:';
+            document.getElementById('modal-prompt-text').innerText = type === 'case' ? sourceItem.interviewerPrompt : sourceItem.question;
+            document.getElementById('transcription-box').value = '';
+            document.getElementById('filler-words').innerText = 'Filler Words: 0';
+            document.getElementById('ai-prompt-output').style.display = 'none';
+            resetAnswerTimer();
+            lastFocusedElement = document.activeElement;
+            document.getElementById('btn-record').focus();
+        }
+
+        let lastFocusedElement = null;
+        function closeModal() { document.getElementById('practice-modal').classList.remove('active'); if (isRecording) stopRecordingEngine(); stopAnswerTimer(); if (lastFocusedElement) lastFocusedElement.focus(); }
+
+        function toggleRecordingEngine() {
+            if (!isRecording) {
+                if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) { alert("Requires Chrome/Edge browser speech engine."); return; }
+                const SpeechClass = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechClass(); recognition.continuous = true; recognition.interimResults = true; recognition.lang = 'en-US';
+                recognition.onresult = function(event) {
+                    let finalSegment = '';
+                    for (let i = event.resultIndex; i < event.results.length; ++i) { if (event.results[i].isFinal) finalSegment += event.results[i][0].transcript; }
+                    if (finalSegment) { const box = document.getElementById('transcription-box'); box.value += finalSegment + ' '; countTrackedFillers(box.value); }
+                };
+                // Chrome ends recognition on its own after silence or transient
+                // network errors. While the user still intends to record, restart
+                // instead of dying silently with a stale "Stop Recording" button.
+                recognition.onend = function() {
+                    if (isRecording) {
+                        try { recognition.start(); }
+                        catch (e) { stopRecordingEngine(); }
+                    }
+                };
+                recognition.onerror = function(event) {
+                    if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                        stopRecordingEngine();
+                        alert("Microphone access is blocked. Allow mic access for this site in your browser settings, then restart the recording.");
+                    }
+                    // 'no-speech', 'network', 'aborted' fall through to onend,
+                    // which restarts the session while isRecording is true.
+                };
+                recognition.start(); document.getElementById('btn-record').innerText = "🛑 Stop Recording"; document.getElementById('recording-status').style.display = "inline-flex"; isRecording = true; startAnswerTimer();
+            } else { stopRecordingEngine(); }
+        }
+
+        function stopRecordingEngine() { isRecording = false; if (recognition) recognition.stop(); document.getElementById('btn-record').innerText = "🎙️ Start Spoken Answer"; document.getElementById('recording-status').style.display = "none"; stopAnswerTimer(); }
+
+        function countTrackedFillers(text) {
+            const singles = ['um', 'uh', 'like', 'basically', 'actually'];
+            const phrases = [/\byou know\b/g, /\bsort of\b/g, /\bkind of\b/g];
+            const lower = text.toLowerCase();
+            let score = 0;
+            lower.split(/\s+/).forEach(p => { if (singles.includes(p.replace(/[^a-z]/g, ''))) score++; });
+            phrases.forEach(re => { const m = lower.match(re); if (m) score += m.length; });
+            document.getElementById('filler-words').innerText = `Filler Words: ${score}`;
+        }
+
+        /* ---- 2-minute answer timer (starts with recording) ---- */
+        const TIMER_LIMIT_SECONDS = 120;
+        let timerInterval = null, timerRemaining = TIMER_LIMIT_SECONDS;
+
+        function renderAnswerTimer() {
+            const el = document.getElementById('timer-display');
+            const overtime = timerRemaining < 0;
+            const t = Math.abs(timerRemaining);
+            const mm = Math.floor(t / 60), ss = String(t % 60).padStart(2, '0');
+            el.innerText = overtime ? `⏱ +${mm}:${ss} over` : `⏱ ${mm}:${ss}`;
+            el.style.color = overtime ? 'var(--mbb-red, #ff3333)' : (timerRemaining <= 30 ? 'var(--accent-gold)' : 'var(--text-muted)');
+        }
+
+        function startAnswerTimer() {
+            stopAnswerTimer();
+            timerRemaining = TIMER_LIMIT_SECONDS;
+            renderAnswerTimer();
+            timerInterval = setInterval(() => { timerRemaining--; renderAnswerTimer(); }, 1000);
+        }
+
+        function stopAnswerTimer() { if (timerInterval) { clearInterval(timerInterval); timerInterval = null; } }
+
+        function resetAnswerTimer() { stopAnswerTimer(); timerRemaining = TIMER_LIMIT_SECONDS; renderAnswerTimer(); }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && document.getElementById('practice-modal').classList.contains('active')) closeModal();
+        });
+
+function triggerAIFeedbackPayload() {
+    let item = activeItemType === 'case' ? SPRINT_CASES.find(c => c.id === activeItemId) : SPRINT_QUESTIONS.find(q => q.id === activeItemId);
+    const userSpeech = document.getElementById('transcription-box').value;
+    if (!item) return;
+
+    let payload = `
+[CONSULTING / MBB INTERVIEW COACHING — ECCLES MBA MODULE]
+Evaluate the candidate response to the following consulting tracking prompt using partner-level standards:
+
+${activeItemType === 'case' ? `CASE SCENARIO: ${item.title}\nPROMPT EXPECTATION: "${item.interviewerPrompt}"\nIDEAL FRAMEWORK PATH: "${item.suggestedStructure}"` : `INTERVIEW PROMPT: "${item.question}"\nEXPECTED MODEL DELIVERY: "${item.conversational}"`}
+
+CANDIDATE AUDIO TRANSCRIPT INPUT:
+"${userSpeech || "[No transcript provided. Evaluate parameters and provide an elite baseline model response.]"}"
+
+Provide deep structured metrics using exactly this markdown output schema:
+
+**What Worked**
+[Detail 1-2 key operational strengths from what the candidate said.]
+
+**Top 2 Areas for Improvement**
+1. [Identify the primary gap versus an elite MBB delivery and give specific replacement phrasing.]
+2. [Identify any logical gaps, calculation slips, or structural blind spots.]
+
+**Advanced Consulting Power Move**
+[Provide one custom partner-level business insight or analytical variable tailored to this specific scenario context.]
+
+**Dashboard Scorecard Matrix**
+Assign exactly one rubric score (1. Emerging | 2. Developing | 3. Interview-Ready | 4. MBB-Caliber) for each applicable competency based on this specific performance:
+* Case Structuring: [Score]
+* Business Judgment: [Score]
+* Math Accuracy: [Score]
+* Synthesis: [Score]
+* Fit / PEI Storytelling: [Score]
+* Executive Presence: [Score]
+* Communication Clarity: [Score]
+* Recommendation Strength: [Score]
+    `;
+
+    document.getElementById('ai-copy-text').innerText = payload.trim();
+    document.getElementById('ai-prompt-output').style.display = 'block';
+}
+
+        function copyPayloadToClipboard() { navigator.clipboard.writeText(document.getElementById('ai-copy-text').innerText); alert("Payload packed to clipboard!"); }
+        window.onload = () => { populateSprintArchitecture(); };
+    </script>
+</body>
+</html>
