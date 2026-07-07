@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eccles MBA — Consulting Math & Analytics Drills Playbook</title>
+    <style>
+        :root {
+            --primary-red: #CC0000;
+            --accent-gold: #c9a84c;
+            --bg-dark: #121212;
+            --bg-card: #1e1e1e;
+            --bg-sidebar: #0a0a0a;
+            --text-main: #f5f5f5;
+            --text-muted: #a0a0a0;
+            --border-color: #333333;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            font-family: var(--font-family);
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* PERMANENT GLOBAL SIDEBAR */
+        aside {
+            width: 320px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            padding: 0 24px 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 15px;
+        }
+
+        .brand h2 {
+            color: var(--primary-red);
+            margin: 0 0 5px 0;
+            font-size: 1.3rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .brand p {
+            color: var(--accent-gold);
+            margin: 0;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .nav-label {
+            padding: 10px 24px 5px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        aside a {
+            text-decoration: none;
+            color: var(--text-muted);
+            padding: 12px 24px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-left: 4px solid transparent;
+        }
+
+        aside a:hover, aside a.active {
+            background-color: rgba(204, 0, 0, 0.1);
+            color: var(--primary-red);
+            border-left-color: var(--primary-red);
+        }
+
+        .count-badge {
+            background-color: #2a2a2a;
+            color: var(--accent-gold);
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        main {
+            flex: 1;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            background-color: rgba(18, 18, 18, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title-area h1 { margin: 0; font-size: 1.25rem; font-weight: 700; }
+        .header-subtitle { margin: 2px 0 0 0; font-size: 0.85rem; color: var(--accent-gold); text-transform: uppercase; letter-spacing: 1px; }
+        .search-container { width: 350px; }
+        .search-input { width: 100%; background-color: #1e1e1e; border: 1px solid var(--border-color); border-radius: 4px; padding: 10px 15px; color: white; font-family: var(--font-family); font-size: 0.9rem; transition: border-color 0.2s; }
+        .search-input:focus { outline: none; border-color: var(--primary-red); }
+
+        /* HORIZONTAL INTERNAL VIEW TOOLBAR */
+        .local-toolbar {
+            background-color: #161616;
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 40px;
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+        }
+
+        .toolbar-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .toolbar-btn:hover, .toolbar-btn.active {
+            background-color: rgba(204, 0, 0, 0.1);
+            color: white;
+        }
+
+        .section-container { padding: 40px; max-width: 1300px; width: calc(100% - 80px); margin: 0 auto; }
+        .hero { margin-bottom: 40px; border-bottom: 1px solid var(--border-color); padding-bottom: 30px; }
+        .track-pill { display: inline-block; background-color: rgba(201, 168, 76, 0.1); color: var(--accent-gold); padding: 5px 14px; border-radius: 4px; font-size: 0.8rem; text-transform: uppercase; font-weight: 700; margin-bottom: 15px; letter-spacing: 1px; }
+        .hero h2 { font-size: 2.5rem; margin: 0 0 15px 0; font-weight: 800; }
+        .description { color: var(--text-muted); line-height: 1.6; font-size: 1.1rem; max-width: 900px; margin: 0; }
+        .drills-grid { display: grid; grid-template-columns: 1fr; gap: 25px; }
+        
+        .card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 28px; transition: all 0.25s ease; position: relative; overflow: hidden; }
+        .card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background-color: var(--accent-gold); transition: background-color 0.2s; }
+        .card:hover { border-color: var(--primary-red); transform: translateY(-2px); }
+        .card:hover::before { background-color: var(--primary-red); }
+        .card-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .card-category { font-size: 0.8rem; text-transform: uppercase; color: var(--accent-gold); font-weight: 700; letter-spacing: 1px; }
+        .card-title { font-size: 1.6rem; margin: 0 0 15px 0; font-weight: 700; color: var(--text-main); }
+        .content-block { margin-bottom: 20px; }
+        .content-block-label { font-size: 0.85rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; letter-spacing: 0.5px; }
+        .content-block-text { font-size: 1rem; line-height: 1.5; color: #e0e0e0; }
+        .formula-box { background-color: #121212; padding: 12px 18px; border-radius: 4px; border-left: 3px solid var(--primary-red); font-family: "Courier New", Courier, monospace; font-weight: bold; color: #ffffff; margin: 5px 0; font-size: 1.05rem; }
+        .btn-action { background-color: var(--primary-red); color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-weight: 700; font-size: 0.9rem; transition: background-color 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-action:hover { background-color: #a00000; }
+        .script-box { background-color: rgba(201, 168, 76, 0.05); border: 1px dashed rgba(201, 168, 76, 0.3); border-radius: 6px; padding: 18px; margin-top: 20px; }
+        .script-box strong { color: var(--accent-gold); }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .modal.active { display: flex; }
+        .modal-content { background-color: var(--bg-card); width: 90%; max-width: 850px; max-height: 85vh; overflow-y: auto; padding: 35px; border-radius: 8px; border: 1px solid var(--primary-red); position: relative; }
+        .close-modal { position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--text-muted); font-size: 2rem; cursor: pointer; }
+        .recording-indicator { display: none; color: var(--primary-red); font-weight: 700; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+        textarea { width: 100%; box-sizing: border-box; height: 160px; background-color: #121212; color: white; border: 1px solid var(--border-color); border-radius: 4px; padding: 15px; margin-top: 15px; font-family: var(--font-family); font-size: 1rem; line-height: 1.5; resize: vertical; }
+        .copy-box { background-color: #121212; padding: 20px; border-left: 4px solid var(--accent-gold); font-family: monospace; margin-top: 15px; white-space: pre-wrap; font-size: 0.9rem; color: #dcdcdc; max-height: 250px; overflow-y: auto; }
+        .modal-buttons-row { display: flex; gap: 15px; margin-top: 15px; align-items: center; }
+        #filler-words { font-size: 0.9rem; font-weight: 600; color: var(--accent-gold); }
+        .no-results { text-align: center; padding: 40px; color: var(--text-muted); font-size: 1.1rem; border: 1px dashed var(--border-color); border-radius: 8px; }
+    </style>
+</head>
+<body>
+
+    <!-- PERMANENT GLOBAL SIDEBAR -->
+    <aside>
+        <div class="brand">
+            <h2>Eccles MBA</h2>
+            <p>Consulting Command Center</p>
+        </div>
+        <div class="nav-label">Core Directory</div>
+        <a href="./index.html">Ecosystem Dashboard</a>
+        <a href="./playbook_frameworks.html">20 Case Frameworks</a>
+        <a href="./playbook_math.html" class="active">15 Analytics Math Drills</a>
+        <a href="./playbook_battlecard.html">MBB Battlecard Vault</a>
+        
+        <div class="nav-label">Practice Sprints</div>
+        <a href="./playbook_sprint_01.html">Sprint 1: Profitability</a>
+        <a href="./playbook_sprint_02.html">Sprint 2: M&A Strategy</a>
+        <a href="./playbook_sprint_03.html">Sprint 3: Operations</a>
+        <a href="./playbook_sprint_04.html">Sprint 4: Tech & SaaS</a>
+        <a href="./playbook_sprint_05.html">Sprint 5: GTM & Pricing</a>
+        <a href="./playbook_sprint_06.html">Sprint 6: Capstones</a>
+    </aside>
+
+    <main>
+        <header>
+            <div class="header-title-area">
+                <h1>Consulting Math & Analytics Drills</h1>
+                <div class="header-subtitle">Eccles MBA · Advanced Quantitative Synthesis</div>
+            </div>
+            <div class="search-container">
+                <input type="text" id="search-box" class="search-input" placeholder="Search formulas..." oninput="handleSearch()">
+            </div>
+        </header>
+
+        <!-- LOCAL HORIZONTAL TOOLBAR -->
+        <div class="local-toolbar" id="local-toolbar-math">
+            <button class="toolbar-btn active" onclick="filterCategory('all', this)">All Math Drills <span class="count-badge" id="badge-all">15</span></button>
+            <button class="toolbar-btn" onclick="filterCategory('Corporate Valuation & Profit Margins', this)">Valuation & Margins <span class="count-badge" id="badge-margins">0</span></button>
+            <button class="toolbar-btn" onclick="filterCategory('Market Sizing & Commercial Models', this)">Sizing & Commercial <span class="count-badge" id="badge-sizing">0</span></button>
+            <button class="toolbar-btn" onclick="filterCategory('Operations, Yield & Efficiency', this)">Operations & Efficiency <span class="count-badge" id="badge-operations">0</span></button>
+        </div>
+
+        <section class="section-container">
+            <div class="hero">
+                <span class="track-pill">Quantitative Track</span>
+                <h2>Consulting Math Mastery</h2>
+                <p class="description">
+                    Elite consulting firms evaluate your ability to think structurally about numbers. You do not just calculate silently; you must articulate your math logic smoothly, round numbers effectively, and constantly map quantitative answers back to strategic client implications.
+                </p>
+            </div>
+            <div class="drills-grid" id="drills-display"></div>
+        </section>
+
+        <!-- Spoken Practice Canvas Modal -->
+        <div id="practice-modal" class="modal">
+            <div class="modal-content">
+                <button class="close-modal" onclick="closeModal()">×</button>
+                <h2 style="color: var(--primary-red); margin-top: 0; font-size: 1.75rem;">Interactive Quantitative Verbalization Masterclass</h2>
+                <h3 id="modal-drill-title" style="margin: 5px 0 15px 0; font-size: 1.2rem; color: var(--accent-gold);"></h3>
+                
+                <div style="background-color: #252525; padding: 15px; border-radius: 6px; border-left: 3px solid var(--primary-red);">
+                    <span style="font-size: 0.8rem; text-transform: uppercase; font-weight: 800; color: var(--text-muted); display: block; margin-bottom: 4px;">Live Consulting Case Problem Set:</span>
+                    <p id="modal-case-text" style="margin: 0; font-size: 1rem; line-height: 1.5; color: #fff;"></p>
+                </div>
+                
+                <div class="modal-buttons-row">
+                    <button class="btn-action" onclick="toggleRecording()" id="btn-record">🎙️ Start Spoken Calculation</button>
+                    <span class="recording-indicator" id="recording-status">🔴 Live Audio Engine Streaming...</span>
+                    <div id="filler-words">Filler Words Detected: 0</div>
+                </div>
+                
+                <textarea id="transcription-box" placeholder="Your verbalized math logic transcript will populate here..."></textarea>
+                <button class="btn-action" style="background-color: var(--accent-gold); color: black; margin-top: 15px; width: 100%; justify-content: center;" onclick="generateMathCoachingPrompt()">Generate Rigorous AI Math Coaching Payload</button>
+                
+                <div id="ai-prompt-output" style="display: none;">
+                    <p style="margin-top: 20px; font-weight: 700; color: #fff;">Copy the quantitative evaluation payload template below:</p>
+                    <div class="copy-box" id="ai-copy-text"></div>
+                    <button class="btn-action" style="margin-top: 12px;" onclick="copyToClipboard()">Copy Payload to Clipboard</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const CONSULTING_DRILLS = [
+            { id: "math_01", drillType: "Percent Change", category: "Corporate Valuation & Profit Margins", formula: "Percentage Change = ((New Value - Old Value) / Old Value) * 100%", consultingExample: "A legacy fashion retail client reports a drop in flagship store sales from $120M in Year 1 to $105M in Year 2. Calculate the drop and interpret it.", sampleCalculation: "(105M - 120M) / 120M = -15M / 120M = -1/8 = -12.5% decrease.", verbalizationScript: "To assess the flagship store performance baseline, I'll calculate the year-over-year percentage variance. The absolute drop is $15M against a starting base of $120M. Dividing 15 by 120 reduces easily to negative one-eighth, which equates to a 12.5% compression in absolute sales velocity. Given this double-digit compression, our immediate priority must be isolating whether this contraction is driven by lower customer foot traffic or a drop in average basket size.", commonMistakes: "Swapping the numerator variables or dividing by the new year baseline instead of the starting value; failing to explain what the final percentage change means for the client's business." },
+            { id: "math_02", drillType: "Margin Analysis", category: "Corporate Valuation & Profit Margins", formula: "Gross Margin % = ((Revenue - COGS) / Revenue) * 100% | Operating Margin % = (EBIT / Revenue) * 100%", consultingExample: "A specialized medical device manufacturer generates $500M in absolute top-line revenue. COGS is $150M and corporate SG&A overhead is $200M. Calculate Gross and Operating Margins.", sampleCalculation: "Gross Profit = 500M - 150M = 350M | Gross Margin = 350M / 500M = 70%. EBIT = 350M - 200M = 150M | Operating Margin = 150M / 500M = 30%.", verbalizationScript: "To examine the unit profitability of our medical device client, I will calculate their margins. Starting with gross revenue of $500M and stripping away $150M in COGS leaves a gross profit of $350M, translating to a strong 70% gross margin. Next, factoring in $200M in fixed SG&A leaves $150M in operating income. This gives an operating margin of exactly 30%. This profile shows excellent product health but indicates that overhead costs are taking up a large part of our revenue.", commonMistakes: "Conflating Gross Margin with Operating/Net profit margin layers; stating absolute dollar amounts when the interviewer explicitly asks for a margin percentage calculation." },
+            { id: "math_03", drillType: "Breakeven Analysis", category: "Operations, Yield & Efficiency", formula: "Breakeven Units = Fixed Costs / (Unit Price - Unit Variable Cost)", consultingExample: "An entertainment streaming platform invests $12M upfront to develop a regional content hub. The monthly subscription fee is $15 ($180/year) and the variable infrastructure and royalty cost per subscriber is $5/month ($60/year). How many annual subscribers are required to break even?", sampleCalculation: "Annual Contribution Margin per User = $180 - $60 = $120. Breakeven Volume = $12,000,000 / $120 = 100,000 active annual subscribers.", verbalizationScript: "To determine how many subscribers are needed to cover the investment, I will look at unit contribution metrics. On an annualized basis, each subscriber brings in $180 in revenue while incurring $60 in variable costs, generating a net contribution of $120 per user. Dividing the $12M fixed setup costs by our $120 unit contribution tells us the client must capture 100,000 active annual subscribers to break even on this investment.", commonMistakes: "Dividing fixed costs by total revenue instead of subtracting variable costs first; failing to adjust monthly fees and costs to a matching annual timeline." },
+            { id: "math_04", drillType: "Market Sizing", category: "Market Sizing & Commercial Models", formula: "Total Market Size = Target Population * Penetration Rate * Annual Consumption Frequency * Average Unit Price", consultingExample: "Estimate the total annual addressable market size for premium commercial drone delivery software subscriptions across the United States.", sampleCalculation: "330M Pop -> ~130M Households * 80% Urban/Suburban = 104M. 5% Enterprise adoption = 5.2M nodes. 20 runs/node at $10 fee = $1.04B total addressable footprint size.", verbalizationScript: "To size the US drone software market from the bottom up, I'll start with the macro population of 330M, which at roughly 2.5 persons per household translates to about 130M households. Filtering for urban and suburban density where infrastructure can support drone tech gives us an 80% pool, or roughly 104M households. Assuming a conservative 5% peak penetration gives us roughly 5.2M potential delivery nodes. At an average of 20 deliveries per year per node and a $10 platform fee, we reach an annual total addressable market size of approximately $1.04B.", commonMistakes: "Picking arbitrary percentages without providing solid business context; getting lost in large strings of zeroes rather than scientific notation or shorthand tracking metrics." },
+            { id: "math_05", drillType: "Revenue Build", category: "Market Sizing & Commercial Models", formula: "Total Revenue = Capacity * Utilization Yield * Capture Conversion Rate * Average Ticket Size", consultingExample: "Model the annual concession revenue engine for a major baseball stadium during an 81-game season. The venue holds 40,000 seats, averages a 75% attendance rate, and estimates that 60% of attendees buy food items at a $25 average order value.", sampleCalculation: "30,000 attendees per game * 60% conversion = 18,000 buyers. 18,000 * $25 spend = $450,000 per game. $450,000 * 81 games = $36,450,000 annual run rate.", verbalizationScript: "To model the stadium's annual concession revenue, I'll start with per-game metrics. At 75% average capacity utilization, attendance is 30,000 fans per game. If 60% convert to concession buyers, that's 18,000 purchasing fans. At a $25 average ticket size, the stadium pulls in $450,000 per game. Multiplying this across 81 home games yields an annual concession revenue run rate of exactly $36.45M.", commonMistakes: "Failing to account for the number of games in the season; assuming 100% stadium capacity without applying the realistic utilization discount." },
+            { id: "math_06", drillType: "Cost Structure Analysis", category: "Operations, Yield & Efficiency", formula: "Total Cost Base = Total Fixed Costs + (Unit Variable Cost * Production Volume)", consultingExample: "A domestic airline route incurs $35,000 in fixed costs per flight (lease amortizations, crew, gate landing fees). Variable service costs are $75 per traveler. If a flight carries 150 passengers, what is the cost structure baseline and total cost?", sampleCalculation: "Variable Costs = 150 * $75 = $11,250. Total Cost Base = $35,000 + $11,250 = $46,250. Per passenger cost = $46,250 / 150 = $308.33.", verbalizationScript: "To analyze the flight route's cost structure, I will calculate the total variable layout. At 150 passengers and a $75 variable cost per seat, the total variable expense is $11,250. Combining this with the $35,000 fixed operational cost brings our total cost to $46,250 per flight. This means our average fully loaded cost per passenger is roughly $308. To ensure profitability, our ticket pricing must average safely above this benchmark.", commonMistakes: "Spreading fixed costs over capacity instead of actual passenger volume; failing to separate variable components from fixed overhead assets." },
+            { id: "math_07", drillType: "Compound Annual Growth Rate (CAGR)", category: "Corporate Valuation & Profit Margins", formula: "CAGR = (End Value / Start Value)^(1 / Years) - 1", consultingExample: "A targeted cloud cybersecurity enterprise scales its annual recurring revenue from $80M in Year 0 to $125M in Year 2. Calculate the compound annual growth rate.", sampleCalculation: "End/Start ratio = 125/80 = 1.5625. Square root of 1.5625 = 1.25. 1.25 - 1.0 = 25% CAGR.", verbalizationScript: "To isolate the compound annual growth rate, I'll examine the multi-year scaling ratio. The total revenue scaling factor is 125 divided by 80, which reduces cleanly to 1.5625. Since this growth occurred over a two-year period, taking the square root of 1.5625 yields 1.25. Subtracting one gives a compound annual growth rate of exactly 25%. This indicates a strong expansion path that matches premium venture capital benchmarks.", commonMistakes: "Using a simple average growth rate over the time horizon instead of compounding; applying an incorrect number of compounding periods in the calculation." },
+            { id: "math_08", drillType: "Payback Period", category: "Operations, Yield & Efficiency", formula: "Payback Period = Net Initial Capital Investment / Annual Net Cash Inflow Benefit", consultingExample: "An e-commerce logistics hub installs automated guided vehicles (AGVs) for an upfront cost of $4M. The upgrade saves $800,000 per year in labor costs and increases fulfillment capacity, adding $200,000 in net profit annually. Calculate the payback window.", sampleCalculation: "Total Combined Annual Benefit = $800,000 + $200,000 = $1,000,000. Payback Period = $4,000,000 / $1,000,000 = 4.0 Years.", verbalizationScript: "To evaluate this automation project, I will calculate how long it takes to recoup the capital investment. Combining the $800,000 labor cost reduction with the $200,000 in capacity profit gives a total annual cash flow benefit of $1M. Dividing the initial $4M equipment expense by this $1M annual return tells us the investment will pay for itself in exactly 4 years.", commonMistakes: "Forgetting to add revenue increases to cost savings when calculating total annual benefit; omitting ongoing maintenance costs if mentioned in the case data." },
+            { id: "math_09", drillType: "Return on Investment (ROI)", category: "Corporate Valuation & Profit Margins", formula: "ROI % = (Net Lifecycle Benefits / Total Initial Capital Invested) * 100%", consultingExample: "A global mining conglomerate spends $50M on a predictive telemetry maintenance system. Over a 5-year period, this system avoids 4 major equipment failures, with each failure costing $15M in repairs and lost production. Calculate total project ROI.", sampleCalculation: "Gross Value Derived = 4 * 15M = 60M. Net Financial Benefit = 60M - 50M Investment = 10M. ROI = (10M / 50M) * 100 = 20% total lifecycle return.", verbalizationScript: "To calculate the return on investment for the telemetry system, I'll first quantify the financial damages avoided. Preventing 4 major breakdowns at $15M each saves a gross total of $60M. Subtracting our initial $50M capital investment yields a net financial benefit of $10M. Dividing this $10M net return by our $50M initial cost gives a total project ROI of 20% over 5 years.", commonMistakes: "Dividing gross savings by the initial investment instead of using net savings; failing to align costs and benefits over the same project timeline." },
+            { id: "math_10", drillType: "Weighted Averages", category: "Market Sizing & Commercial Models", formula: "Weighted Average Value = Sum of (Component Value * Component Weight Share)", consultingExample: "An industrial manufacturing company sources raw steel from three vendors: 50% from Vendor A at $800/ton, 30% from Vendor B at $900/ton, and 20% from Vendor C at $1,000/ton. What is the blended raw cost of steel per ton?", sampleCalculation: "Blended Cost = (0.50 * 800) + (0.30 * 900) + (0.20 * 1000) = 400 + 270 + 200 = $870 weighted cost per ton.", verbalizationScript: "To calculate the blended raw cost of steel per ton, I'll apply a weighted average based on purchase volumes. Vendor A contributes $400 to the unit cost, Vendor B adds $270, and Vendor C adds $200. Summing these parts gives a blended raw cost of $870 per ton. This weighted average gives us a much more accurate baseline for our product margin analysis than a simple average of the three prices.", commonMistakes: "Calculating a simple average of the numbers ($900/ton) while ignoring the different purchase volumes from each vendor; writing out long fractions instead of converting to clean decimals." },
+            { id: "math_11", drillType: "Capacity Utilization", category: "Operations, Yield & Efficiency", formula: "Capacity Utilization Rate % = (Actual Total Output / Maximum Theoretical Capacity) * 100%", consultingExample: "A commercial bakery operates 4 automated production lines running 8 hours a day, 5 days a week. The ideal capacity per line is 1,000 loaves per hour. Due to maintenance down periods, they produce 120,000 loaves per week. Calculate utilization.", sampleCalculation: "Max Line Hours = 4 lines * 8 hours * 5 days = 160 hours/week. Max Output = 160 * 1,000 = 160,000 loaves. Utilization Rate = 120,000 / 160,000 = 75%.", verbalizationScript: "To check the efficiency of our production facility, I will calculate the capacity utilization rate. The plant operates 160 total line hours per week, which means a theoretical peak output of 160,000 loaves. Since actual production is 120,000 loaves, our capacity utilization rate is exactly 75%. This indicates there is a 25% production gap, likely caused by bottleneck delays or setup changes, which we can look to optimize.", commonMistakes: "Multiplying variables incorrectly across lines or time periods; confusing actual inventory sales metrics with physical production output capacity." },
+            { id: "math_12", drillType: "Price-Volume-Mix Variance", category: "Market Sizing & Commercial Models", formula: "Price Effect = (New Price - Old Price) * New Volume | Volume Effect = (New Volume - Old Volume) * Old Price", consultingExample: "A consumer goods client sells 1,000,000 cases of spirits at $20/case in Year 1. In Year 2, they raise the price to $22/case, causing volume to slide to 950,000 cases. Break down the net revenue variance.", sampleCalculation: "Net Revenue Change = $20.9M - $20M = +$900k. Price Effect = ($22 - $20) * 950k = +$1.9M. Volume Effect = (950k - 1,000k) * $20 = -$1.0M. Net Verification = +$1.9M - $1.0M = +$900,000.", verbalizationScript: "To understand why our revenue grew by $900,000, I will break down the price and volume effects. Raising the price by $2 generated an extra $1.9M on our new volume base. However, the resulting volume drop of 50,000 cases cost us $1M when valued at our starting price point. Combining a positive $1.9M price effect with a negative $1M volume effect explains our net revenue lift of $900,000. This confirms that the price increase successfully outweighed the drop in volume.", commonMistakes: "Multiplying the volume change by the new price instead of the baseline price; losing track of positive or negative signs during variance calculations." },
+            { id: "math_13", drillType: "Contribution Margin Optimization", category: "Corporate Valuation & Profit Margins", formula: "Contribution Margin per Unit = Price - Variable Cost | Contribution Ratio = Unit Contribution / Price", consultingExample: "A local craft microbrewery sells kegs to commercial venues for $120. Variable manufacturing inputs total $30 for ingredients, $10 for packaging wear, and $20 for logistics labor. Calculate absolute contribution margin and ratio.", sampleCalculation: "Total Unit Variable Cost = 30 + 10 + 20 = $60. Contribution Margin = 120 - 60 = $60. Contribution Ratio = 60 / 120 = 50%.", verbalizationScript: "To check the unit economic health of the brewery, I'll calculate its contribution margin. Summing the variable inputs gives a total variable cost of $60 per keg. Subtracting this from the $120 selling price leaves a contribution margin of $60 per unit, which translates to a clean 50% contribution margin ratio. This means every dollar of revenue generated above the breakeven point contributes 50 cents directly toward covering fixed corporate expenses and driving net profit.", commonMistakes: "Subtracting fixed overhead costs when calculating unit contribution metrics; dividing by variable cost instead of total revenue to find the ratio." },
+            { id: "math_14", drillType: "Profit Bridge Decomposition", category: "Corporate Valuation & Profit Margins", formula: "Net Profit Variance = Revenue Performance Variance - Variable Cost Adjustments - Fixed Overhead Shifting", consultingExample: "A client's operational profit drops from $10M to $8M despite expanding top-line sales. Revenue expanded by $5M, but variable COGS increased by $4M, and overhead fixed costs rose by $3M. Map out the bridge.", sampleCalculation: "Net Profit Variance = -$2M. Bridge Steps: Base 10M + 5M (Revenue Growth) - 4M (Variable Cost Escalation) - 3M (Fixed Growth) = 8M final benchmark.", verbalizationScript: "To explain our client's $2M profit decline despite growing sales, I will build a profit bridge. We started with a baseline profit of $10M. Our volume expansion added a positive $5M to the top line. However, variable cost escalation wiped out $4M of that growth, and an increase in fixed overhead added another $3M in costs. The combined effect of these changes explains the net $2M drop, highlighting that fixed cost growth was the main driver behind our lower profitability.", commonMistakes: "Listing cost increases as positive additions rather than subtractions in the profit bridge; failing to cross-verify that the individual components sum to the exact net change." },
+            { id: "math_15", drillType: "Exhibit Interpretation Analysis", category: "Market Sizing & Commercial Models", formula: "Total Tier Cost Model = Tier Fixed Cost Architecture + (Tier Variable Rate * Active Operational Users)", consultingExample: "An exhibit graph shows corporate software implementation costs across three scales: Small Tier ($50k fixed + $5k/user), Medium Tier ($100k fixed + $3k/user), and Large Tier ($200k fixed + $2k/user). A client platform has 40 active users. Calculate the most cost-effective tier.", sampleCalculation: "Small: 50k + (5k * 40) = $250k. Medium: 100k + (3k * 40) = $220k. Large: 200k + (2k * 40) = $280k. Medium Tier is the lowest-cost configuration.", verbalizationScript: "To find the best software layout for our client's 40 users, I will calculate the total cost for each tier shown in the exhibit. The Small Tier costs $250,000, the Large Tier totals $280,000 due to its high fixed fees, while the Medium Tier comes in lowest at $220,000. Therefore, the Medium Tier is our clear recommendation, saving the client $30,000 over the Small Tier while providing a scalable foundation for future user growth.", commonMistakes: "Choosing a tier based only on the lowest fixed cost or lowest variable rate without calculating the total cost for the client's specific user count; misreading intercept points on the chart data." }
+        ];
+
+        let currentCategory = 'all';
+
+        function calculateNavigationBadges() {
+            const counts = { 'all': CONSULTING_DRILLS.length, 'Corporate Valuation & Profit Margins': 0, 'Market Sizing & Commercial Models': 0, 'Operations, Yield & Efficiency': 0 };
+            CONSULTING_DRILLS.forEach(drill => { if (counts[drill.category] !== undefined) counts[drill.category]++; });
+            
+            document.getElementById('badge-all').innerText = counts.all;
+            document.getElementById('badge-margins').innerText = counts['Corporate Valuation & Profit Margins'];
+            document.getElementById('badge-sizing').innerText = counts['Market Sizing & Commercial Models'];
+            document.getElementById('badge-operations').innerText = counts['Operations, Yield & Efficiency'];
+        }
+
+        function renderDrills(dataToRender) {
+            const container = document.getElementById('drills-display'); container.innerHTML = '';
+            if (dataToRender.length === 0) { container.innerHTML = `<div class="no-results">No math drills match criteria.</div>`; return; }
+            dataToRender.forEach(drill => {
+                container.innerHTML += `
+                    <div class="card">
+                        <div class="card-meta"><span class="card-category">${drill.category}</span><span style="font-size:0.75rem; background:#2a2a2a; color:var(--accent-gold); padding:4px 10px; border-radius:4px; font-weight:bold;">DRILL ${drill.id.split('_')[1]}</span></div>
+                        <h3 class="card-title">${drill.drillType}</h3>
+                        <div class="content-block"><div class="content-block-label">Standard Consulting Formula Architecture</div><div class="formula-box">${drill.formula}</div></div>
+                        <div class="content-block"><div class="content-block-label">Case Scenario Premise</div><div class="content-block-text">${drill.consultingExample}</div></div>
+                        <div class="content-block"><div class="content-block-label">Calculation Execution</div><div class="content-block-text" style="font-family:monospace; color:#fff; background:#1a1a1a; padding:10px; border-radius:4px;">${drill.sampleCalculation}</div></div>
+                        <div class="content-block"><div class="content-block-label" style="color:#ff8b8b;">Critical Pitfalls</div><div class="content-block-text" style="color:#ff8b8b;">${drill.commonMistakes}</div></div>
+                        <div class="script-box"><div class="content-block-label" style="color:var(--accent-gold);">Elite Spoken Math Framework Script</div><div class="content-block-text" style="font-style:italic; color:#e5c158;">"${drill.verbalizationScript}"</div></div>
+                        <div style="margin-top:25px; display:flex; justify-content:space-between; align-items:center;">
+                            <div style="font-size:0.85rem; color:var(--text-muted); max-width:65%;">Link quantitative logic maps straight to strategic takeaways.</div>
+                            <button class="btn-action" onclick="openPracticeModal('${drill.id}')">Practice Delivery Aloud →</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function filterCategory(categoryName, activeBtn) {
+            currentCategory = categoryName;
+            document.querySelectorAll('.toolbar-btn').forEach(btn => btn.classList.remove('active'));
+            activeBtn.classList.add('active');
+            handleSearch();
+        }
+
+        function handleSearch() {
+            const query = document.getElementById('search-box').value.toLowerCase().trim();
+            let filtered = CONSULTING_DRILLS;
+            if (currentCategory !== 'all') filtered = filtered.filter(d => d.category === currentCategory);
+            if (query !== '') {
+                filtered = filtered.filter(d => d.drillType.toLowerCase().includes(query) || d.formula.toLowerCase().includes(query) || d.consultingExample.toLowerCase().includes(query) || d.verbalizationScript.toLowerCase().includes(query));
+            }
+            renderDrills(filtered);
+        }
+
+        let recognition, isRecording = false, activeDrillId = null;
+
+        function openPracticeModal(id) {
+            const drill = CONSULTING_DRILLS.find(d => d.id === id); if (!drill) return;
+            activeDrillId = id;
+            document.getElementById('practice-modal').classList.add('active');
+            document.getElementById('modal-drill-title').innerText = drill.drillType;
+            document.getElementById('modal-case-text').innerText = drill.consultingExample;
+            document.getElementById('transcription-box').value = '';
+            document.getElementById('filler-words').innerText = 'Filler Words Detected: 0';
+            document.getElementById('ai-prompt-output').style.display = 'none';
+        }
+
+        function closeModal() { document.getElementById('practice-modal').classList.remove('active'); if (isRecording) stopRecordingEngine(); }
+        function toggleRecording() { if (!isRecording) startRecordingEngine(); else stopRecordingEngine(); }
+
+        function startRecordingEngine() {
+            const btn = document.getElementById('btn-record'), status = document.getElementById('recording-status'), box = document.getElementById('transcription-box');
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) { alert("Engine requires Chrome/Edge."); return; }
+            const SpeechGen = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechGen(); recognition.continuous = true; recognition.interimResults = true; recognition.lang = 'en-US';
+            recognition.onresult = function(event) {
+                let finalTranscript = '';
+                for (let i = event.resultIndex; i < event.results.length; ++i) { if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript; }
+                if (finalTranscript) { box.value += finalTranscript + ' '; countFillerWords(box.value); }
+            };
+            recognition.start(); btn.innerText = "🛑 Stop Engine"; btn.style.backgroundColor = "#555"; status.style.display = "inline-flex"; isRecording = true;
+        }
+
+        function stopRecordingEngine() {
+            const btn = document.getElementById('btn-record'), status = document.getElementById('recording-status');
+            if (recognition) recognition.stop();
+            btn.innerText = "🎙️ Start Spoken Calculation"; btn.style.backgroundColor = "var(--primary-red)"; status.style.display = "none"; isRecording = false;
+        }
+
+        function countFillerWords(text) {
+            const fillers = ['um', 'uh', 'like', 'you know', 'basically', 'actually', 'sort of', 'kind of'];
+            let count = 0; const cleanWords = text.toLowerCase().split(/\s+/);
+            cleanWords.forEach(word => { if (fillers.includes(word.replace(/[^a-z]/g, ''))) count++; });
+            document.getElementById('filler-words').innerText = `Filler Words Detected: ${count}`;
+        }
+
+   function generateMathCoachingPrompt() {
+    const drill = CONSULTING_DRILLS.find(d => d.id === activeDrillId);
+    const userSpeech = document.getElementById('transcription-box').value;
+    
+    if (!drill) return;
+
+    const structuredPayload = `
+[CONSULTING / MBB INTERVIEW COACHING — ECCLES MBA MODULE]
+Evaluate the candidate's spoken math explanation against the provided business context using partner-level standards.
+
+DRILL TYPE APPLIED: ${drill.drillType}
+CONSULTING STYLE SCENARIO: "${drill.consultingExample}"
+FORMULA ENGINE: "${drill.formula}"
+MODEL ANSWER STRUCTURE: "${drill.sampleCalculation}"
+MODEL VERBALIZATION EXPECTATION: "${drill.verbalizationScript}"
+
+CANDIDATE TRANSCRIBED RESPONSE STATEMENT:
+"${userSpeech || "[Candidate provided no spoken transcript. Evaluate parameters and provide a model answer layout.]"}"
+
+Provide deep, objective metrics utilizing exactly this markdown output schema:
+
+**What Worked**
+[Detail 1-2 quantitative strengths.]
+
+**Top 2 Areas for Improvement**
+1. [Critique execution pacing or mental rounding metrics]
+2. [Identify any logical or structural slips]
+
+**Advanced Consulting Power Move**
+[Provide one advanced corporate finance variable or optimization metric move]
+
+**Dashboard Scorecard Matrix**
+Assign exactly one rubric score (1. Emerging | 2. Developing | 3. Interview-Ready | 4. MBB-Caliber) for each applicable competency based on this specific performance:
+* Case Structuring: [Score (N/A if not tested)]
+* Business Judgment: [Score]
+* Math Accuracy: [Score]
+* Synthesis: [Score]
+* Fit / PEI Storytelling: [Score (N/A if not tested)]
+* Executive Presence: [Score]
+* Communication Clarity: [Score]
+* Recommendation Strength: [Score]
+    `;
+
+    document.getElementById('ai-copy-text').innerText = structuredPayload.trim();
+    document.getElementById('ai-prompt-output').style.display = 'block';
+}
+
+        function copyToClipboard() { navigator.clipboard.writeText(document.getElementById('ai-copy-text').innerText); alert("Payload copied!"); }
+        window.onload = () => { calculateNavigationBadges(); renderDrills(CONSULTING_DRILLS); };
+    </script>
+</body>
+</html>
