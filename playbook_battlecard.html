@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eccles MBA — MBB Battlecard & Red Flags Vault</title>
+    <style>
+        :root {
+            --primary-red: #CC0000;
+            --accent-gold: #c9a84c;
+            --bg-dark: #121212;
+            --bg-card: #1e1e1e;
+            --bg-sidebar: #0a0a0a;
+            --text-main: #f5f5f5;
+            --text-muted: #a0a0a0;
+            --border-color: #333333;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --danger-red: #ff4d4d;
+            --success-green: #4ecdc4;
+        }
+
+        body {
+            margin: 0;
+            font-family: var(--font-family);
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* PERMANENT GLOBAL SIDEBAR */
+        aside {
+            width: 320px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            padding: 0 24px 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 15px;
+        }
+
+        .brand h2 { color: var(--primary-red); margin: 0 0 5px 0; font-size: 1.3rem; text-transform: uppercase; letter-spacing: 1.5px; }
+        .brand p { color: var(--accent-gold); margin: 0; font-size: 0.9rem; font-weight: 600; }
+        .nav-label { padding: 10px 24px 5px; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; font-weight: 700; }
+
+        aside a {
+            text-decoration: none;
+            color: var(--text-muted);
+            padding: 12px 24px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-left: 4px solid transparent;
+        }
+
+        aside a:hover, aside a.active {
+            background-color: rgba(204, 0, 0, 0.1);
+            color: var(--primary-red);
+            border-left-color: var(--primary-red);
+        }
+
+        .count-badge { background-color: #2a2a2a; color: var(--accent-gold); font-size: 0.75rem; padding: 2px 8px; border-radius: 10px; font-weight: bold; }
+        main { flex: 1; overflow-y: auto; scroll-behavior: smooth; display: flex; flex-direction: column; }
+
+        header {
+            position: sticky;
+            top: 0;
+            background-color: rgba(18, 18, 18, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title-area h1 { margin: 0; font-size: 1.25rem; font-weight: 700; }
+        .header-subtitle { margin: 2px 0 0 0; font-size: 0.85rem; color: var(--accent-gold); text-transform: uppercase; letter-spacing: 1px; }
+        .search-container { width: 350px; }
+        .search-input { width: 100%; background-color: #1e1e1e; border: 1px solid var(--border-color); border-radius: 4px; padding: 10px 15px; color: white; font-family: var(--font-family); font-size: 0.9rem; transition: border-color 0.2s; }
+        .search-input:focus { outline: none; border-color: var(--primary-red); }
+
+        /* HORIZONTAL TOOLBAR ROWS */
+        .local-toolbar {
+            background-color: #161616;
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 40px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .toolbar-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .toolbar-btn:hover, .toolbar-btn.active {
+            background-color: rgba(204, 0, 0, 0.1);
+            color: white;
+        }
+
+        .section-container { padding: 40px; max-width: 1300px; width: calc(100% - 80px); margin: 0 auto; display: none; }
+        .section-container.active { display: block; }
+        .hero { margin-bottom: 40px; border-bottom: 1px solid var(--border-color); padding-bottom: 30px; }
+        .track-pill { display: inline-block; background-color: rgba(201, 168, 76, 0.1); color: var(--accent-gold); padding: 5px 14px; border-radius: 4px; font-size: 0.8rem; text-transform: uppercase; font-weight: 700; margin-bottom: 15px; letter-spacing: 1px; }
+        .hero h2 { font-size: 2.5rem; margin: 0 0 15px 0; font-weight: 800; }
+        .description { color: var(--text-muted); line-height: 1.6; font-size: 1.1rem; max-width: 900px; margin: 0; }
+        .vault-grid { display: grid; grid-template-columns: 1fr; gap: 30px; }
+        .card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 28px; position: relative; }
+        .card-header-line { border-bottom: 1px solid #333; padding-bottom: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .card-title { font-size: 1.35rem; font-weight: 700; margin: 0; color: white; }
+        .sub-card-badge { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; padding: 4px 10px; border-radius: 4px; letter-spacing: 0.5px; }
+        .battlecard-badge { background-color: rgba(201, 168, 76, 0.1); color: var(--accent-gold); border: 1px solid rgba(201, 168, 76, 0.2); }
+        .redflag-badge { background-color: rgba(255, 77, 77, 0.1); color: var(--danger-red); border: 1px solid rgba(255, 77, 77, 0.2); }
+        .checklist-item { margin-bottom: 18px; line-height: 1.5; }
+        .checklist-item:last-child { margin-bottom: 0; }
+        .checklist-title { font-size: 1.05rem; font-weight: 700; color: var(--accent-gold); margin-bottom: 4px; }
+        .checklist-desc { font-size: 0.95rem; color: #dcdcdc; }
+        .quote-box { background-color: #121212; padding: 14px 18px; border-left: 3px solid var(--primary-red); font-family: monospace; font-size: 0.95rem; color: #fff; margin-top: 8px; white-space: pre-wrap; border-radius: 0 4px 4px 0; }
+        .danger-box { background-color: rgba(255, 77, 77, 0.03); border: 1px dashed rgba(255, 77, 77, 0.3); padding: 16px; border-radius: 6px; margin-top: 12px; font-size: 0.95rem; line-height: 1.5; }
+        .danger-label { color: var(--danger-red); font-weight: 800; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px; margin-bottom: 4px; display: block; }
+        .remedy-box { background-color: rgba(78, 205, 196, 0.03); border: 1px dashed rgba(78, 205, 196, 0.3); padding: 16px; border-radius: 6px; margin-top: 12px; font-size: 0.95rem; line-height: 1.5; }
+        .remedy-label { color: var(--success-green); font-weight: 800; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px; margin-bottom: 4px; display: block; }
+        .no-results { text-align: center; padding: 40px; color: var(--text-muted); font-size: 1.1rem; border: 1px dashed var(--border-color); border-radius: 8px; }
+    </style>
+</head>
+<body>
+
+    <!-- PERMANENT GLOBAL SIDEBAR -->
+    <aside>
+        <div class="brand">
+            <h2>Eccles MBA</h2>
+            <p>Consulting Command Center</p>
+        </div>
+        <div class="nav-label">Core Directory</div>
+        <a href="./index.html">Ecosystem Dashboard</a>
+        <a href="./playbook_frameworks.html">20 Case Frameworks</a>
+        <a href="./playbook_math.html">15 Analytics Math Drills</a>
+        <a href="./playbook_battlecard.html" class="active">MBB Battlecard Vault</a>
+        
+        <div class="nav-label">Practice Sprints</div>
+        <a href="./playbook_sprint_01.html">Sprint 1: Profitability</a>
+        <a href="./playbook_sprint_02.html">Sprint 2: M&A Strategy</a>
+        <a href="./playbook_sprint_03.html">Sprint 3: Operations</a>
+        <a href="./playbook_sprint_04.html">Sprint 4: Tech & SaaS</a>
+        <a href="./playbook_sprint_05.html">Sprint 5: GTM & Pricing</a>
+        <a href="./playbook_sprint_06.html">Sprint 6: Capstones</a>
+    </aside>
+
+    <main>
+        <header>
+            <div class="header-title-area">
+                <h1 id="header-main-title">MBB Interview Battlecard</h1>
+                <div class="header-subtitle">Eccles MBA · Ultimate Quick-Reference Asset</div>
+            </div>
+            <div class="search-container">
+                <input type="text" id="vault-search" class="search-input" placeholder="Search parameters..." oninput="executeVaultSearch()">
+            </div>
+        </header>
+
+        <!-- REGIONAL HORIZONTAL VIEW TOOLBAR -->
+        <div class="local-toolbar">
+            <button class="toolbar-btn active" id="btn-show-bc" onclick="switchVaultView('battlecard-section', this)">MBB Checklists <span class="count-badge">15</span></button>
+            <button class="toolbar-btn" id="btn-show-rf" onclick="switchVaultView('redflags-section', this)">Fatal Red Flags <span class="count-badge">20</span></button>
+        </div>
+
+        <!-- VAULT SECTION: BATTLECARD -->
+        <section id="battlecard-section" class="section-container active">
+            <div class="hero">
+                <span class="track-pill">Cheat Sheet Core</span>
+                <h2>MBB Interview Battlecard</h2>
+                <p class="description">Your quick-reference cheat sheet. Review before every consulting coffee chat, recruiter call, case screen, and partner interview.</p>
+            </div>
+            <div class="vault-grid" id="battlecard-anchor"></div>
+        </section>
+
+        <!-- VAULT SECTION: RED FLAGS -->
+        <section id="redflags-section" class="section-container">
+            <div class="hero">
+                <span class="track-pill">Elimination Guardrails</span>
+                <h2>Consulting Interview Red Flags</h2>
+                <p class="description">The specific behaviors and structural flaws that eliminate elite candidates. Know these boundaries.</p>
+            </div>
+            <div class="vault-grid" id="redflags-anchor"></div>
+        </section>
+    </main>
+
+    <script>
+        const BATTLECARD_DATA = [
+            { id: "bc_01", title: "Must-Know Consulting Concepts", items: [ { name: "MECE Structural Hygiene", desc: "Mutually Exclusive, Collectively Exhaustive. Every tree branch must separate issues cleanly with zero layer overlap while covering 100% of the possible diagnostic space." }, { name: "The 80/20 Prioritization Parameter", desc: "Focus entirely on the 20% of strategic value drivers that dictate 80% of corporate bottom-line outcomes." }, { name: "First-Principles Unit Economics", desc: "Always drill down below high-level metrics to evaluate performance trends on a per-unit basis." } ] },
+            { id: "bc_02", title: "Case Interview Opening Checklist", items: [ { name: "Step 1: Active Synthesis", desc: "Listen intently to the context, document core variables, and play back a concise, re-synthesized summary to confirm problem alignment." }, { name: "Step 2: Objective Verification", desc: "State the primary quantified milestone clearly (e.g., 'Isolate a structural path to clear $40M in annualized cost savings')." }, { name: "Step 3: Strategy Mapping", desc: "Pitch exactly 1 or 2 targeted industry questions to expose boundaries before requesting a framework timeout." } ] },
+            { id: "bc_03", title: "Clarifying Question Power Phrases", items: [ { name: "Context Clarification Engine", desc: "Use to separate industry headwinds from isolated asset performance trends.", quote: "To anchor my initial framework, I want to clarify if this 12% operating profit drop matches a wider industry-wide pattern, or if it is isolated entirely to our client's facility footprint?" }, { name: "Objective Boundary Calibration", desc: "Deploy to establish whether the target goal is an absolute standalone return or a strategic ecosystem play.", quote: "Is the core priority driving this market entry timeline centered purely on a standalone financial hurdle rate, or are we mapping this infrastructure launch to protect our broader vehicle sales pipeline?" } ] },
+            { id: "bc_04", title: "Structuring Power Phrases", items: [ { name: "Signposting Structural Layers", desc: "Transition cleanly from the initial timeout to pitch your customized issue tree with high corporate credibility.", quote: "To analyze our direct path forward, I have constructed a tailored issue architecture looking across three specific buckets: localized pricing degradation parameters, supply channel margin leakages, and technical operational debt." }, { name: "Custom Scaffold Adjustments", desc: "Differentiate your categories explicitly from generic textbooks by weaving in client-specific operational variables.", quote: "Instead of looking across generic cost buckets, I want to divide our cost analysis into physical conversion bay bottlenecks and unionized long-haul logistics overtime structures." } ] },
+            { id: "bc_05", title: "Hypothesis-Driven Thinking Prompts", items: [ { name: "Early Claim Formulation", desc: "State a testable strategic claim within the first 4 minutes of the case run to show intuitive business judgment.", quote: "Given the rapid increase in digital customer acquisition costs noted in our context overview, my initial hypothesis is that digital channels have reached a saturation point, meaning our growth solutions must target offline wholesale distribution pools." }, { name: "Iterative Hypothesis Redirection", desc: "Acknowledge new data constraints smoothly to pivot your tree categories without losing your structured presence.", quote: "Since this new chart exhibit proves raw commodity inflation is affecting all tiers equally, I will reject my initial sourcing hypothesis and shift our focus to evaluate outbound logistics bottlenecks." } ] },
+            { id: "bc_06", title: "Profitability Drivers to Know Cold", items: [ { name: "Revenue Optimization Channels", desc: "Breakdown top-line structures via: [Volume × Price/Mix Matrix]. Track customer acquisition conversion scales, order frequencies, cohort churn dynamics, and value tier distributions." }, { name: "Cost Footprint Realities", desc: "Deconstruct expenses via: [Total Fixed Operational Overheads + (Unit Variable Rates × Production Volumes)]. Map physical asset depreciation schedules, processing scrap rates, and labor utilization yields." } ] },
+            { id: "bc_07", title: "Market Sizing Shortcuts", items: [ { name: "Demographic Anchor Metrics", desc: "US Population: 330M | US Households: ~130M (~2.5 persons/HH). Large Metropolitan Capital Hub Scale: 10M population base baseline anchor." }, { name: "The Mathematical Rounding Rule", desc: "Always adjust your working percentage metrics up or down to create clean fraction groupings (e.g., using 33M as 10% of the US population base) to keep verbal math fast and authoritative." } ] },
+            { id: "bc_08", title: "Consulting Math Must-Knows", items: [ { name: "Unit Economic Contribution Formulas", desc: "Unit Contribution Margin = Price - Unit Variable Cost.\nContribution Margin Ratio = Unit Contribution / Unit Price." }, { name: "Breakeven Capacity Metrics", desc: "Breakeven Production Output Volume = Total Fixed System Expenses / Unit Contribution Margin value." }, { name: "Compound Annual Scaling (CAGR)", desc: "Rule of 72: years to double ≈ 72 ÷ annual growth rate (12% growth doubles in ~6 years). Quick CAGR estimate: total % growth ÷ number of years — this slightly overstates the true compound rate, so round your answer down." } ] },
+            { id: "bc_09", title: "Exhibit Interpretation Checklist", items: [ { name: "Step 1: Structural Audit Scan", desc: "Identify titles, check vertical and horizontal axis parameters, and verify internal unit scales and data labels." }, { name: "Step 2: Identify Anomalies", desc: "Locate steep slopes, intercept crossings, outlier groupings, or sharp percentage shifts across cohorts." }, { name: "Step 3: Executive Strategic Linkage", desc: "Never summarize the chart design details; state the direct implication of the data trend on the client's investment or diagnostic choice." } ] },
+            { id: "bc_10", title: "Final Recommendation Formula", items: [ { name: "The Executive Pyramid Framework", desc: "Lead instantly with a bold, definitive strategic conclusion. Never waffle or trail into process history.", quote: "Our clear recommendation is to [Proceed / Halt]. This strategy is driven by three specific quantified pillars: first, [Financial upside]; second, [Operational capacity protection]; third, [Competitive synergy leverage]. The primary risk is [Downside parameter], which we will successfully mitigate via [Operational action]. Immediate next steps are to [Action 1] and [Action 2]." } ] },
+            { id: "bc_11", title: "Fit / PEI Story Bank Checklist", items: [ { name: "The Personal Leadership 'I' Focus", desc: "Ensure 75% of your story runtime details your specific individual thoughts, words, and actions, not collective team outcomes." }, { name: "Quantified Impact Anchors", desc: "Every behavioral story must conclude with a clear, verified business or team metric (e.g., 'boosting efficiency by 40%,' or 'reclaiming $400,000 in structural costs')." } ] },
+            { id: "bc_12", title: "Strong Candidate Signals", items: [ { name: "Core Competency Metrics Profile", desc: "Structures ambiguous problems cleanly without relying on generic checklists; states early hypotheses; performs math step-by-step aloud; connects calculations directly back to strategic client impacts; synthesizes insights cleanly." } ] },
+            { id: "bc_13", title: "Common MBB Interview Mistakes", items: [ { name: "Framework Memorization Recital", desc: "Pitching un-customized textbook frameworks across highly specialized industrial or technology cases." }, { name: "Calculations in Silence", desc: "Running complex numbers in your head for extended blocks without sharing your intermediate steps aloud." }, { name: "Chronological Summaries", desc: "Concluding a case by recounting a historical summary of your analysis steps instead of leading directly with an answer-first recommendation." } ] },
+            { id: "bc_14", title: "Final-Round Differentiators", items: [ { name: "Commercial Poise Under Fire", desc: "Senior partners will challenge your variables or model structures; stay calm, project coachability, and run collaborative adjustments live." }, { name: "The 'So What?' Analytical Catalyst", desc: "Whenever you calculate a value or interpret a chart curve, instantly explain what that outcome means for the client's long-term margin options." } ] },
+            { id: "bc_15", title: "Last-Minute Review", items: [ { name: "The 30-Second Mindset Reset", desc: "Take a deep breath. Focus entirely on driving the business case as a trusted colleague advising a real CEO. Be highly structured, explicitly quantitative, data-driven, and relentlessly outcome-oriented." } ] }
+        ];
+
+        const REDFLAGS_DATA = [
+            { id: "rf_01", title: "1. Memorized Frameworks Without Customization", desc: "Reciting generic marketing or textbook frameworks across a specialized B2B scenario.", example: "Candidate notes: 'For this medical curative drug launch, I want to look at Place, Promotion, Price, and Product.'", remedy: "Customize categories using industry-specific operational variables: 'To evaluate this launch asset, I will focus on insurance reimbursement paths, economic value capture metrics, and hospital procurement tracks.'" },
+            { id: "rf_02", title: "2. Weak Problem Framing", desc: "Failing to clearly establish the primary problem parameters or target quantified business metrics during the case opening.", example: "Candidate dives straight into lists of business ideas without defining the core objective parameters.", remedy: "State the primary quantified milestone clearly: 'Our primary objective is to evaluate whether this $400M green energy investment can clear our strict 14% internal hurdle rate limit.'" },
+            { id: "rf_03", title: "3. Non-MECE Structure", desc: "Building issue tree categories that overlap significantly, creating logical confusion and analytical blind spots.", example: "Structuring a profit turnaround framework with separate concurrent branches for 'Sales Contraction' and 'Lower Retail Traffic' (which overlap).", remedy: "Separate branches into clean, mathematically isolated drivers: 'We will segment revenue drivers into average ticket pricing layers and consumer customer volume footprint metrics.'" },
+            { id: "rf_04", title: "4. Missing the Client Objective", desc: "Designing a highly complex strategic solution that looks flashy but fails to solve the client's actual primary business problem.", example: "Recommending an expensive, multi-year digital platform redesign when the client is facing an urgent, near-term working capital liquidity crisis.", remedy: "Constantly cross-check your analysis paths against the client's target timeline and core problem parameters." },
+            { id: "rf_05", title: "5. Poor Clarifying Questions", desc: "Asking long lists of open-ended background questions during the case opening that add zero tactical value and stall diagnostic speed.", example: "Candidate asks: 'Can you tell me the complete 20-year history of the company's brand messaging strategies?'", remedy: "Ask sharp, target questions designed to uncover data boundaries: 'I want to clarify if this margin compression is unique to our client or an industry-wide trend?'" },
+            { id: "rf_06", title: "6. Math Errors or Unclear Math", desc: "Making careless calculation errors or writing numbers down in silence without explaining your steps aloud.", example: "Candidate calculates silently for 45 seconds, then speaks an incorrect valuation total with no visible tracking path.", remedy: "Speak your steps aloud, share your intermediate numbers clearly, and round values strategically to keep calculations fast and accurate." },
+            { id: "rf_07", title: "7. Weak Exhibit Interpretation", desc: "Passively summarizing titles or reading data point coordinates off an exhibit page without linking the trends to a strategic choice.", example: "Candidate notes: 'This chart illustrates that the Europe segment achieved 12% revenue growth while the US hit 8%.'", remedy: "Deliver the direct business implication: 'This chart proves that our European segment has achieved superior scale efficiency, meaning we should focus our near-term capital here.'" },
+            { id: "rf_08", title: "8. No Hypothesis", desc: "Wandering through data sheets and charts aimlessly without building an early strategic hypothesis to direct your focus.", example: "Candidate notes: 'Let's just look at every single chart in order to see if we can find anything interesting.'", remedy: "State a testable claim early to drive your analysis: 'Given the regional fuel cost spikes, I hypothesize that our margin compression is entirely driven by outbound logistics cost increases.'" },
+            { id: "rf_09", title: "9. Analysis Without Prioritization", desc: "Treating minor corporate cost buckets with the same analytical weight as massive, high-impact operational value drivers.", example: "Spending 15 minutes debating office paper expenses when the refinery client is facing an 18% spike in crude naphtha input costs.", remedy: "Isolate the highest-volume cost centers immediately and focus 80% of your structural analysis time on those levers." },
+            { id: "rf_10", title: "10. Summary Without Recommendation", desc: "Concluding a business case run with a loose recap of your observations instead of delivering a bold, answer-first decision.", example: "Candidate wraps up: 'We analyzed profits and looked at marketing, and there are good arguments on both sides.'", remedy: "Lead instantly with a definitive strategic choice: 'Our clear recommendation is to proceed with the asset acquisition, driven by three quantified pillars...'" },
+            { id: "rf_11", title: "11. Ignoring Risks and Implementation", desc: "Delivering a flawless strategic recommendation but completely failing to evaluate downside operational risks or execution timelines.", example: "Recommending an immediate global software consolidation plan without analyzing the risk of system downtime or user adoption friction.", remedy: "Conclude your final summary with a quantified downside parameter and an immediate 30-day risk mitigation next step." },
+            { id: "rf_12", title: "12. Weak Business Judgment", desc: "Proposing unrealistic operational solutions that ignore basic industry economics or capital investment realities.", example: "Suggesting a small regional family-owned retail grocer build a multi-billion dollar satellite tracking network to fix inventory delays.", remedy: "Align your solutions with the client's asset scale, available cash runway, and the structural realities of their market sector." },
+            { id: "rf_13", title: "13. Poor Communication Structure", desc: "Wandering through disorganized streams of consciousness instead of signposting your thoughts using clear, structured tracks.", example: "Candidate talks loosely about pricing ideas, then jumps to labor issues, before circling back to discuss ad budgets.", remedy: "Structure your thoughts cleanly using the Rule of 3: 'To evaluate our path forward, I will analyze three specific levers: pricing tiers, channel structures, and capacity limits.'" },
+            { id: "rf_14", title: "14. Low Executive Presence", desc: "Fidgeting, showing extreme nervousness, using conversational filler words, or speaking without confident professional authority.", example: "Delivering an answer packed with constant 'ums,' 'likes,' and defensive hesitations when questioned on a data variable.", remedy: "Maintain strong eye contact, utilize deliberate pauses to plan your steps, and speak with the calm, authoritative presence of a trusted advisor." },
+            { id: "rf_15", title: "15. Vague Fit Stories", desc: "Sharing vague, generic behavioral stories that read like a resume list without showing your individual personal impact.", example: "Candidate wants to share a team success story: 'Our project team worked really hard on an analysis, and we successfully delivered the final report on schedule.'", remedy: "Focus entirely on your individual actions: 'I sat down with the skeptical VP individually, leveraged our financial model to manage their concerns, and secured the budget approval...'" },
+            { id: "rf_16", title: "16. Weak Motivation for Consulting", desc: "Delivering generic, boilerplate reasons for pursuing consulting that sound like you are just looking for a prestigious resume stamp.", example: "Candidate notes: 'I want to do consulting because I like solving problems and want to work across different industries.'", remedy: "Share a specific, researched connection: 'I am targeting your firm's private equity practice group to leverage my financial data training to drive commercial due diligence turnarounds.'" },
+            { id: "rf_17", title: "17. Overconfidence Without Evidence", desc: "Projecting an arrogant, uncooperative attitude or making big strategic claims without using data metrics to support them.", example: "Candidate notes: 'This market entry move will obviously succeed because I have great intuition for consumer trends.'", remedy: "Support every strategic claim with hard metrics: 'This entry path is highly viable because our model proves utilization yields only need to clear 65% to hit our return targets.'" },
+            { id: "rf_18", title: "18. Lack of Coachability", desc: "Getting defensive or arguing blindly with an interviewer when they provide corrective data hints or partner-round pushback.", example: "Arguing with a senior partner who points out a flaw in your model assumptions instead of integrating their operational feedback.", remedy: "Treat pushback as a valuable data input: 'That localized operational context is exactly the nuance we need to test; let's see how adjusting that parameter alters our cash flows.'" },
+            { id: "rf_19", title: "19. Failure to Drive the Case", desc: "Sitting back passively and waiting for the interviewer to hand you data sheets and prompt instructions instead of proactively leading the case.", example: "Candidate pauses after a chart analysis and waits silently for the interviewer to tell them what step to take next.", remedy: "Proactively guide the conversation forward: 'Since this exhibit isolates our cost leak to the packing bay, I want to evaluate our labor utilization yields at that workstation.'" },
+            { id: "rf_20", title: "20. Behavioral Interview Weaknesses", desc: "Using 'We' throughout behavioral fit stories, which hides your personal contribution and makes your individual impact unclear.", example: "Candidate notes: 'We built a great tracking spreadsheet and we managed to reduce our warehouse delivery delays by 20%.'", remedy: "Own your actions completely: 'I designed the custom data layout, reallocated tasks across the engineering squad, and personally drove the timeline compression.'" }
+        ];
+
+        let currentVaultView = 'battlecard-section';
+
+        function switchVaultView(viewId, activeBtn) {
+            currentVaultView = viewId;
+            document.querySelectorAll('.section-container').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.toolbar-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(viewId).classList.add('active');
+            activeBtn.classList.add('active');
+
+            const titleMap = { 'battlecard-section': 'MBB Interview Battlecard', 'redflags-section': 'Consulting Interview Red Flags' };
+            document.getElementById('header-main-title').innerText = titleMap[viewId];
+            executeVaultSearch();
+        }
+
+        function renderVaultArchitecture(battlecardDataToRender, redflagsDataToRender) {
+            const bcAnchor = document.getElementById('battlecard-anchor'); bcAnchor.innerHTML = '';
+            if (battlecardDataToRender.length === 0) {
+                bcAnchor.innerHTML = `<div class="no-results">No battlecard metrics match parameters.</div>`;
+            } else {
+                battlecardDataToRender.forEach(card => {
+                    let itemsHtml = '';
+                    card.items.forEach(item => {
+                        itemsHtml += `
+                            <div class="checklist-item">
+                                <div class="checklist-title">${item.name}</div>
+                                <div class="checklist-desc">${item.desc}</div>
+                                ${item.quote ? `<div class="quote-box">"${item.quote}"</div>` : ''}
+                            </div>
+                        `;
+                    });
+                    bcAnchor.innerHTML += `<div class="card"><div class="card-header-line"><h3 class="card-title">${card.title}</h3><span class="sub-card-badge battlecard-badge">Ref Sheet Matrix</span></div><div>${itemsHtml}</div></div>`;
+                });
+            }
+
+            const rfAnchor = document.getElementById('redflags-anchor'); rfAnchor.innerHTML = '';
+            if (redflagsDataToRender.length === 0) {
+                rfAnchor.innerHTML = `<div class="no-results">No red flag parameters match search metrics.</div>`;
+            } else {
+                redflagsDataToRender.forEach(flag => {
+                    rfAnchor.innerHTML += `
+                        <div class="card" style="border-left:4px solid var(--danger-red);">
+                            <div class="card-header-line"><h3 class="card-title">${flag.title}</h3><span class="sub-card-badge redflag-badge">Ding Trigger</span></div>
+                            <div class="checklist-item">
+                                <div class="checklist-desc" style="font-size:1.05rem; color:#f5f5f5; margin-bottom:10px;">${flag.desc}</div>
+                                <div class="danger-box"><span class="danger-label">Fatal Interview Manifestation Behavior:</span><span style="font-style:italic; color:#ff9999;">"${flag.example}"</span></div>
+                                <div class="remedy-box"><span class="remedy-label">Eccles Practice Turnaround Path:</span><span style="color:#99ffe6; font-weight:600;">${flag.remedy}</span></div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        function executeVaultSearch() {
+            const query = document.getElementById('vault-search').value.toLowerCase().trim();
+            let filteredBC = BATTLECARD_DATA, filteredRF = REDFLAGS_DATA;
+            if (query !== '') {
+                filteredBC = BATTLECARD_DATA.filter(card => card.title.toLowerCase().includes(query) || card.items.some(item => item.name.toLowerCase().includes(query) || item.desc.toLowerCase().includes(query)));
+                filteredRF = REDFLAGS_DATA.filter(flag => flag.title.toLowerCase().includes(query) || flag.desc.toLowerCase().includes(query) || flag.example.toLowerCase().includes(query) || flag.remedy.toLowerCase().includes(query));
+            }
+            renderVaultArchitecture(filteredBC, filteredRF);
+        }
+
+        window.onload = () => { renderVaultArchitecture(BATTLECARD_DATA, REDFLAGS_DATA); };
+    </script>
+</body>
+</html>
