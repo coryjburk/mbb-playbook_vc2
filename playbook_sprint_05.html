@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eccles MBA — Consulting Practice Sprint 5</title>
+    <style>
+        :root {
+            --primary-red: #CC0000;
+            --accent-gold: #c9a84c;
+            --bg-dark: #121212;
+            --bg-card: #1e1e1e;
+            --bg-sidebar: #0a0a0a;
+            --text-main: #f5f5f5;
+            --text-muted: #a0a0a0;
+            --border-color: #333333;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            font-family: var(--font-family);
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* PERMANENT GLOBAL SIDEBAR */
+        aside {
+            width: 320px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            padding: 0 24px 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 15px;
+        }
+
+        .brand h2 {
+            color: var(--primary-red);
+            margin: 0 0 5px 0;
+            font-size: 1.3rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .brand p {
+            color: var(--accent-gold);
+            margin: 0;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .nav-label {
+            padding: 10px 24px 5px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        aside a {
+            text-decoration: none;
+            color: var(--text-muted);
+            padding: 12px 24px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-left: 4px solid transparent;
+        }
+
+        aside a:hover, aside a.active {
+            background-color: rgba(204, 0, 0, 0.1);
+            color: var(--primary-red);
+            border-left-color: var(--primary-red);
+        }
+
+        .count-badge {
+            background-color: #2a2a2a;
+            color: var(--accent-gold);
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        main {
+            flex: 1;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            background-color: rgba(18, 18, 18, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title-area h1 { margin: 0; font-size: 1.25rem; font-weight: 700; }
+        .header-subtitle { margin: 2px 0 0 0; font-size: 0.85rem; color: var(--accent-gold); text-transform: uppercase; letter-spacing: 1px; }
+
+        /* HORIZONTAL LOCAL TOOLBAR VIEW TOGGLE */
+        .local-toolbar {
+            background-color: #161616;
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 40px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .toolbar-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toolbar-btn:hover, .toolbar-btn.active {
+            background-color: rgba(204, 0, 0, 0.1);
+            color: white;
+        }
+
+        .section-container { padding: 40px; max-width: 1300px; width: calc(100% - 80px); margin: 0 auto; display: none; }
+        .section-container.active { display: block; }
+        .hero { margin-bottom: 40px; border-bottom: 1px solid var(--border-color); padding-bottom: 30px; }
+        .track-pill { display: inline-block; background-color: rgba(201, 168, 76, 0.1); color: var(--accent-gold); padding: 5px 14px; border-radius: 4px; font-size: 0.8rem; text-transform: uppercase; font-weight: 700; margin-bottom: 15px; letter-spacing: 1px; }
+        .hero h2 { font-size: 2.5rem; margin: 0 0 15px 0; font-weight: 800; }
+        .description { color: var(--text-muted); line-height: 1.6; font-size: 1.1rem; max-width: 900px; margin: 0; }
+        .content-grid { display: grid; grid-template-columns: 1fr; gap: 25px; }
+        .card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 28px; transition: all 0.25s ease; position: relative; }
+        .card-header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+        .card-title { font-size: 1.5rem; margin: 0; font-weight: 700; color: var(--text-main); }
+        .tag-row { display: flex; gap: 10px; margin-top: 5px; }
+        .badge { font-size: 0.75rem; padding: 4px 10px; border-radius: 4px; font-weight: bold; text-transform: uppercase; }
+        .badge-category { background-color: rgba(201, 168, 76, 0.1); color: var(--accent-gold); }
+        .badge-difficulty { background-color: rgba(204, 0, 0, 0.1); color: var(--primary-red); }
+
+        .content-block { margin-top: 15px; background-color: #161616; padding: 15px 20px; border-radius: 6px; border-left: 3px solid #333; }
+        .content-block-title { font-size: 0.85rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; letter-spacing: 0.5px; }
+        .content-block-text { font-size: 0.95rem; line-height: 1.5; color: #e0e0e0; white-space: pre-line; }
+
+        .tabs-container { margin-top: 20px; }
+        .tab-headers { display: flex; border-bottom: 1px solid var(--border-color); gap: 10px; }
+        .tab-btn { background: none; border: none; color: var(--text-muted); padding: 10px 15px; cursor: pointer; font-size: 0.9rem; font-weight: 600; transition: all 0.2s; border-bottom: 2px solid transparent; }
+        .tab-btn.active { color: var(--primary-red); border-bottom-color: var(--primary-red); }
+        .tab-content { display: none; padding: 15px 5px; font-size: 0.95rem; line-height: 1.5; }
+        .tab-content.active { display: block; }
+
+        .btn-action { background-color: var(--primary-red); color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-weight: 700; font-size: 0.9rem; transition: background-color 0.2s; display: inline-flex; align-items: center; gap: 8px; margin-top: 15px; }
+        .btn-action:hover { background-color: #a00000; }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .modal.active { display: flex; }
+        .modal-content { background-color: var(--bg-card); width: 90%; max-width: 850px; max-height: 85vh; overflow-y: auto; padding: 35px; border-radius: 8px; border: 1px solid var(--primary-red); position: relative; }
+        .close-modal { position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--text-muted); font-size: 2rem; cursor: pointer; }
+        textarea { width: 100%; box-sizing: border-box; height: 160px; background-color: #121212; color: white; border: 1px solid var(--border-color); border-radius: 4px; padding: 15px; margin-top: 15px; font-family: var(--font-family); font-size: 1rem; line-height: 1.5; resize: vertical; }
+        .copy-box { background-color: #121212; padding: 20px; border-left: 4px solid var(--accent-gold); font-family: monospace; margin-top: 15px; white-space: pre-wrap; font-size: 0.9rem; color: #dcdcdc; max-height: 250px; overflow-y: auto; }
+        .recording-indicator { display: none; color: var(--primary-red); font-weight: 700; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <!-- PERMANENT GLOBAL SIDEBAR -->
+    <aside>
+        <div class="brand">
+            <h2>Eccles MBA</h2>
+            <p>Consulting Command Center</p>
+        </div>
+        <div class="nav-label">Core Directory</div>
+        <a href="./index.html">Ecosystem Dashboard</a>
+        <a href="./playbook_frameworks.html">20 Case Frameworks</a>
+        <a href="./playbook_math.html">15 Analytics Math Drills</a>
+        <a href="./playbook_battlecard.html">MBB Battlecard Vault</a>
+        
+        <div class="nav-label">Practice Sprints</div>
+        <a href="./playbook_sprint_01.html">Sprint 1: Profitability</a>
+        <a href="./playbook_sprint_02.html">Sprint 2: M&A Strategy</a>
+        <a href="./playbook_sprint_03.html">Sprint 3: Operations</a>
+        <a href="./playbook_sprint_04.html">Sprint 4: Tech & SaaS</a>
+        <a href="./playbook_sprint_05.html" class="active">Sprint 5: GTM & Pricing</a>
+        <a href="./playbook_sprint_06.html">Sprint 6: Capstones</a>
+    </aside>
+
+    <main>
+        <header>
+            <div class="header-title-area">
+                <h1 id="header-display-title">Sprint 5: Case Prompts</h1>
+                <div class="header-subtitle">International Expansion, Go-To-Market, and Commercial Pricing</div>
+            </div>
+        </header>
+
+        <!-- HORIZONTAL LOCAL TOOLBAR VIEW TOGGLE -->
+        <div class="local-toolbar">
+            <button class="toolbar-btn active" id="btn-cases" onclick="switchView('cases-view', this)">MBB Case Prompts <span class="count-badge">5</span></button>
+            <button class="toolbar-btn" id="btn-questions" onclick="switchView('questions-view', this)">Paired Question Bank <span class="count-badge">20</span></button>
+        </div>
+
+        <!-- VIEW: CASES -->
+        <section id="cases-view" class="section-container active">
+            <div class="hero">
+                <span class="track-pill">Commercial GTM Block</span>
+                <h2>MBB Case Prompt Library</h2>
+                <p class="description">Analyze geographic market entry, value-based pricing architectures, multi-channel distribution models, and pricing elasticity scenarios across 5 production-ready cases.</p>
+            </div>
+            <div class="content-grid" id="cases-anchor"></div>
+        </section>
+
+        <!-- VIEW: QUESTIONS -->
+        <section id="questions-view" class="section-container">
+            <div class="hero">
+                <span class="track-pill">Commercial Logic Block</span>
+                <h2>Paired Question Bank</h2>
+                <p class="description">20 core strategy questions mapped to test market entry thresholds, currency/regulatory barriers, economic value calculations, and behavioral fit stories.</p>
+            </div>
+            <div class="content-grid" id="questions-anchor"></div>
+        </section>
+
+        <!-- Global Interactive Modal Canvas -->
+        <div id="practice-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title-header">
+            <div class="modal-content">
+                <button class="close-modal" onclick="closeModal()" aria-label="Close practice modal">×</button>
+                <h2 style="color: var(--primary-red); margin-top: 0;" id="modal-title-header">Interactive Practice Arena</h2>
+                <h3 id="modal-item-title" style="color: var(--accent-gold); margin: 5px 0 15px 0;"></h3>
+                
+                <div style="background-color: #252525; padding: 15px; border-radius: 6px; border-left: 3px solid var(--primary-red);">
+                    <span style="font-size: 0.8rem; text-transform: uppercase; font-weight: 800; color: var(--text-muted); display: block;" id="modal-context-label">Context Prompt:</span>
+                    <p id="modal-prompt-text" style="margin: 5px 0 0 0; font-size: 1rem; line-height: 1.5; color: #fff;"></p>
+                </div>
+                
+                <div style="margin-top: 15px; display: flex; gap: 15px; align-items: center;">
+                    <button class="btn-action" onclick="toggleRecordingEngine()" id="btn-record">🎙️ Start Spoken Answer</button>
+                    <span class="recording-indicator" id="recording-status" role="status">🔴 Audio Pipeline Live...</span>
+                    <div id="filler-words" aria-live="polite" style="font-size: 0.9rem; font-weight:600; color:var(--accent-gold);">Filler Words: 0</div>
+                    <div id="timer-display" style="font-size: 0.9rem; font-weight:700; color:var(--text-muted); margin-left:auto;">⏱ 2:00</div>
+                </div>
+                
+                <textarea id="transcription-box" aria-label="Live speech transcript" placeholder="Your live recording speech transcript will populate here..."></textarea>
+                <button class="btn-action" style="background-color: var(--accent-gold); color: black; width: 100%; justify-content: center;" onclick="triggerAIFeedbackPayload()">Generate Rigorous AI Coaching Prompt</button>
+                
+                <div id="ai-prompt-output" style="display: none;">
+                    <p style="margin-top: 20px; font-weight: 700; font-size: 0.95rem;">Copy this payload directly into your AI assistant for partner-grade processing:</p>
+                    <div class="copy-box" id="ai-copy-text"></div>
+                    <button class="btn-action" onclick="copyPayloadToClipboard()">Copy Payload to Clipboard</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const SPRINT_CASES = [
+            {
+                id: "s5_case_01",
+                caseType: "Pricing strategy",
+                difficulty: "Advanced",
+                title: "Global Video Streaming Platform LatAm Localization",
+                clientContext: "Our client is a dominant global over-the-top (OTT) video streaming subscription platform. After successfully capturing premium segments across North America, their subscriber growth in Latin America (specifically Brazil) has entirely stalled due to high relative pricing barriers vs local incomes.",
+                interviewerPrompt: "The Chief Commercial Officer wants to evaluate whether to introduce a lower-priced, ad-supported tier or implement localized regional price cuts to unlock the next 10 million mass-market accounts. How do you model this tradeoff?",
+                candidateObjectives: "1. Quantify localized price elasticity of demand across Brazilian consumer segments.\n2. Analyze advertising average revenue per user (ARPU) offsets vs ad-free subscription losses.\n3. Identify user cannibalization vectors from current premium subscribers moving down to a cheaper tier.",
+                clarifyingQuestions: "What is the recorded ad revenue potential per user in Brazil's advertising market? Secondly, what percentage of our current premium users are expected to downgrade if a cheaper ad-supported tier is launched?",
+                suggestedStructure: "Monetization Tiering System:\n- Market Demand & Elasticity Dynamics: Willingness-to-pay margins, customer churn triggers, localized competitor pricing models.\n- Revenue Stream Decomposition: Ad-supported ARPU builds (monthly fee + ad impressions) vs current Premium tiers.\n- Operational Capabilities: Local ad sales force tracking, streaming data delivery costs, regional payment infrastructure.\n- Cannibalization Risks: Downward migration yields, net impact on core company profit margins.",
+                keyBusinessIssues: "Local competitors price their entry options 40% below our client's lowest tier; Brazil's ad market is highly concentrated, requiring an integrated direct local enterprise sales team.",
+                mathRequired: "Calculate the blended ARPU of an ad-supported tier ($3.00 subscription + 100 ad views at $20 CPM) and find the breakeven migration threshold vs a standard $6.00 ad-free tier.",
+                sampleDataOrExhibit: "Exhibit 1: Brazilian Consumer Segment Analysis:\n- Current Premium Base: 2,000,000 users paying $8.00/month\n- Targeted Mass-Market Tier Option A (Ad-Supported): $3.00/month fee\n- Ad Market Metric: Average 100 ad views per user per month at a $20 CPM rate (Cost Per Mille / 1,000 impressions)\n- Expected Premium User Cannibalization Downward Shift: 15%",
+                strongAnswerPath: "The candidate calculates the ad-supported tier ARPU: $3.00 base + ($20 CPM * 100 views / 1000) = $3.00 + $2.00 = $5.00 total monthly ARPU. They compare this $5.00 ARPU against the standard $6.00 tier and evaluate the 15% premium cannibalization loss against the volume upside from the 10 million mass-market users.",
+                finalRecommendation: "Launch the localized ad-supported tier at $3.00/month, as the combined $5.00 ARPU highly protects margins. Build a local ad sales team through a joint venture with a top regional media house to secure high-value ad spend quickly.",
+                coachingNotes: "Ensure candidates explain ad pricing terms (like CPM) clearly and understand how variable advertising revenues can offset a lower upfront subscription price.",
+                redFlags: "Failing to calculate the ad-revenue contribution ($2.00/user) or ignoring the revenue lost when premium users downgrade to a cheaper tier."
+            },
+            {
+                id: "s5_case_02",
+                caseType: "New product or service launch",
+                difficulty: "Expert",
+                title: "Advanced AgTech Predictive Crop-Yield Platform Launch",
+                clientContext: "Our client is a premier enterprise agricultural technology company. They have developed a highly accurate, proprietary IoT telemetry software module that uses satellite tracking and soil sensors to predict crop yields and prevent catastrophic pest damage.",
+                interviewerPrompt: "The commercial launch team needs a go-to-market and pricing architecture. They are torn between pricing the platform at a standard cost-plus margin structure or using an economic value-based pricing model. How do you advise them?",
+                candidateObjectives: "1. Quantify the absolute Economic Value to the Customer (EVC) per acre for an average corporate farm.\n2. Design a commercial distribution strategy utilizing existing agricultural equipment dealer networks.\n3. Structure tiered feature packages to address separate high-value vs low-value crop segments.",
+                clarifyingQuestions: "What is the average dollar loss per acre that a corporate farm experiences due to undetected pest damage? Secondly, what are the direct technical setup and ongoing cloud data processing expenses per acre?",
+                suggestedStructure: "Value-Based GTM System:\n- Economic Value Quantification (EVC): Baseline crop yields, dollar value of waste avoided, operational cost reductions.\n- Commercial Competitor Landscape: Current basic soil sensors, software pricing models, barriers to switching providers.\n- B2B Distribution Blueprint: Equipment dealer partnerships, direct sales teams, field trial pilot programs.\n- Price Capturing Model: Annual per-acre subscription fee vs taking a percentage of the farm's increased yield revenue.",
+                keyBusinessIssues: "Corporate farmers are conservative buyers who reject new technology unless it delivers clear, proven ROI; manufacturing and cloud setup costs are low ($5/acre), meaning cost-plus pricing would leave immense value on the table.",
+                mathRequired: "Calculate total EVC per acre: If average crop yield is $1,000/acre and the software prevents an 8% pest damage loss while saving $20/acre in fertilizer inputs.",
+                sampleDataOrExhibit: "Table 2: Corporate Farm Operating Parameters:\n- Average Gross Crop Revenue: $1,000 per acre\n- Average Loss to Late Pest Detection: 8% of total yield\n- Software Protection Level: Eliminates 75% of pest losses\n- Direct Fertilizer Cost Reductions Enabled: $20 per acre",
+                strongAnswerPath: "The candidate avoids cost-plus pricing ($5 cost base). They calculate the value delivered: 8% loss = $80/acre. Software saves 75% of that loss = $60/acre. Plus $20 fertilizer savings = $80 total economic value per acre. They recommend pricing the platform at 25-30% of EVC ($20 to $24 per acre) to secure a high premium while still giving farmers a clear 3x ROI.",
+                finalRecommendation: "Price the software module at $20/acre using a value-based model to capture huge margins. Secure immediate market access by partnering with major agricultural equipment distributors (e.g., John Deere dealers), offering them a 15% commission to leverage their trusted relationship with corporate farmers.",
+                coachingNotes: "In enterprise B2B sales, pricing must always be linked to quantified revenue gains or cost reductions for the buyer.",
+                redFlags: "Suggesting a low cost-plus price point like $10/acre, which fails to capture the true value delivered and leaves millions in profit on the table."
+            },
+            {
+                id: "s5_case_03",
+                caseType: "International expansion",
+                difficulty: "Core",
+                title: "European Micro-Mobility Aggregator Tier-1 US Entry",
+                clientContext: "A high-growth European electric scooter and micro-mobility aggregator has captured dominant market share across 35 European cities. They have raised a $200M growth capital round to fund a major international expansion into tier-1 US metropolitan markets.",
+                interviewerPrompt: "The investment sponsors want a rigorous evaluation of whether to enter New York City and San Francisco simultaneously, or focus initial capital on a single city pilot. How would you structure this geographic market entry strategy?",
+                candidateObjectives: "1. Evaluate localized regulatory caps on micro-mobility fleet deployments.\n2. Model asset utilization rates and trip density configurations across geographies.\n3. Quantify localized fleet rebalancing costs and maintenance infrastructure requirements.",
+                clarifyingQuestions: "What are the specific municipal permit costs and fleet vehicle limits enforced by transit authorities in NYC vs San Francisco? Secondly, what is the average lifespan of a vehicle asset under US urban operating conditions?",
+                suggestedStructure: "Geographic Expansion Framework:\n- Regulatory & Compliance Environment: Fleet vehicle caps, permit fees, geofenced parking rules, city insurance mandates.\n- Market Demand & Density: Daily commuter volumes, tourist transit loops, average trip lengths, local weather patterns.\n- Local Operating Costs: Fleet rebalancing logistics, battery charging setups, field maintenance teams, vandalism rates.\n- Strategic Entry Sequencing: Dual city launch to shock competitors vs single-city pilot to protect capital.",
+                keyBusinessIssues: "Both targeted cities enforce strict limits on total active vehicles per provider; local competitor density is high (Bird, Lime, Spin), leading to intense price competition and high driver acquisition spend.",
+                mathRequired: "Calculate the daily revenue potential per scooter based on average utilization metrics and find the time required to recoup the upfront asset purchase cost.",
+                sampleDataOrExhibit: "Exhibit 3: City Operational Cost and Utilization Parameters:\n- Upfront Cost per Heavy-Duty Scooter: $600\n- Average Ride Pricing: $1.00 unlock fee + $0.40 per minute\n- Average Trip Duration: 15 Minutes\n- San Francisco: 4 rides/scooter/day | NYC: 6 rides/scooter/day",
+                strongAnswerPath: "The candidate calculates the revenue per ride: $1.00 + ($0.40 * 15) = $7.00 total per ride. Daily revenue in NYC is $42 ($7 * 6 rides), while SF yields $28 ($7 * 4 rides). They balance NYC's superior revenue against its tougher winter weather and complex local delivery rules, recommending a single-city pilot to protect capital.",
+                finalRecommendation: "Launch an exclusive phase-1 pilot in New York City to capture the superior $42/day asset revenue. Focus operations on high-density commuter paths, and delay the San Francisco entry until the local fleet infrastructure achieves cash-flow breakeven.",
+                coachingNotes: "Market entry strategy requires looking past general population sizes to evaluate localized operational challenges, regulatory limits, and asset utilization metrics.",
+                redFlags: "Recommending an immediate dual-city launch without calculating the asset payback differences or evaluating city regulatory caps."
+            },
+            {
+                id: "s5_case_04",
+                caseType: "Go-to-market strategy",
+                difficulty: "Advanced",
+                title: "Premium Commercial B2B Climate Systems Commercialization",
+                clientContext: "Our client is an established manufacturer of high-end, energy-efficient commercial HVAC and climate control systems. Over the past 4 quarters, their market share has slipped by 8% due to low-cost international competitors aggressively selling direct to commercial real estate developers.",
+                interviewerPrompt: "The VP of Global Sales needs a commercial go-to-market realignment to reclaim market share without starting a margin-destroying price war. How do you redesign their sales channel strategy?",
+                candidateObjectives: "1. Evaluate the financial trade-offs of selling via independent engineering distributors vs building a direct internal sales force.\n2. Frame a value proposition centered on long-term total cost of ownership (TCO) advantages.\n3. Design performance incentive programs to realign independent HVAC design engineers.",
+                clarifyingQuestions: "What is the current margin split between our independent distribution partners and our internal factory teams? Secondly, what is the average energy cost reduction our premium systems deliver over low-cost competitors?",
+                suggestedStructure: "Go-To-Market Channel Framework:\n- Customer Segment Alignment: Commercial developers (upfront CapEx focus) vs Building owners (long-term lifecycle OpEx focus).\n- Channel Structure Architecture: Independent distributor networks, direct factory sales reps, general contractor partnerships.\n- Commercial Value Position: Total Cost of Ownership (TCO) models, energy savings metrics, building value impact.\n- Incentive Realignment: Commission tier updates, technical installation support, exclusive regional contracts.",
+                keyBusinessIssues: "Independent design engineers recommend systems based on upfront installation costs rather than long-term energy efficiency performance, which favors low-cost competitors.",
+                mathRequired: "Calculate a 5-year Total Cost of Ownership (TCO) comparison to show how long-term utility savings offset a 30% higher upfront equipment price tag.",
+                sampleDataOrExhibit: "Table 4: B2B HVAC Lifecycle Cost Performance Metrics:\n- Client Premium System: Upfront CapEx $100,000 | Annual Operating Utility Cost: $5,000/year\n- Competitor Low-Cost System: Upfront CapEx $70,000 | Annual Operating Utility Cost: $12,000/year\n- Target Client Profile: Long-term institutional asset holders (Hold timeline > 10 Years)",
+                strongAnswerPath: "The candidate isolates the core issue: the client is selling to the wrong buyer segment using the wrong metrics. While developers only care about low upfront costs ($70k vs $100k), long-term building owners save $7,000/year in utility fees with the client's system. The candidate recommends bypassing distributors to sell direct to long-term property holders using a Total Cost of Ownership (TCO) sales pitch.",
+                finalRecommendation: "Build a specialized direct sales force to target long-term institutional property owners, bypass standard distributors to preserve margins, and frame the pitch around a TCO model that proves the system pays for its $30,000 price premium within just 4.3 years.",
+                coachingNotes: "B2B commercialization cases require a deep focus on customer incentives and channel alignment. You must understand who makes the purchase choice and what metric dictates their behavior.",
+                redFlags: "Recommending matching the competitor's low prices, which starts a margin-destroying price war and ignores the client's massive energy efficiency advantage."
+            },
+            {
+                id: "s5_case_05",
+                caseType: "Retail / consumer strategy",
+                difficulty: "Expert",
+                title: "US Fast-Casual Restaurant Titan Tokyo Expansion",
+                clientContext: "A dominant US fast-casual restaurant chain famous for premium custom-built burritos wants to execute an entry into the dense Tokyo culinary ecosystem, planning 50 retail locations over 5 years.",
+                interviewerPrompt: "The international development team faces high prime commercial real estate costs in Tokyo, deep structural local labor shortages, and different consumer eating habits. How do you design their product localization and property asset strategy?",
+                candidateObjectives: "1. Determine menu localization adaptations to match Japanese consumer tastes.\n2. Balance traditional high-foot-traffic retail spaces against lean, delivery-only ghost kitchen formats.\n3. Redesign kitchen processes to handle chronic local labor shortages through automation.",
+                clarifyingQuestions: "What is the average rent premium per square foot in Tokyo's central business districts compared to our standard US suburban footprints? Secondly, do local consumers favor digital delivery apps or in-store dining during lunch periods?",
+                suggestedStructure: "Retail Localization Framework:\n- Product & Menu Adaptation: Portion sizing adjustments, protein flavor variations, localized ingredient sourcing.\n- Property Format Strategy: Central flagship stores (brand building) vs small footprint train-station locations and delivery ghost kitchens.\n- Operational Labor Optimization: Kitchen assembly automation, digital self-service ordering kiosks, cross-training staff.\n- Supply Chain Logistics: Direct importing of core spice mixes vs sourcing local fresh produce networks.",
+                keyBusinessIssues: "Traditional large-format locations are unavailable or cost 3x more than US baselines; Japanese consumers prefer smaller portions and place a premium on visual food presentation.",
+                mathRequired: "Calculate the operational breakeven volume differences between a large flagship restaurant format and a lean, delivery-focused ghost kitchen format in Tokyo.",
+                sampleDataOrExhibit: "Exhibit 5: Property Format Operational Economics:\n- Flagship Format: Fixed Rent $30,000/month | Average Ticket Size: $15 | Contribution Margin: 60%\n- Ghost Kitchen Format: Fixed Rent $8,000/month | Average Ticket Size: $12 | Contribution Margin: 50%",
+                strongAnswerPath: "The candidate calculates the monthly contribution needed to cover fixed rent: Flagship requires $30,000 / 0.60 = $50,000 in revenue, or 3,333 orders. Ghost kitchen requires $8,000 / 0.50 = $16,000 in revenue, or 1,333 orders. They use this data to recommend a hub-and-spoke model: 2 flagships for brand building, surrounded by 10 ghost kitchens to scale delivery volume efficiently.",
+                finalRecommendation: "Deploy a hub-and-spoke property strategy utilizing 2 central flagships for brand visibility, surrounded by a dense network of low-rent ghost kitchens to fulfill delivery orders. Localize the menu by reducing portion sizes by 20% and introducing premium local options (e.g., Wagyu beef) to match local consumer tastes.",
+                coachingNotes: "In high-rent cities like Tokyo, maximizing revenue per square foot via delivery loops is an essential strategy.",
+                redFlags: "Recommending an immediate rollout of large US-style suburban restaurant layouts, which ignores Tokyo's extreme real estate costs and layout constraints."
+            }
+        ];
+
+        const SPRINT_QUESTIONS = [
+            { id: "s5_q_01", category: "Pricing, Revenue, and Commercial Strategy Cases", difficulty: "Core", question: "Explain the strategic business concept of 'Value-Based Pricing' and contrast it directly with traditional 'Cost-Plus' financial models.", conversational: "Value-based pricing sets product prices primarily on the quantified economic value delivered to the customer—such as additional revenue generated or costs avoided, whereas cost-plus pricing simply takes baseline production expenses and adds a flat percentage markup. Value pricing allows companies to maximize profit capture for highly differentiated innovations. Cost-plus pricing is safer for commodity items, but it leaves massive margins on the table if applied to high-value solutions.", deepdive: "Value-based pricing requires deep data tracking to measure the buyer's willingness to pay and economic upside (EVC). Cost-plus pricing is inward-focused and blind to market dynamics, which often leads to underpricing premium products or overpricing low-value assets.", coaching: "Frame your explanation through an enterprise B2B lens. Use terms like 'Economic Value to the Customer,' 'value capture optimization,' and 'willingness-to-pay thresholds' to project professional credibility.", redFlag: "Defining value-based pricing as simply charging whatever you feel like, which ignores the strict quantitative data tracking required to measure true customer value." },
+            { id: "s5_q_02", category: "Consulting Fit & Motivation", difficulty: "Core", question: "Why does our firm's Global GTM and Commercial Pricing strategy group interest you over a standard corporate marketing role?", conversational: "A corporate marketing role typically manages campaign spend, brand aesthetics, and content pipelines for a single company's product line. I prefer the high-stakes, analytical focus of pricing and GTM consulting. Here, I can work with executive teams across multiple sectors to tackle their toughest revenue challenges—designing value-based pricing tiers for biotech innovations, launching multi-sided marketplace platforms, and resolving distribution channel conflicts for global industrial giants.", deepdive: "Pricing and GTM consulting connects commercial choices directly to an enterprise's financial statements, requiring deep data analytics, financial modeling, and strategic execution planning over basic creative marketing copy.", coaching: "Focus your response on the quantitative side of monetization. Detail your interest in data-driven topics like price elasticity modeling, channel architecture, and margin optimization.", redFlag: "Discussing creative brand messaging or ad copy trends, which signals a tactical marketing mindset rather than a strategic B2B consultant profile." },
+            { id: "s5_q_03", category: "Data Interpretation, Charts, and Exhibits", difficulty: "Advanced", question: "If an international expansion exhibit shows a client's unit sales are growing at 30% YoY in a new market, but total localized revenue in US dollars is completely flat, what macro drivers would you check?", conversational: "I would immediately check three specific international and operational drivers. First, foreign exchange currency devaluation—if the local currency is depreciating rapidly against the US dollar, it will completely wipe out our local sales gains when consolidated back to the parent company. Second, average product mix downshifting—evaluating if buyers are switching to lower-priced entry items. Third, aggressive price discounting across retail channels to hit volume targets.", deepdive: "Currency cross-border exposure can destroy the financial returns of international expansion. Global consultants must always cross-examine localized transaction growth against foreign exchange trends and pricing shifts.", coaching: "Use formal international trade terms. Mentioning 'foreign exchange currency conversion headwinds,' 'product mix optimization,' and 'realized price degradation' builds immediate consulting readiness.", redFlag: "Assuming that a flat revenue performance means product demand is low, ignoring the macro currency impacts that alter international financial reporting." },
+            { id: "s5_q_04", category: "Consulting Math & Business Judgment", difficulty: "Advanced", question: "A client increases the price of its industrial software seat license by 20%, moving the annual cost from $1,000 to $1,200. Consequently, total active seats drop by 10%, falling from 10,000 down to 9,000. Calculate the price elasticity of demand and the net revenue impact.", conversational: "Let's calculate the commercial metrics. Price elasticity is percentage change in quantity divided by percentage change in price, which is negative 10% divided by positive 20%, yielding an elasticity rating of negative 0.5. This proves demand is inelastic. For the financial impact, our starting baseline revenue was 10,000 seats multiplied by $1,000, which equals $10M. Our new revenue profile is 9,000 seats multiplied by $1,200, which equals $10.8M. Therefore, the price increase successfully expanded net revenue by exactly $800,000.", deepdive: "Elasticity scores between 0 and negative 1 prove the product is price inelastic, meaning price increases will successfully outweigh volume losses to expand net profitability.", coaching: "Present your calculations step-by-step: calculate the elasticity rating first (-0.5), establish the revenue baseline ($10M), find the new year-end revenue ($10.8M), and deliver the final $800,000 revenue gain.", redFlag: "Stating that the price increase caused a revenue loss or failing to calculate the price elasticity formula correctly." },
+            { id: "s5_q_05", category: "Personal Experience / Behavioral Interview", difficulty: "Advanced", question: "Tell me about a time you had to launch a product or service initiative when early customer validation data was mixed. How did you optimize the GTM strategy?", conversational: "During a previous software feature pilot, our quantitative usage metrics were strong among technical users, but non-technical corporate accounts were completely abandoning the app within 7 days. Instead of delaying the entire launch, I paused the broad GTM rollout and redesigned our customer segmentation strategy. I focused our phase-1 marketing entirely on technical user profiles where product-market fit was proven, which secured $2M in initial ARR while we simplified the interface for other users in phase 2.", deepdive: "Successful go-to-market execution relies on rapid data segmentation and targeted customer profiles rather than forcing a single product format onto conflicting user cohorts.", coaching: "Highlight your data-driven prioritization steps: focus on how you isolated the high-performing user segment and adjusted the launch scope to protect near-term revenues.", redFlag: "Claiming you pushed ahead with a full nationwide rollout despite the negative user data, which shows poor execution risk management." },
+            { id: "s5_q_06", category: "Pricing, Revenue, and Commercial Strategy Cases", difficulty: "Expert", question: "Explain the strategic risk of 'Channel Conflict' when an omni-channel consumer goods manufacturer launches a direct-to-consumer digital portal.", conversational: "Channel conflict occurs when a manufacturer's new direct-to-consumer digital platform begins competing directly for sales with their established third-party retail distributors. If independent retailers see the manufacturer selling the exact same products online at a discount, they will react defensively—reducing shelf space, cutting marketing support, or dropping the brand entirely. To prevent this, management must differentiate the digital channel by selling exclusive web-only bundles, keeping prices aligned with retail partners, or using the site primarily to generate leads for local stores.", deepdive: "Direct digital channels capture higher margins but can destroy critical high-volume third-party retail partnerships unless pricing boundaries and product catalogs are managed carefully.", coaching: "Focus on risk mitigation strategies. Detail how a company can use 'product catalog differentiation' and 'retail commission protections' to preserve critical distributor channels.", redFlag: "Assuming that a manufacturer can completely eliminate third-party retail distributors overnight without facing severe near-term distribution and revenue drops." },
+            { id: "s5_q_07", category: "Case Interview Fundamentals", difficulty: "Core", question: "Our consumer medical device client wants to expand operations into Germany. What initial commercial and regulatory metrics would you check to evaluate this entry?", conversational: "I would prioritize three specific strategic tracks. First, healthcare reimbursement integration—verifying if local German public health insurance models will cover our device cost for patients. Second, competitive concentration levels—benchmarking against entrenched European medical suppliers. Third, localized distribution networks—checking if we need to build an internal sales team or secure exclusive access via local hospital procurement distributors.", deepdive: "International medical entries are heavily gated by local government reimbursement models and hospital group purchasing requirements. Without insurance coverage, consumer adoption velocities will stall.", coaching: "Avoid generic market entry answers. Customize your categories around healthcare metrics by using precise terms like 'insurance reimbursement approvals,' 'hospital procurement tracks,' and 'clinical compliance rules.'", redFlag: "Focusing entirely on general population size or basic consumer marketing loops while ignoring the strict European healthcare compliance and reimbursement channels." },
+            { id: "s5_q_08", category: "Synthesis, Recommendation, and Executive Communication", difficulty: "Advanced", question: "Deliver a final 90-second executive summary on whether an enterprise software client should transition from a flat-rate subscription model to a usage-based consumption pricing model.", conversational: "Our definitive recommendation is to proceed with transitioning our enterprise software pricing structure to a usage-based consumption model. This choice is driven by three factors: First, top-line revenue expansion—our usage data proves consumption pricing will unlock a 25% ARR lift across our high-volume enterprise accounts by monetizing unmapped computing activity. Second, lowering entry friction—reducing upfront entry barriers for small accounts, which will expand our new customer pipeline by 40%. Third, churn protection—aligning ongoing software costs with the real business value clients derive. The primary risk is short-term billing volatility, which we can mitigate by implementing a mandatory minimum baseline subscription fee across all accounts. Next steps are to train our customer success teams on usage analytics and launch a phase-1 pilot across our mid-market user cohort.", deepdive: "Elite summaries require structured recommendations, clear value-creation parameters, and actionable structural containment steps.", coaching: "Apply the pyramid principle structure: state your definitive recommendation first, back it with three clear pillars, provide a risk mitigation plan, and list immediate next steps.", redFlag: "Delivering a vague summary that lists pros and cons without providing a bold, definitive pricing recommendation for the client board." },
+            { id: "s5_q_09", category: "Consulting Fit & Motivation", difficulty: "Core", question: "How do you handle a scenario where a client executive team is deeply wedded to an un-optimized cost-plus pricing model because it feels safe?", conversational: "I avoid criticizing their historic practices and use hard customer data to prove how much profit they are leaving on the table. I build a value-quantification model that tracks the financial ROI or cost savings their solution delivers for their top accounts. Showing that competitors are capturing double the margin by pricing based on economic value typically shifts the executive perspective, allowing us to align on a low-risk value-based pricing pilot for their next product launch line.", deepdive: "Moving clients away from cost-plus pricing requires proving value metrics using external data. Show that cost-plus pricing forces the company to subsidize high-value innovations for their buyers.", coaching: "Emphasize your data-driven approach and focus your answer on change-management frameworks, like running limited pricing pilots to de-risk the strategic shift for the client.", redFlag: "Telling the client they are wrong using academic business theories, which breaks consultant-client trust and creates organizational pushback." },
+            { id: "s5_q_10", category: "Case Interview Fundamentals", difficulty: "Advanced", question: "A high-end luxury fashion brand client wants to launch a lower-priced sub-brand to capture aspirational millennial buyers. What core commercial risks must they manage?", conversational: "They must manage three major commercial risks. First, core brand equity erosion—if the lower-priced line is viewed as cheap or over-distributed, it will destroy the luxury premium position of the parent brand. Second, customer cannibalization—the risk that current high-margin buyers downgrade to the cheaper sub-brand line. Third, retail channel confusion—managing separate boutique placements to keep the product lines visually isolated in the market.", deepdive: "Downward brand extension strategies capture volume growth but risk damaging the core luxury brand's pricing power unless product design, materials, and distribution networks are kept completely separate.", coaching: "Focus on risk mitigation: suggest using 'separate product design parameters' and 'isolated digital distribution portals' to protect the parent company's high-margin premium luxury lines.", redFlag: "Focusing entirely on top-of-funnel volume growth while ignoring customer cannibalization or the risk of long-term luxury brand dilution." },
+            { id: "s5_q_11", category: "Pricing, Revenue, and Commercial Strategy Cases", difficulty: "Expert", question: "Explain the strategic concept of 'Price Skimming' vs 'Penetration Pricing' during a high-profile technology platform product launch.", conversational: "Price skimming sets a high initial price point at launch to capture the maximum margin from early adopters who are less price sensitive, gradually lowering the price over time to capture mass-market segments. Penetration pricing sets an intentionally low price point at launch to rapidly maximize user volume, build network density, and block out competitors. Skimming maximizes short-term profit to recoup high R&D costs, while penetration is superior for platform ecosystems where building a massive user base quickly creates lasting network advantages.", deepdive: "Price skimming works for highly differentiated hardware or software where substitutes don't exist. Penetration pricing requires a strong cash runway but successfully locks in market share and creates high switching barriers for late entrants.", coaching: "Contrast the two pricing strategies clearly by linking them to explicit business models—explain how skimming prioritizes short-term margin capture while penetration prioritizes rapid network scaling.", redFlag: "Claiming penetration pricing means selling products at a permanent financial loss, ignoring the long-term monetization loops built into platform growth plans." },
+            { id: "s5_q_12", category: "Data Interpretation, Charts, and Exhibits", difficulty: "Core", question: "A commercial GTM dashboard reveals that your top 5% of B2B client accounts generate 85% of total corporate revenues. What is your strategic diagnosis and next step?", conversational: "This data reveals a classic high customer concentration risk pattern. While these accounts drive huge revenues, the client's business model is highly vulnerable—losing just one of those top accounts will trigger a catastrophic margin crash. My immediate next step is to evaluate account contract durability, audit their product engagement levels, and build a strategic diversification plan to scale up mid-market account segments to de-risk the corporate revenue pipeline.", deepdive: "High customer concentration caps long-term valuation multiples because private equity buyers and investors price in the high risk of major revenue drops if a primary account cancels.", coaching: "Connect the data observation straight to investment risk. Use precise vocabulary like 'revenue pipeline de-risking,' 'customer concentration mitigation,' and 'contract lifecycle protection tracks.'", redFlag: "Concluding that the business model is perfectly optimized simply because top-line revenues are high, ignoring the extreme dependency risk left unmanaged." },
+            { id: "s5_q_13", category: "Consulting Fit & Motivation", difficulty: "Advanced", question: "Tell me about a time you had to adjust a product pricing model based on unexpected competitive feedback or shifting user data data metrics. What was your optimization path?", conversational: "We initially launched our enterprise analytics tracking tool at a flat $500/month fee, hypothesizing that simple pricing would accelerate sign-ups. However, our user metrics revealed that large accounts were maxing out our data storage capacities within weeks, while small users were canceling because they didn't use the features enough. I pivoted the pricing strategy to a multi-tiered feature model based on monthly data volume, which stabilized small-user churn while expanding enterprise account revenues by 35%.", deepdive: "Pricing models must reflect real product utilization patterns. Rigid flat-rate structures often fail because they under-monetize power users while overpricing low-volume segments.", coaching: "Structure your narrative around pricing optimization steps: detail how you tracked usage data, identified the misalignment, and designed a tiered pricing model to expand margins.", redFlag: "Recommending broad across-the-board price cuts to handle churn without first segmenting user usage profiles and data trends." },
+            { id: "s5_q_14", category: "Case Interview Fundamentals", difficulty: "Advanced", question: "A specialized agricultural equipment manufacturer wants to expand into Brazil. What core macroeconomic and distribution risks must they evaluate?", conversational: "They must evaluate three specific international expansion risks. First, import tariff architectures and local border taxation policies that could inflate our retail prices by 40%. Second, specialized agricultural credit access—verifying if local Brazilian banks will finance expensive equipment purchases for regional farmers. Third, distribution access—determining whether to build an independent dealer footprint or partner with established local co-operatives to secure immediate geographic access.", deepdive: "Heavy industrial asset expansion requires balancing high upfront capital logistics costs against local financing realities, import barriers, and entrenched regional dealer networks.", coaching: "Address the localized financing layer. Equipment sales velocities rely heavily on the availability of asset-backed credit options within the target international market.", redFlag: "Ignoring localized financing and credit accessibility metrics, or assuming US distribution dealer networks can be easily duplicated overseas without high capital spend." },
+            { id: "s5_q_15", category: "Consulting Math & Business Judgment", difficulty: "Core", question: "A consumer product company sells 500,000 units per year at a wholesale price of $10. The variable manufacturing cost is $4. Management rolls out a value-based packaging upgrade that adds $0.50 to variable production costs but allows them to lift the wholesale price point by 10%. Calculate the net impact on profitability.", conversational: "Let's track the profit metrics. Our current unit contribution margin is $10 price minus $4 variable cost, which equals $6 per unit, yielding $3M in total profit. Lifting the wholesale price point by 10% adds $1.00, moving the new price to $11. Meanwhile, the packaging upgrade expands our variable cost by $0.50, moving it to $4.50 per unit. Our new unit contribution margin is $11 minus $4.50, which equals $6.50 per unit. Across our 500,000 volume base, this expands total profitability to $3.25M—a net profit increase of exactly $250,000.", deepdive: "Value-based product enhancements justify small increases in variable cost if the resulting price premium expands the absolute unit contribution margin baseline.", coaching: "Walk the interviewer through the calculations sequentially: determine current total contribution ($3M), calculate the new margin per unit ($6.50), and deliver the final net profit expansion ($250,000).", redFlag: "Calculating the price increase correctly but forgetting to add the extra packaging cost back into the variable expense baseline." },
+            { id: "s5_q_16", category: "Case Interview Fundamentals", difficulty: "Advanced", question: "A global enterprise logistics client wants to launch a new freight tracking software service. What are the key strategic parameters to consider when deciding between a direct enterprise sales force and a third-party reseller model?", conversational: "The choice balances customer control against expansion velocity. A direct enterprise sales force ensures complete control over pricing integrity, allows for deep relationship management with top accounts, and captures 100% of transaction margins. However, it requires high fixed corporate overhead spend and takes months to scale up. A third-party reseller model utilizes established distributor networks to maximize near-term sales velocity at a lower upfront cost, but it requires giving up 20-30% of your margins and limits your visibility into direct customer usage data.", deepdive: "High-complexity enterprise solutions require direct sales alignment to navigate long corporate sales cycles. Low-complexity software tools use reseller networks to scale up volume footprints quickly.", coaching: "Focus on solution complexity. Contrast the high-touch direct sales model required for enterprise accounts against the low-touch volume scaling enabled by reseller channels.", redFlag: "Choosing an operational model based on cost alone without checking if third-party resellers have the technical skills required to pitch complex software solutions." },
+            { id: "s5_q_17", category: "Consulting Fit & Motivation", difficulty: "Expert", question: "How do you evaluate whether a client's commercial go-to-market failure is driven by an un-optimized pricing tier architecture or a mismatch in their product distribution channels?", conversational: "I run a diagnostic that separates sales funnel conversion metrics from margin data. First, I check channel conversion rates—if sales reps are securing product trials but buyers walk away during final contract steps, the bottleneck is an un-optimized pricing tier setup. Next, I look at target account discovery—if salespeople are failing to even book initial discovery calls with our ideal customer profile, the failure is a complete mismatch in product distribution channels.", deepdive: "Companies often mistakenly cut prices to fix a commercial launch slowdown, when the true issue is that their distribution channels are targeting the wrong buyer segments entirely.", coaching: "Demonstrate a consultant's diagnostic mindset: detail how you drill into sales funnel stages to separate pricing bottlenecks from channel execution gaps.", redFlag: "Assuming that every commercial go-to-market failure can be fixed by simply running a new marketing campaign or dropping prices by 20% across the board." },
+            { id: "s5_q_18", category: "Personal Experience / Behavioral Interview", difficulty: "Core", question: "Tell me about a time you had to balance competing channel requirements between separate direct online sales and physical retail dealer footprints. What was your pricing strategy?", conversational: "During our e-commerce platform launch, our independent physical dealer network threatened to boycott our brand because they felt our online portal would poach their local customers. To resolve this channel conflict, I designed a pricing strategy that protected our retail partners. We kept online single-item prices strictly aligned with retail MSRP, but used the digital channel to sell exclusive web-only bundles that dealers didn't stock, while routing online maintenance service leads back to local physical dealers to preserve their core business.", deepdive: "Omni-channel strategy requires careful product catalog planning and price coordination to prevent direct digital channels from destroying trusted third-party retail footprints.", coaching: "Focus on your channel coordination framework: detail how you used product bundling boundaries and local lead routing to protect distributor relationships and eliminate channel friction.", redFlag: "Ignoring the physical dealers' complaints or completely prioritizing online channels without managing the near-term risk of losing retail distribution footprints." },
+            { id: "s5_q_19", category: "Case Interview Fundamentals", difficulty: "Advanced", question: "A premium medical device client wants to deploy an outcome-based pricing model where hospital billings are tied to patient recovery milestones. What are the operational challenges?", conversational: "They face three major operational challenges. First, data tracking orchestration—verifying what specific healthcare metrics define a successful recovery milestone and tracking that data accurately across separate hospital databases. Second, billing cash-flow latency—transitioning from high upfront sales revenue to delayed, risk-linked payment cycles that can extend working capital requirements. Third, legal liability management—separating device performance from independent hospital operational errors or doctor mistakes.", deepdive: "Outcome-based pricing models build deep customer trust and justify high premiums, but they require robust data tracking platforms and split the operational risk between buyer and seller.", coaching: "Focus on operational execution: explain how outcome pricing is unviable unless both hospital and supplier align on a single, automated, and tamper-proof metric tracking platform.", redFlag: "Treating outcome-based pricing as a simple marketing pitch while ignoring the complex legal liabilities and working capital delays it injects into financial planning." },
+            { id: "s5_q_20", category: "Case Interview Fundamentals", difficulty: "Core", question: "Our automotive fleet client wants to transition from traditional vehicle sales to a flexible commercial vehicle subscription model. What commercial pricing risks must they check?", conversational: "They must check three specific commercial and pricing risks. First, asset depreciation variance—ensuring monthly subscription pricing accurately accounts for hyper-extended mileage wear from high-volume corporate users. Second, utilization yield management—predicting inventory buffers to prevent vehicles from sitting un-rented in parking lots, which creates a dead capital drag. Third, customer acquisition cost amortization tracking across short-term contract lifespans.", deepdive: "Subscription pricing shifts hardware companies from upfront transaction cash inflows to multi-year recurring service streams, requiring deep asset management capabilities and high utilization yields to achieve targeted returns.", coaching: "Frame your answer around asset utilization economics: explain how subscription success relies entirely on keeping vehicles actively rented to amortize high upfront capital asset costs.", redFlag: "Approving a subscription framework based on monthly recurring revenue features alone without calculating asset depreciation shifts or minimum fleet utilization requirements." }
+        ];
+
+        let activeView = 'cases-view';
+
+        function switchView(viewId, activeBtn) {
+            document.querySelectorAll('.section-container').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.toolbar-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            activeBtn.classList.add('active');
+            document.getElementById('header-display-title').innerText = viewId === 'cases-view' ? 'Sprint 5: Case Prompts' : 'Sprint 5: Paired Question Bank';
+        }
+
+        function populateSprintArchitecture() {
+            const casesAnchor = document.getElementById('cases-anchor'); casesAnchor.innerHTML = '';
+            SPRINT_CASES.forEach(c => {
+                casesAnchor.innerHTML += `
+                    <div class="card">
+                        <div class="card-header-row">
+                            <div>
+                                <h3 class="card-title">${c.title}</h3>
+                                <div class="tag-row"><span class="badge badge-category">${c.caseType}</span><span class="badge badge-difficulty">${c.difficulty}</span></div>
+                            </div>
+                        </div>
+                        <div class="content-block"><div class="content-block-title">Situation & Context</div><div class="content-block-text">${c.clientContext}</div></div>
+                        <div class="content-block"><div class="content-block-title">Interviewer Prompt</div><div class="content-block-text" style="color:#fff; font-weight:600; font-style:italic;">"${c.interviewerPrompt}"</div></div>
+                        <div class="tabs-container">
+                            <div class="tab-headers">
+                                <button class="tab-btn active" onclick="toggleCardTab(event, 'objectives')">Objectives</button>
+                                <button class="tab-btn" onclick="toggleCardTab(event, 'structure')">Structure</button>
+                                <button class="tab-btn" onclick="toggleCardTab(event, 'data')">Data/Exhibit</button>
+                                <button class="tab-btn" onclick="toggleCardTab(event, 'path')">Ideal Solution</button>
+                                <button class="tab-btn" onclick="toggleCardTab(event, 'coaching')">Partner Notes</button>
+                            </div>
+                            <div class="tab-content active" data-tab="objectives">
+                                <strong>Candidate Milestones:</strong><br>${c.candidateObjectives}<br><br>
+                                <strong>Clarifying Entry Questions:</strong><br><span style="font-style:italic; color:var(--accent-gold);">"${c.clarifyingQuestions}"</span>
+                            </div>
+                            <div class="tab-content" data-tab="structure"><strong>Tailored Framework:</strong><br>${c.suggestedStructure}<br><br><strong>Key Parameters:</strong><br>${c.keyBusinessIssues}</div>
+                            <div class="tab-content" data-tab="data"><strong>Quantitative Requirements:</strong><br>${c.mathRequired}<br><br><strong>Data Exhibit Matrix:</strong><br><pre style="background:#111; padding:10px; border-radius:4px; color:#fff; font-family:sans-serif; white-space:pre-wrap;">${c.sampleDataOrExhibit}</pre></div>
+                            <div class="tab-content" data-tab="path"><strong>Elite Path:</strong><br>${c.strongAnswerPath}<br><br><strong>Recommendation Blueprint:</strong><br><span style="color:var(--accent-gold); font-style:italic;">"${c.finalRecommendation}"</span></div>
+                            <div class="tab-content" data-tab="coaching"><span style="color:#4ecdc4;"><strong>Coaching Note:</strong></span><br>${c.coachingNotes}<br><br><span style="color:#ff6b6b;"><strong>Fatal Red Flags:</strong></span><br>${c.redFlags}</div>
+                        </div>
+                        <button class="btn-action" onclick="openPracticeModal('${c.id}', 'case')">Practice Case Opening Remarks →</button>
+                    </div>`;
+            });
+
+            const questionsAnchor = document.getElementById('questions-anchor'); questionsAnchor.innerHTML = '';
+            SPRINT_QUESTIONS.forEach(q => {
+                questionsAnchor.innerHTML += `
+                    <div class="card">
+                        <div class="card-header-row">
+                            <div>
+                                <h3 class="card-title">${q.question}</h3>
+                                <div class="tag-row"><span class="badge badge-category">${q.category}</span><span class="badge badge-difficulty">${q.difficulty}</span></div>
+                            </div>
+                        </div>
+                        <div class="tabs-container">
+                            <div class="tab-headers">
+                                <button class="tab-btn active" onclick="toggleCardTab(event, 'conversational')">Conversational Answer</button>
+                                <button class="tab-btn" onclick="toggleCardTab(event, 'deepdive')">Strategic Deep-Dive</button>
+                                <button class="tab-btn" onclick="toggleCardTab(event, 'notes')">Coaching & Red Flags</button>
+                            </div>
+                            <div class="tab-content active" data-tab="conversational"><div style="font-style:italic; color:#e5c158; background:#1a1a1a; padding:15px; border-radius:4px; border-left:3px solid var(--accent-gold);">"${q.conversational}"</div></div>
+                            <div class="tab-content" data-tab="deepdive">${q.deepdive}</div>
+                            <div class="tab-content" data-tab="notes"><span style="color:#4ecdc4;"><strong>Delivery Coaching Note:</strong></span><br>${q.coaching}<br><br><span style="color:#ff6b6b;"><strong>Fatal Red Flag Boundary:</strong></span><br>${q.redFlag}</div>
+                        </div>
+                        <button class="btn-action" onclick="openPracticeModal('${q.id}', 'question')">Practice Live Verbalization →</button>
+                    </div>`;
+            });
+        }
+
+        function toggleCardTab(event, tabName) {
+            const container = event.target.closest('.tabs-container');
+            container.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            container.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            event.target.classList.add('active');
+            container.querySelector(`.tab-content[data-tab="${tabName}"]`).classList.add('active');
+        }
+
+        let recognition, isRecording = false, activeItemId = null, activeItemType = null;
+
+        function openPracticeModal(id, type) {
+            activeItemId = id; activeItemType = type;
+            let sourceItem = type === 'case' ? SPRINT_CASES.find(c => c.id === id) : SPRINT_QUESTIONS.find(q => q.id === id);
+            if (!sourceItem) return;
+            document.getElementById('practice-modal').classList.add('active');
+            document.getElementById('modal-title-header').innerText = type === 'case' ? 'Case Structuring Sprint' : 'Verbalization Sprint';
+            document.getElementById('modal-item-title').innerText = type === 'case' ? sourceItem.title : sourceItem.category;
+            document.getElementById('modal-context-label').innerText = type === 'case' ? 'Interviewer Case Prompt:' : 'Target Interview Question:';
+            document.getElementById('modal-prompt-text').innerText = type === 'case' ? sourceItem.interviewerPrompt : sourceItem.question;
+            document.getElementById('transcription-box').value = '';
+            document.getElementById('filler-words').innerText = 'Filler Words: 0';
+            document.getElementById('ai-prompt-output').style.display = 'none';
+            resetAnswerTimer();
+            lastFocusedElement = document.activeElement;
+            document.getElementById('btn-record').focus();
+        }
+
+        let lastFocusedElement = null;
+        function closeModal() { document.getElementById('practice-modal').classList.remove('active'); if (isRecording) stopRecordingEngine(); stopAnswerTimer(); if (lastFocusedElement) lastFocusedElement.focus(); }
+
+        function toggleRecordingEngine() {
+            if (!isRecording) {
+                if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) { alert("Requires Chrome/Edge browser speech engine."); return; }
+                const SpeechClass = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechClass(); recognition.continuous = true; recognition.interimResults = true; recognition.lang = 'en-US';
+                recognition.onresult = function(event) {
+                    let finalSegment = '';
+                    for (let i = event.resultIndex; i < event.results.length; ++i) { if (event.results[i].isFinal) finalSegment += event.results[i][0].transcript; }
+                    if (finalSegment) { const box = document.getElementById('transcription-box'); box.value += finalSegment + ' '; countTrackedFillers(box.value); }
+                };
+                // Chrome ends recognition on its own after silence or transient
+                // network errors. While the user still intends to record, restart
+                // instead of dying silently with a stale "Stop Recording" button.
+                recognition.onend = function() {
+                    if (isRecording) {
+                        try { recognition.start(); }
+                        catch (e) { stopRecordingEngine(); }
+                    }
+                };
+                recognition.onerror = function(event) {
+                    if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                        stopRecordingEngine();
+                        alert("Microphone access is blocked. Allow mic access for this site in your browser settings, then restart the recording.");
+                    }
+                    // 'no-speech', 'network', 'aborted' fall through to onend,
+                    // which restarts the session while isRecording is true.
+                };
+                recognition.start(); document.getElementById('btn-record').innerText = "🛑 Stop Recording"; document.getElementById('recording-status').style.display = "inline-flex"; isRecording = true; startAnswerTimer();
+            } else { stopRecordingEngine(); }
+        }
+
+        function stopRecordingEngine() { isRecording = false; if (recognition) recognition.stop(); document.getElementById('btn-record').innerText = "🎙️ Start Spoken Answer"; document.getElementById('recording-status').style.display = "none"; stopAnswerTimer(); }
+
+        function countTrackedFillers(text) {
+            const singles = ['um', 'uh', 'like', 'basically', 'actually'];
+            const phrases = [/\byou know\b/g, /\bsort of\b/g, /\bkind of\b/g];
+            const lower = text.toLowerCase();
+            let score = 0;
+            lower.split(/\s+/).forEach(p => { if (singles.includes(p.replace(/[^a-z]/g, ''))) score++; });
+            phrases.forEach(re => { const m = lower.match(re); if (m) score += m.length; });
+            document.getElementById('filler-words').innerText = `Filler Words: ${score}`;
+        }
+
+        /* ---- 2-minute answer timer (starts with recording) ---- */
+        const TIMER_LIMIT_SECONDS = 120;
+        let timerInterval = null, timerRemaining = TIMER_LIMIT_SECONDS;
+
+        function renderAnswerTimer() {
+            const el = document.getElementById('timer-display');
+            const overtime = timerRemaining < 0;
+            const t = Math.abs(timerRemaining);
+            const mm = Math.floor(t / 60), ss = String(t % 60).padStart(2, '0');
+            el.innerText = overtime ? `⏱ +${mm}:${ss} over` : `⏱ ${mm}:${ss}`;
+            el.style.color = overtime ? 'var(--mbb-red, #ff3333)' : (timerRemaining <= 30 ? 'var(--accent-gold)' : 'var(--text-muted)');
+        }
+
+        function startAnswerTimer() {
+            stopAnswerTimer();
+            timerRemaining = TIMER_LIMIT_SECONDS;
+            renderAnswerTimer();
+            timerInterval = setInterval(() => { timerRemaining--; renderAnswerTimer(); }, 1000);
+        }
+
+        function stopAnswerTimer() { if (timerInterval) { clearInterval(timerInterval); timerInterval = null; } }
+
+        function resetAnswerTimer() { stopAnswerTimer(); timerRemaining = TIMER_LIMIT_SECONDS; renderAnswerTimer(); }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && document.getElementById('practice-modal').classList.contains('active')) closeModal();
+        });
+
+function triggerAIFeedbackPayload() {
+    let item = activeItemType === 'case' ? SPRINT_CASES.find(c => c.id === activeItemId) : SPRINT_QUESTIONS.find(q => q.id === activeItemId);
+    const userSpeech = document.getElementById('transcription-box').value;
+    if (!item) return;
+
+    let payload = `
+[CONSULTING / MBB INTERVIEW COACHING — ECCLES MBA MODULE]
+Evaluate the candidate response to the following consulting tracking prompt using partner-level standards:
+
+${activeItemType === 'case' ? `CASE SCENARIO: ${item.title}\nPROMPT EXPECTATION: "${item.interviewerPrompt}"\nIDEAL FRAMEWORK PATH: "${item.suggestedStructure}"` : `INTERVIEW PROMPT: "${item.question}"\nEXPECTED MODEL DELIVERY: "${item.conversational}"`}
+
+CANDIDATE AUDIO TRANSCRIPT INPUT:
+"${userSpeech || "[No transcript provided. Evaluate parameters and provide an elite baseline model response.]"}"
+
+Provide deep structured metrics using exactly this markdown output schema:
+
+**What Worked**
+[Detail 1-2 key operational strengths from what the candidate said.]
+
+**Top 2 Areas for Improvement**
+1. [Identify the primary gap versus an elite MBB delivery and give specific replacement phrasing.]
+2. [Identify any logical gaps, calculation slips, or structural blind spots.]
+
+**Advanced Consulting Power Move**
+[Provide one custom partner-level business insight or analytical variable tailored to this specific scenario context.]
+
+**Dashboard Scorecard Matrix**
+Assign exactly one rubric score (1. Emerging | 2. Developing | 3. Interview-Ready | 4. MBB-Caliber) for each applicable competency based on this specific performance:
+* Case Structuring: [Score]
+* Business Judgment: [Score]
+* Math Accuracy: [Score]
+* Synthesis: [Score]
+* Fit / PEI Storytelling: [Score]
+* Executive Presence: [Score]
+* Communication Clarity: [Score]
+* Recommendation Strength: [Score]
+    `;
+
+    document.getElementById('ai-copy-text').innerText = payload.trim();
+    document.getElementById('ai-prompt-output').style.display = 'block';
+}
+
+        function copyPayloadToClipboard() { navigator.clipboard.writeText(document.getElementById('ai-copy-text').innerText); alert("Payload packed to clipboard!"); }
+        window.onload = () => { populateSprintArchitecture(); };
+    </script>
+</body>
+</html>
