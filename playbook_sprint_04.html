@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eccles MBA — Consulting Practice Sprint 4</title>
+    <style>
+        :root {
+            --primary-red: #CC0000;
+            --accent-gold: #c9a84c;
+            --bg-dark: #121212;
+            --bg-card: #1e1e1e;
+            --bg-sidebar: #0a0a0a;
+            --text-main: #f5f5f5;
+            --text-muted: #a0a0a0;
+            --border-color: #333333;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            font-family: var(--font-family);
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* PERMANENT GLOBAL SIDEBAR */
+        aside {
+            width: 320px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            padding: 0 24px 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 15px;
+        }
+
+        .brand h2 {
+            color: var(--primary-red);
+            margin: 0 0 5px 0;
+            font-size: 1.3rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .brand p {
+            color: var(--accent-gold);
+            margin: 0;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .nav-label {
+            padding: 10px 24px 5px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        aside a {
+            text-decoration: none;
+            color: var(--text-muted);
+            padding: 12px 24px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-left: 4px solid transparent;
+        }
+
+        aside a:hover, aside a.active {
+            background-color: rgba(204, 0, 0, 0.1);
+            color: var(--primary-red);
+            border-left-color: var(--primary-red);
+        }
+
+        .count-badge {
+            background-color: #2a2a2a;
+            color: var(--accent-gold);
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        main {
+            flex: 1;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            background-color: rgba(18, 18, 18, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title-area h1 { margin: 0; font-size: 1.25rem; font-weight: 700; }
+        .header-subtitle { margin: 2px 0 0 0; font-size: 0.85rem; color: var(--accent-gold); text-transform: uppercase; letter-spacing: 1px; }
+
+        /* HORIZONTAL LOCAL TOOLBAR VIEW TOGGLE */
+        .local-toolbar {
+            background-color: #161616;
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 40px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .toolbar-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toolbar-btn:hover, .toolbar-btn.active {
+            background-color: rgba(204, 0, 0, 0.1);
+            color: white;
+        }
+
+        .section-container { padding: 40px; max-width: 1300px; width: calc(100% - 80px); margin: 0 auto; display: none; }
+        .section-container.active { display: block; }
+        .hero { margin-bottom: 40px; border-bottom: 1px solid var(--border-color); padding-bottom: 30px; }
+        .track-pill { display: inline-block; background-color: rgba(201, 168, 76, 0.1); color: var(--accent-gold); padding: 5px 14px; border-radius: 4px; font-size: 0.8rem; text-transform: uppercase; font-weight: 700; margin-bottom: 15px; letter-spacing: 1px; }
+        .hero h2 { font-size: 2.5rem; margin: 0 0 15px 0; font-weight: 800; }
+        .description { color: var(--text-muted); line-height: 1.6; font-size: 1.1rem; max-width: 900px; margin: 0; }
+        .content-grid { display: grid; grid-template-columns: 1fr; gap: 25px; }
+        .card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 28px; transition: all 0.25s ease; position: relative; }
+        .card-header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+        .card-title { font-size: 1.5rem; margin: 0; font-weight: 700; color: var(--text-main); }
+        .tag-row { display: flex; gap: 10px; margin-top: 5px; }
+        .badge { font-size: 0.75rem; padding: 4px 10px; border-radius: 4px; font-weight: bold; text-transform: uppercase; }
+        .badge-category { background-color: rgba(201, 168, 76, 0.1); color: var(--accent-gold); }
+        .badge-difficulty { background-color: rgba(204, 0, 0, 0.1); color: var(--primary-red); }
+
+        .content-block { margin-top: 15px; background-color: #161616; padding: 15px 20px; border-radius: 6px; border-left: 3px solid #333; }
+        .content-block-title { font-size: 0.85rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; letter-spacing: 0.5px; }
+        .content-block-text { font-size: 0.95rem; line-height: 1.5; color: #e0e0e0; white-space: pre-line; }
+
+        .tabs-container { margin-top: 20px; }
+        .tab-headers { display: flex; border-bottom: 1px solid var(--border-color); gap: 10px; }
+        .tab-btn { background: none; border: none; color: var(--text-muted); padding: 10px 15px; cursor: pointer; font-size: 0.9rem; font-weight: 600; transition: all 0.2s; border-bottom: 2px solid transparent; }
+        .tab-btn.active { color: var(--primary-red); border-bottom-color: var(--primary-red); }
+        .tab-content { display: none; padding: 15px 5px; font-size: 0.95rem; line-height: 1.5; }
+        .tab-content.active { display: block; }
+
+        .btn-action { background-color: var(--primary-red); color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-weight: 700; font-size: 0.9rem; transition: background-color 0.2s; display: inline-flex; align-items: center; gap: 8px; margin-top: 15px; }
+        .btn-action:hover { background-color: #a00000; }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .modal.active { display: flex; }
+        .modal-content { background-color: var(--bg-card); width: 90%; max-width: 850px; max-height: 85vh; overflow-y: auto; padding: 35px; border-radius: 8px; border: 1px solid var(--primary-red); position: relative; }
+        .close-modal { position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--text-muted); font-size: 2rem; cursor: pointer; }
+        textarea { width: 100%; box-sizing: border-box; height: 160px; background-color: #121212; color: white; border: 1px solid var(--border-color); border-radius: 4px; padding: 15px; margin-top: 15px; font-family: var(--font-family); font-size: 1rem; line-height: 1.5; resize: vertical; }
+        .copy-box { background-color: #121212; padding: 20px; border-left: 4px solid var(--accent-gold); font-family: monospace; margin-top: 15px; white-space: pre-wrap; font-size: 0.9rem; color: #dcdcdc; max-height: 250px; overflow-y: auto; }
+        .recording-indicator { display: none; color: var(--primary-red); font-weight: 700; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <!-- PERMANENT GLOBAL SIDEBAR -->
+    <aside>
+        <div class="brand">
+            <h2>Eccles MBA</h2>
+            <p>Consulting Command Center</p>
+        </div>
+        <div class="nav-label">Core Directory</div>
+        <a href="./index.html">Ecosystem Dashboard</a>
+        <a href="./playbook_frameworks.html">20 Case Frameworks</a>
+        <a href="./playbook_math.html">15 Analytics Math Drills</a>
+        <a href="./playbook_battlecard.html">MBB Battlecard Vault</a>
+        
+        <div class="nav-label">Practice Sprints</div>
+        <a href="./playbook_sprint_01.html">Sprint 1: Profitability</a>
+        <a href="./playbook_sprint_02.html">Sprint 2: M&A Strategy</a>
+        <a href="./playbook_sprint_03.html">Sprint 3: Operations</a>
+        <a href="./playbook_sprint_04.html" class="active">Sprint 4: Tech & SaaS</a>
+        <a href="./playbook_sprint_05.html">Sprint 5: GTM & Pricing</a>
+        <a href="./playbook_sprint_06.html">Sprint 6: Capstones</a>
+    </aside>
+
+    <main>
+        <header>
+            <div class="header-title-area">
+                <h1 id="header-display-title">Sprint 4: Case Prompts</h1>
+                <div class="header-subtitle">Digital Transformation, Tech/SaaS, and AI Strategy</div>
+            </div>
+        </header>
+
+        <!-- HORIZONTAL LOCAL TOOLBAR VIEW TOGGLE -->
+        <div class="local-toolbar">
+            <button class="toolbar-btn active" id="btn-cases" onclick="switchView('cases-view', this)">MBB Case Prompts <span class="count-badge">5</span></button>
+            <button class="toolbar-btn" id="btn-questions" onclick="switchView('questions-view', this)">Paired Question Bank <span class="count-badge">20</span></button>
+        </div>
+
+        <!-- VIEW: CASES -->
+        <section id="cases-view" class="section-container active">
+            <div class="hero">
+                <span class="track-pill">Digital & Tech Block</span>
+                <h2>MBB Case Prompt Library</h2>
+                <p class="description">Master platform unit economics, cloud transformation roadmap designs, SaaS net revenue retention models, and generative AI rollout architectures across 5 elite cases.</p>
+            </div>
+            <div class="content-grid" id="cases-anchor"></div>
+        </section>
+
+        <!-- VIEW: QUESTIONS -->
+        <section id="questions-view" class="section-container">
+            <div class="hero">
+                <span class="track-pill">Tech Strategy Logic Block</span>
+                <h2>Paired Question Bank</h2>
+                <p class="description">20 interview questions covering cloud migration tradeoffs, SaaS growth metrics (LTV, CAC, NRR, Churn), enterprise automation, and organizational change frameworks.</p>
+            </div>
+            <div class="content-grid" id="questions-anchor"></div>
+        </section>
+
+        <!-- Global Interactive Modal Canvas -->
+        <div id="practice-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title-header">
+            <div class="modal-content">
+                <button class="close-modal" onclick="closeModal()" aria-label="Close practice modal">×</button>
+                <h2 style="color: var(--primary-red); margin-top: 0;" id="modal-title-header">Interactive Practice Arena</h2>
+                <h3 id="modal-item-title" style="color: var(--accent-gold); margin: 5px 0 15px 0;"></h3>
+                
+                <div style="background-color: #252525; padding: 15px; border-radius: 6px; border-left: 3px solid var(--primary-red);">
+                    <span style="font-size: 0.8rem; text-transform: uppercase; font-weight: 800; color: var(--text-muted); display: block;" id="modal-context-label">Context Prompt:</span>
+                    <p id="modal-prompt-text" style="margin: 5px 0 0 0; font-size: 1rem; line-height: 1.5; color: #fff;"></p>
+                </div>
+                
+                <div style="margin-top: 15px; display: flex; gap: 15px; align-items: center;">
+                    <button class="btn-action" onclick="toggleRecordingEngine()" id="btn-record">🎙️ Start Spoken Answer</button>
+                    <span class="recording-indicator" id="recording-status" role="status">🔴 Audio Pipeline Live...</span>
+                    <div id="filler-words" aria-live="polite" style="font-size: 0.9rem; font-weight:600; color:var(--accent-gold);">Filler Words: 0</div>
+                    <div id="timer-display" style="font-size: 0.9rem; font-weight:700; color:var(--text-muted); margin-left:auto;">⏱ 2:00</div>
+                </div>
+                
+                <textarea id="transcription-box" aria-label="Live speech transcript" placeholder="Your live recording speech transcript will populate here..."></textarea>
+                <button class="btn-action" style="background-color: var(--accent-gold); color: black; width: 100%; justify-content: center;" onclick="triggerAIFeedbackPayload()">Generate Rigorous AI Coaching Prompt</button>
+                
+                <div id="ai-prompt-output" style="display: none;">
+                    <p style="margin-top: 20px; font-weight: 700; font-size: 0.95rem;">Copy this payload directly into your AI assistant for partner-grade processing:</p>
+                    <div class="copy-box" id="ai-copy-text"></div>
+                    <button class="btn-action" onclick="copyPayloadToClipboard()">Copy Payload to Clipboard</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const SPRINT_CASES = [
+            {
+                id: "s4_case_01",
+                caseType: "Digital transformation",
+                difficulty: "Advanced",
+                title: "100-Year-Old Mutual Insurance Claims Automation",
+                clientContext: "Our client is a legacy mutual insurance provider with a massive property and casualty footprint. They currently average an outdated 22 days to manually review, process, and settle standard automotive fender-bender claims due to disconnected regional paper workflows and legacy terminal silos.",
+                interviewerPrompt: "The CEO wants to execute a digital transformation overhaul to deploy straight-through processing (STP) using AI claims triage engines. How would you structure the economic and operational evaluation for this shift?",
+                candidateObjectives: "1. Quantify the administrative cost reduction from manual adjusters vs software automation.\n2. Estimate the reduction in fraud leakage via real-time image analysis models.\n3. Design a change enablement plan for a highly unionized legacy adjuster workforce.",
+                clarifyingQuestions: "What is the baseline cost per manually processed claim under the current structure? Secondly, what percentage of low-complexity claims can be immediately automated without requiring human escalation points?",
+                suggestedStructure: "Digital Transformation Architecture:\n- Operational Workflow Diagnostic: Steps from client accident photo upload, data validation checkpoints, to payment release delays.\n- Economic Value Modeling: Structural SG&A cost savings, fraud detection accuracy shifts, impact of faster payouts on customer retention loops.\n- Technical Risk Mapping: Core legacy API compatibility layers, cloud storage compliance mandates, data field privacy architectures.\n- Change Enablement Strategy: Staff training tracks, automated escalation protocols for remaining human adjusters.",
+                keyBusinessIssues: "Legacy mainframe terminals lack modern API layers, requiring expensive middleware bridges; old adjusters fear immediate automation layoffs and are pushing back against the application rollout.",
+                mathRequired: "Calculate the net annual savings if straight-through processing cuts processing costs from $150 down to $10 per claim across an annual volume of 500,000 claims.",
+                sampleDataOrExhibit: "Exhibit 1: Claims Distribution and Cost Architecture:\n- Total Annual Claim Volume: 500,000 cases\n- Low-Complexity Claims (Eligible for STP): 60% of total volume\n- High-Complexity Claims (Requires Adjuster Review): 40% of total volume\n- Current Manual Processing Cost: $150 per claim\n- Targeted AI Automation Processing Cost: $10 per claim",
+                strongAnswerPath: "The candidate recognizes that 60% of the 500,000 claims can be completely automated. They calculate that moving 300,000 cases from a $150 cost base down to $10 saves a massive $42M annually in operational costs. They recommend using these savings to fund the required mainframe system modernization.",
+                finalRecommendation: "Deploy the straight-through processing engine for low-complexity claims to unlock $42M in annual savings, build modern cloud API wrappers around legacy mainframes to prevent a costly system rebuild, and re-train current manual adjusters to act as specialized fraud escalations leads.",
+                coachingNotes: "Remind candidates that digital transformations are workflow and integration problems, not just software projects. They must connect data processing speed metrics directly to corporate cost reductions.",
+                redFlags: "Suggesting a complete multi-year, multi-billion dollar replacement of the legacy mainframe system before proving the financial ROI via smaller automated pilots."
+            },
+            {
+                id: "s4_case_02",
+                caseType: "Technology / SaaS strategy",
+                difficulty: "Expert",
+                title: "B2B Enterprise SaaS Net Revenue Retention Recovery",
+                clientContext: "Our client is an enterprise cloud collaboration software provider with a $200M annual recurring revenue (ARR) footprint. Over the last 6 quarters, their Net Revenue Retention (NRR) has dropped from a top-tier 115% down to an alarming 92%, causing their valuation multiple to compress from 12x down to 5x ARR.",
+                interviewerPrompt: "The executive leadership team needs to reverse this NRR decay to protect their upcoming venture capital exit options. How do you isolate the root cause of this churn and design a retention roadmap?",
+                candidateObjectives: "1. Segment churn drivers across user cohorts, seat sizes, and industry verticals.\n2. Compare pricing architecture updates (per-seat fees vs consumption-based pricing models).\n3. Optimize the customer success framework to stabilize net expansion revenues.",
+                clarifyingQuestions: "Has this NRR drop occurred due to full corporate account cancellations, or are current clients scaling back their active user seat counts during renewal windows?",
+                suggestedStructure: "SaaS Retention Scaffolding:\n- Customer Churn Diagnostics: Segment by account lifespan cohorts, macro vertical exposures, and platform feature utilization rates.\n- Pricing & Packaging Design: Tiered feature boundaries, volume discount parameters, contract duration structures.\n- Customer Success Orchestration: Health scoring tracking, onboarding cycle completion tracking, proactive expansion prompts.\n- Commercial Product Updates: Cross-selling new AI features, building API integrations into competitor ecosystems.",
+                keyBusinessIssues: "Mid-market enterprise clients are cutting seat counts by 25% due to macro tech rightsizing trends; the customer success team is reactive, only reaching out to accounts 30 days before contract expirations.",
+                mathRequired: "Deconstruct NRR metrics by factoring in baseline contraction percentages, absolute customer churn, and customer expansion upsells to calculate the net value gaps.",
+                sampleDataOrExhibit: "Table 2: Annual Enterprise SaaS Cohort Margin and Retention Performance:\n- Enterprise Accounts (>1000 seats): 105% NRR, $120M base\n- Mid-Market Accounts (100-1000 seats): 80% NRR, $60M base\n- SMB Accounts (<100 seats): 95% NRR, $20M base\n*Note: Product engagement metrics reveal mid-market accounts drop active usage by 40% within the first 90 days post-onboarding.*",
+                strongAnswerPath: "The candidate utilizes the data matrix to pinpoint mid-market accounts as the primary problem area (80% NRR on a $60M base). They connect the low usage in the first 90 days to a failed onboarding process, and shift the strategy from late renewals to proactive early onboarding support to protect long-term retention.",
+                finalRecommendation: "Redesign the customer success framework to mandate structured technical onboarding within the first 30 days for mid-market accounts, transition pricing from rigid per-seat constraints to flexible consumption usage brackets, and cross-sell the new workflow automation module to enterprise accounts to push NRR back above 110%.",
+                coachingNotes: "Elite tech consultants must master standard SaaS mechanics. They should link user engagement drops directly to contract renewals and multi-year valuation compressions.",
+                redFlags: "Suggesting increasing top-of-funnel marketing spend to acquire new users without first fixing the leaky bucket onboarding problem that destroys mid-market NRR."
+            },
+            {
+                id: "s4_case_03",
+                caseType: "AI / automation strategy",
+                difficulty: "Advanced",
+                title: "Global Retail Bank Generative AI Support Rollout",
+                clientContext: "Our client is a top-tier commercial retail banking institution handling over 50 million inbound customer service inquiries annually across call centers, mobile applications, and web portals. Operational care delivery costs currently total a heavy $300M per year.",
+                interviewerPrompt: "The digital banking division wants to launch an advanced generative AI conversational model to fully automate tier-1 support interactions. How do you evaluate the financial ROI and manage the operational compliance risks of this rollout?",
+                candidateObjectives: "1. Model call resolution yields and containment rates across inquiry categories.\n2. Quantify capital software development budgets against ongoing compute cost architectures.\n3. Protect data privacy systems to meet strict banking regulatory compliance rules (FINRA/SEC).",
+                clarifyingQuestions: "What is the average variable cost difference between a human agent call resolution versus an automated conversational AI interaction? Secondly, what is the targeted containment rate for the first year of rollout?",
+                suggestedStructure: "AI Engineering Framework:\n- Inquiry Triage Mapping: Categorize inputs into Simple (balance checks, pin resets) vs Complex/Sensitive (fraud escalations, credit underwriting disputes).\n- ROI Financial Engine: Upfront LLM fine-tuning investments, token processing infrastructure costs vs human care labor savings.\n- Regulatory & Compliance Tracks: Data token masking systems, hallucination risk thresholds, customer disclosure protocols.\n- Escalation Flow Design: Hand-off loops from AI back to human specialized agents when interaction sentiment drops.",
+                keyBusinessIssues: "Hallucination risks could cause the AI to mistakenly quote inaccurate interest rates to borrowers, creating severe compliance liabilities; data compliance rules prevent passing unmasked customer banking data to public APIs.",
+                mathRequired: "Calculate the net cost reduction if the conversational AI achieves a 40% containment rate across the 50 million total call volume, dropping average cost per call from $6 down to $0.50.",
+                sampleDataOrExhibit: "Exhibit 3: Inbound Customer Service Inquiry Mix and Economics:\n- Total Inbound Annual Inquiries: 50,000,000 contacts\n- Average Cost per Human Resolved Inquiry: $6.00\n- Projected Cost per Generative AI Resolved Inquiry: $0.50\n- Inquiry Mix: Account Balance/Transaction Audits (50%), Password/PIN Resets (20%), Fraud/Disputes (30%)",
+                strongAnswerPath: "The candidate isolates account checks and password resets (70% of total volume) as highly eligible for AI containment. They calculate that a 40% containment rate transforms 20 million calls from $6 down to $0.50, unlocking a huge $110M annual operational cost reduction. They emphasize the need for strict data masking filters to ensure regulatory compliance.",
+                finalRecommendation: "Deploy the conversational AI tool limited strictly to account checks and password resets to capture $110M in annual care savings, install an on-premise data masking layer to keep sensitive data secure, and design automated routing triggers to hand off complex fraud calls to human agents instantly.",
+                coachingNotes: "Ensure candidates look beyond basic software features to analyze hallucination liability and compute cost architectures. Financial institutions require strict risk mitigation alongside cost reduction plans.",
+                redFlags: "Recommending opening the generative AI engine to handle highly regulated credit disputes or wealth management advice during phase 1 of launch."
+            },
+            {
+                id: "s4_case_04",
+                caseType: "Go-to-market strategy",
+                difficulty: "Advanced",
+                title: "B2B Industrial Equipment Asset-Light Marketplace Scale-up",
+                clientContext: "A traditional heavy industrial equipment distributor wants to launch an asset-light digital marketplace platform connecting independent construction firms with industrial equipment rental providers nationwide.",
+                interviewerPrompt: "The client faces low initial liquidity and significant multi-sided network friction—construction firms won't log on because there aren't enough rental providers, and rental providers won't upload assets because there aren't enough buyers. How do you design an execution strategy to achieve critical mass?",
+                candidateObjectives: "1. Break the chicken-and-egg platform puzzle to build supply and demand liquidity.\n2. Design the monetization take-rate fee model across asset rental tiers.\n3. Establish platform trust mechanisms (insurance, verification loops, ranking frameworks).",
+                clarifyingQuestions: "Do we intend to focus initial rollout efforts on a specific regional market to build localized density, or launch a broad nationwide marketing push on day one?",
+                suggestedStructure: "Multi-Sided Platform Framework:\n- Supply Liquidity Engine: Partnering with regional equipment fleets, bulk upload tooling, initial fee discounts for providers.\n- Demand Acquisition Tracks: Target customer segments (mid-sized contractors), digital procurement integrations, pricing transparency models.\n- Marketplace Monetization Mechanics: Take-rate percentages on transactions, premium listing fees, integrated damage insurance subscriptions.\n- Network Density Metrics: Active liquidity ratios, geographic matching speeds, cross-side transaction retention metrics.",
+                keyBusinessIssues: "Incumbent rental yards view our platform as a competitive threat to their direct client accounts; construction managers refuse to rent expensive assets online without clear product quality guarantees.",
+                mathRequired: "Calculate the marketplace gross merchandise value (GMV) scale required to hit operational breakeven given a 12% platform transaction take-rate model.",
+                sampleDataOrExhibit: "Table 4: Regional Construction Asset Sourcing Metrics:\n- Target Local Contractor Volume: 10,000 firms\n- Average Annual Equipment Rental Spend per Firm: $50,000\n- Target Platform Take-Rate: 12% of transaction volume\n- Platform Annual Operational Software Maintenance Overhead: $6,000,000",
+                strongAnswerPath: "The candidate avoids broad marketing plans by focusing on a hyper-local strategy. They recommend launching exclusively in a single high-growth metropolitan area (e.g., Salt Lake City) to seed supply liquidity first. By onboarding three dominant local rental yards, they create a dense catalog that naturally draws in local contractors.",
+                finalRecommendation: "Deploy a geo-fenced launch playbook starting in a single high-density city to build localized market liquidity, offer zero-percent take-rates to early strategic suppliers to capture catalog volume, and embed an automated damage insurance wrapper into every transaction to build marketplace trust.",
+                coachingNotes: "Platform cases require a deep focus on network economics. True liquidity and transaction density always beat generic nationwide ad spend loops.",
+                redFlags: "Suggesting a broad, expensive nationwide marketing launch before establishing supplier inventory liquidity in any specific regional city hub."
+            },
+            {
+                id: "s4_case_05",
+                caseType: "Digital transformation",
+                difficulty: "Expert",
+                title: "Multi-State Healthcare EHR Cloud Migration",
+                clientContext: "Our client is a massive healthcare network operating 45 hospitals and 300 clinical care centers. They are executing a critical system modernization to migrate separate on-premise Electronic Health Record (EHR) databases into a unified cloud environment.",
+                interviewerPrompt: "The tech integration is stalling due to high technical debt across legacy medical hardware and intense resistance from staff physicians who claim the new interface slows down their patient chart documentation. How do you realign this digital transformation?",
+                candidateObjectives: "1. Map data normalization steps across separate legacy clinical formats.\n2. Isolate and remove interface design bottlenecks to protect daily physician chart workflows.\n3. Design a peer-led change management framework to accelerate software adoption speeds.",
+                clarifyingQuestions: "What is the recorded drop in physician documentation speeds during the initial clinical trial sites? Secondly, are database integration delays driven by hardware connectivity issues or messy software data schemas?",
+                suggestedStructure: "Technology Modernization Scaffolding:\n- Technology Foundation Audit: Legacy database architectures, data normalization protocols, interface response latencies.\n- Clinical Workflow Diagnostics: Time-motion track of a physician's daily documentation path from patient room to chart sign-off.\n- Adoption & Change Management: Peer champion networks, specialized training tracks, data-driven feedback loops.\n- Clinical Operational Metrics: Average charting times, data accuracy rates, patient throughput impacts.",
+                keyBusinessIssues: "The new software requires 14 screen clicks to complete standard prescription orders versus just 4 clicks on the old legacy terminal systems; data migration steps are stalling because old lab formats lack clear field matching schemas.",
+                mathRequired: "Calculate the net impact on hospital system patient capacity if the new interface adds 10 minutes of extra administrative documentation time per patient encounter across a network handling 12,000 daily check-ins.",
+                sampleDataOrExhibit: "Exhibit 5: Clinical Workflow and Documentation Performance Metrics:\n- Total Network Daily Patient Encounters: 12,000 check-ins\n- Average Historical Documentation Time: 15 minutes per patient\n- Post-Migration Trial Documentation Time: 25 minutes per patient\n- Average Outpatient Revenue Contribution per Encounter: $200",
+                strongAnswerPath: "The candidate connects the dots: adding 10 minutes of paperwork per patient across 12,000 daily check-ins strips away a massive 2,000 hours of daily medical capacity, directly reducing hospital patient volumes and revenue. They focus their plan entirely on fixing the interface clicks to protect medical throughput.",
+                finalRecommendation: "Deploy a dedicated software engineering squad to redesign the prescription interface, cutting steps down from 14 clicks to a streamlined 4-click layout. Launch a peer-led clinician champion program across sites, and pause the wider deployment until trial site documentation times return to the 15-minute baseline.",
+                coachingNotes: "Show how software usability directly dictates enterprise revenue capacity. Adding administrative friction to professional workflows causes massive operational losses across a network.",
+                redFlags: "Telling physicians to simply comply with the new software mandate while ignoring the data showing a massive drop in patient care capacity."
+            }
+        ];
+
+        const SPRINT_QUESTIONS = [
+            { id: "s4_q_01", category: "Operations, Supply Chain, and Transformation Cases", difficulty: "Core", question: "What is the operational concept of 'Technical Debt' in corporate digital modernization transformations, and how does it compress margin profiles?", conversational: "Technical debt represents the long-term implied cost of choosing a fast, temporary software patch today instead of investing in a clean, scalable architectural solution. In massive corporate transformations, technical debt acts as a silent margin killer. It forces IT teams to waste up to 40% of their operational run-rate budgets simply building custom middleware bridges, fixing broken data schemas, and maintaining legacy code blocks rather than deploying new high-value features.", deepdive: "Technical debt increases corporate SG&A overhead by locking up engineering capacity in low-value asset maintenance. It creates data silos that slow down enterprise decision cycles and leaves the organization vulnerable to cybersecurity failures.", coaching: "Explain technical debt through a clear financial lens. Frame it as an operational tax that limits engineering output and drives up fixed corporate overhead costs over time.", redFlag: "Defining technical debt as standard balance sheet debt or assuming it represents basic hardware depreciation metrics." },
+            { id: "s4_q_02", category: "Consulting Fit & Motivation", difficulty: "Core", question: "Why does our firm's Digital Transformation and Tech Strategy practice group appeal to your MBA goals over a standard product manager role at a Big Tech firm?", conversational: "A product manager inside a tech firm typically owns a narrow product feature vertical over multiple quarters. While that product ownership is valuable, I prefer the fast-paced, high-impact world of tech strategy consulting. Here, I can work directly with Fortune 500 executive teams to align their core business strategies with modern technology architectures—solving complex problems like converting legacy industrial giants into data-driven platforms or deploying generative AI across global banking networks.", deepdive: "Strategic technology advisory links infrastructure choices directly to capital allocation and long-term enterprise value, bypassing the granular software engineering metrics required of internal tech project managers.", coaching: "Highlight your problem-solving scope. Explain how your skills allow you to link technology infrastructure choices directly to an enterprise's financial statements and competitive advantage.", redFlag: "Focusing your answer entirely on tech sector compensation models or using empty buzzwords without detailing a genuine passion for enterprise transformation strategy." },
+            { id: "s4_q_03", category: "Data Interpretation, Charts, and Exhibits", difficulty: "Advanced", question: "If a SaaS cohort chart reveals customer acquisition costs (CAC) are flat but net revenue retention (NRR) drops with each newer customer cohort, what issues would you investigate?", conversational: "I would investigate three potential product-market fit challenges. Since CAC is stable, our sales funnel is working efficiently, but falling NRR across newer cohorts indicates a retention problem. First, I'd check for overselling—verifying if marketing teams are acquiring lower-quality user segments that don't match our core feature value. Second, onboarding gaps—checking if our onboarding team is failing to drive product adoption for complex new accounts. Third, competitive pressure—identifying if niche startups are poaching accounts post-onboarding.", deepdive: "Decaying cohort NRR despite stable CAC proves the business is burning through its addressable market. It signals that long-term customer lifetime value (LTV) assumptions are broken, which will compress valuation multiples.", coaching: "Break down the SaaS mechanics. Contrast top-of-funnel conversion efficiency (CAC) against post-sale user adoption and expansion metrics (NRR) to pinpoint the operational failure.", redFlag: "Recommending cutting sales team commissions or increasing marketing spend, which fails to fix the underlying post-purchase churn issue." },
+            { id: "s4_q_04", category: "Consulting Math & Business Judgment", difficulty: "Advanced", question: "An enterprise software company has 2,000 active customer accounts paying an average of $50,000 annually. If their gross churn rate is 10% and their customer expansion team adds $15M in expansion upsells annually, calculate their net revenue retention (NRR) percentage.", conversational: "Let's run the SaaS metrics. Our starting annualized recurring revenue (ARR) base is 2,000 accounts multiplied by $50,000, which equals exactly $100M. A 10% gross churn rate strips away $10M from that starting baseline, leaving $90M. The customer expansion team adds an extra $15M in cross-sell upsells to that retained user base, bringing our final year-end revenue footprint to $105M. Dividing $105M by our starting $100M base yields a Net Revenue Retention rate of exactly 105%.", deepdive: "NRR measures the change in value within an existing customer base over a specified timeframe. Scores above 100% indicate expansion revenue is successfully outstripping gross churn losses.", coaching: "Walk through the calculation steps in order: find the starting ARR baseline ($100M), calculate absolute gross churn drops ($10M), add customer expansion gains ($15M), and state the final NRR percentage (105%).", redFlag: "Conflating gross churn with net churn metrics, or dividing expansion revenue by the wrong account baseline totals." },
+            { id: "s4_q_05", category: "Personal Experience / Behavioral Interview", difficulty: "Advanced", question: "Tell me about a time you led a team through a complex system implementation when technical delays threatened to derail a hard client deadline. How did you manage project risks?", conversational: "During a major cloud database migration for a corporate client, our data mapping script failed 48 hours before our production deadline, putting our launch target at risk. The engineering team was in panic mode. I called an immediate huddle, isolated our remaining options, and realigned our focus. I cut non-essential reporting features from the initial release to focus 100% of our capacity on core transaction tables, which allowed us to hit our delivery deadline safely and deploy the remaining features later.", deepdive: "Project risk management relies on prioritization and clear communication. You must show an ability to stay calm, cut non-critical project scope, and keep a team focused during high-stress delays.", coaching: "Emphasize your risk-mitigation strategy. Focus on how you used data to make objective scope tradeoffs and how you managed client expectations through the delay.", redFlag: "Claiming you resolved the technical delay simply by demanding your engineers work through the night, which demonstrates poor leadership and project planning skills." },
+            { id: "s4_q_06", category: "AI / automation strategy", difficulty: "Expert", question: "What are the core operational cost levers to analyze when building a business case for an enterprise transition from public API LLM models to custom on-premise fine-tuned models?", conversational: "The transition balances variable transaction costs against high upfront fixed infrastructure investments. When using public APIs, the primary cost is variable—driven by token consumption rates, which can scale up rapidly across millions of automated customer calls. Moving to custom on-premise fine-tuned models requires high upfront capital spend for GPU hardware, specialized data engineering talent, and model training loops. However, it lowers ongoing token costs, ensures complete data privacy control, and eliminates external network latency risks.", deepdive: "The financial tipping point relies on processing volume. High-volume enterprise interactions justify high fixed setup costs to secure lower variable processing fees and protect sensitive user data.", coaching: "Structure your analysis around clear financial buckets. Contrast 'upfront capital infrastructure CapEx' against 'ongoing variable token processing OpEx parameters' to show strong business judgment.", redFlag: "Focusing entirely on the raw performance features of AI models while ignoring the massive capital infrastructure costs required to host models on-premise." },
+            { id: "s4_q_07", category: "Case Interview Fundamentals", difficulty: "Core", question: "A multi-billion dollar traditional retail company client wants to build an internal data lake platform to unify separate online and store inventories. What initial questions would you ask to structure your approach?", conversational: "To build a tailored framework, I need to isolate the root cause of their inventory data silos across three tracks. First, on the technology layer, I want to see if their store point-of-sale systems can sync data in real-time or if they run on manual batch transfers. Second, on the commercial side, I need to check how separate data schemas affect order fulfillment errors and stockouts. Finally, on the organization level, I want to verify if online and store teams share matching performance incentives or if they compete for sales allocations.", deepdive: "Unifying retail data silos requires evaluating technology platform compatibility, data schema matching, and organizational team alignment across separate channels.", coaching: "Avoid generic tech checklists. Customize your categories around retail operations by using precise terms like 'point-of-sale data syncs,' 'stockout frequencies,' and 'omnichannel fulfillment paths.'", redFlag: "Reciting a memorized framework like the 4Ps without tailoring your categories to address enterprise data architecture and retail operations challenges." },
+            { id: "s4_q_08", category: "Synthesis, Recommendation, and Executive Communication", difficulty: "Advanced", question: "Deliver a final 90-second executive summary to a corporate board on whether to sunset a legacy ERP architecture and migrate to a modern cloud system.", conversational: "Our definitive recommendation is to proceed with sunsetting the legacy ERP system and execute a phased migration to a modern cloud network. This choice is driven by three factors: First, a direct $8M annual reduction in fixed mainframe maintenance and specialized software license expenses. Second, speed-to-market advantages—shortening our regional inventory reporting loops from a delayed 24 hours down to real-time syncs, which will lower nationwide warehouse stockout rates by 12%. Third, risk mitigation—eliminating severe cybersecurity compliance liabilities tied to our unpatched legacy system code. The primary risk is data migration errors during the transition, which we can mitigate by running parallel systems during a 60-day pilot across our midwest hub. Next steps are to finalize the cloud vendor SLA boundaries and launch the phase-1 data mapping sprints.", deepdive: "Elite meetings demand answer-first recommendations. Structural cost modifications, capacity shifts, and risk parameter reduction metrics should be signposted natively using top-down structures.", coaching: "Apply the pyramid principle: state your definitive recommendation first, back it with three clear pillars, provide a risk mitigation plan, and list immediate next steps.", redFlag: "Providing a long, technical history of the software architecture instead of delivering a clear, data-driven business recommendation for the board." },
+            { id: "s4_q_09", category: "Consulting Fit & Motivation", difficulty: "Core", question: "How do you explain a complex, technical cloud infrastructure data challenge to a non-technical corporate board director during a high-stakes case presentation?", conversational: "I avoid technical jargon like microservices or database indexing and explain the issue through its direct impact on business performance and revenue loops. For example, instead of explaining data latency in cloud pipelines, I use a simple delivery analogy: I frame it as a traffic jam at our central fulfillment warehouse that prevents packages from reaching customers on time. This allows the director to skip the technical details and focus on the strategic decisions—evaluating project costs against targeted margin protections.", deepdive: "Consultants must act as translation layers between technical engineering teams and non-technical business leaders, ensuring complex infrastructure choices are always linked to corporate strategy.", coaching: "Emphasize your use of clear business analogies and focus your explanation on financial metrics like cost, capacity, risk, and timeline impacts.", redFlag: "Using heavy technical engineering acronyms or assuming that a corporate board needs to understand software code parameters to make a strategic choice." },
+            { id: "s4_q_10", category: "Case Interview Fundamentals", difficulty: "Advanced", question: "Our media streaming client wants to deploy an AI-driven personalization algorithm to lower user churn rates. What operational metrics dictate the success of this investment?", conversational: "The success of this personalization project is dictated by three sequential metrics. First, engagement velocity—tracking the percentage increase in average daily minutes streamed per user post-deployment. Second, content discovery loops—measuring the drop in user search times before clicking play, which proves the algorithm is serving accurate recommendations. Third, customer retention—quantifying the absolute drop in monthly subscription cancellations, which determines our net financial ROI.", deepdive: "Personalization engines must drive core engagement metrics higher to achieve retention upsells. If user watch times do not scale up, the algorithm is failing to deliver value, and the capital investment will compress returns.", coaching: "Structure your metrics along the customer journey path: connect algorithm accuracy to user engagement shifts, and link engagement directly to subscription revenue retention metrics.", redFlag: "Focusing your answer entirely on technical machine learning accuracy rates while ignoring retention returns and subscription revenue metrics." },
+            { id: "s4_q_11", category: "Technology / SaaS strategy", difficulty: "Expert", question: "Explain the strategic concept of 'Consumption-Based Pricing' vs traditional per-seat licensing models within enterprise software architectures.", conversational: "Consumption-based pricing links software costs directly to user platform activity—charging metrics like data gigabytes processed, API calls processed, or computing hours used, whereas traditional seat licensing charges a rigid flat fee per registered employee. Consumption pricing aligns software costs with user business value, which lowers the initial entry barrier for small accounts and unlocks massive revenue growth as clients scale up their platform activity. However, it injects revenue volatility for the software provider, as client billings fluctuate month-to-month based on macro usage trends.", deepdive: "Per-seat models offer high financial predictability but create growth ceilings and risk seat reductions during client layoffs. Consumption architectures maximize value expansion but require strong customer onboarding support to prevent usage drops.", coaching: "Contrast the two pricing architectures across clear dimensions: entry friction, expansion speed, billing predictability, and churn exposure vectors.", redFlag: "Claiming that consumption-based models are always superior without addressing the billing volatility and revenue risk they inject into a SaaS company's financial planning." },
+            { id: "s4_q_12", category: "Data Interpretation, Charts, and Exhibits", difficulty: "Core", question: "A digital transformation dashboard reveals that 75% of your corporate employees stop using a newly installed workflow app within 14 days post-launch. What is your diagnosis?", conversational: "This data reveals a critical user adoption failure that threatens to destroy our software investment ROI. A 75% drop in usage within the first two weeks points to two operational friction channels. First, onboarding complexity—the app's user interface is likely too confusing, causing employees to abandon it for their old manual workarounds. Second, value misalignment—the tool may be adding administrative work for the staff without helping them complete their core tasks faster. We need to audit user paths immediately.", deepdive: "High early usage drops indicate that user training frameworks are failing or that the software interface is adding operational friction to daily employee routines.", coaching: "Focus on user experience mechanics. State that high initial churn cannot be fixed by corporate decrees; it requires process optimization and product usability refinements.", redFlag: "Recommending buying an entirely different software package before running a user audit to locate the specific design flaws inside the current system." },
+            { id: "s4_q_13", category: "Consulting Fit & Motivation", difficulty: "Advanced", question: "Tell me about a time you had to manage intense stakeholder pushback from a conservative team leader during a data modernization initiative. What was your alignment strategy?", conversational: "Our finance director refused to transition our regional tracking metrics to an automated cloud dashboard, preferring to rely on manual spreadsheets due to data security concerns. Instead of using top-down pressure, I sat down with them to understand their specific data access worries. I ran a limited 30-day pilot that duplicated their reports on the cloud while using strict encryption filters. I proved the dashboard cut their weekly compilation times from 8 hours down to real-time updates, which won them over and secured approval for the full rollout.", deepdive: "Managing tech pushback requires empathy, listening to security or process concerns, and using data-driven pilots to prove efficiency gains and build alignment.", coaching: "Highlight your collaborative approach: explain how you de-risked the transition via a dual-track pilot and used quantified time-savings to win over the skeptical stakeholder.", redFlag: "Claiming you bypassed the director by escalating the issue to executive leadership, which shows weak corporate diplomacy and poor relationship management skills." },
+            { id: "s4_q_14", category: "Case Interview Fundamentals", difficulty: "Advanced", question: "A traditional legacy shipping provider client wants to launch a digital freight-matching platform to compete with agile tech startups. What are the core product execution risks?", conversational: "They must manage three specific execution risks. First, platform liquidity building—breaking the chicken-and-egg trap to onboard shippers and truck drivers simultaneously. Second, real-time dynamic pricing accuracy—ensuring our algorithm can accurately quote freight rates across changing routes without destroying transaction margins. Third, technical architecture debt—connecting the new digital matching app with their slow legacy back-office tracking systems.", deepdive: "Legacy companies launching digital platforms struggle to match the product agility and network matching speeds of native tech players due to slow backend infrastructure and manual internal processing habits.", coaching: "Focus on marketplace dynamics. Detail how the client can leverage their existing corporate shipper relationships to guarantee initial volume and build platform supply liquidity.", redFlag: "Treating a digital platform launch as a basic marketing app project while ignoring the complex algorithmic matching and network economics required to compete." },
+            { id: "s4_q_15", category: "Consulting Math & Business Judgment", difficulty: "Core", question: "A traditional company operates an internal customer support team costing $10M annually. An AI transformation project will automate 50% of inbound contacts, cutting variable processing fees down by 80% while adding $1M in ongoing annual cloud software license overhead. Calculate the net financial impact.", conversational: "Let's break down the transformation economics. Our baseline support cost structure is $10M. Automating 50% of our volume targets a $5M labor pool. Cutting variable fees across this targeted pool by 80% yields a direct labor cost reduction of exactly $4M, lowering our core support spend down to $6M. Factoring in the $1M increase in fixed annual cloud software license overhead reduces our net annual savings to exactly $3M.", deepdive: "Enterprise automation projects replace manual operational labor expenses with fixed software license and cloud compute overhead. Calculating net returns requires balancing labor savings against new software costs.", coaching: "Walk through the calculation steps in order: isolate the targeted labor cost pool ($5M), apply the efficiency reduction ($4M savings), factor in the new software overhead ($1M cost), and state the final $3M net profit lift.", redFlag: "Applying the 80% savings rate directly to the total $10M support budget, ignoring the fact that automation is limited to half of the inbound volume." },
+            { id: "s4_q_16", category: "Case Interview Fundamentals", difficulty: "Advanced", question: "A global retail bank client wants to consolidate its 12 separate legacy regional mobile banking apps into a single unified global application architecture. What are the key operational trade-offs?", conversational: "The decision balances structural cost efficiency against local market flexibility. On the positive side, consolidation removes redundant regional engineering teams, standardizes software compliance pipelines, and cuts annual software maintenance expenses across the footprint. On the negative side, it removes local autonomy—making it harder for regional marketing teams to deploy custom features on time to match localized regulatory changes or competitive shifts.", deepdive: "Global software consolidation expands capital efficiency and unifies the brand experience, but it risks creating central product approval bottlenecks that slow down localized features.", coaching: "Address the organizational governance model: recommend a centralized global platform foundation paired with flexible regional API layers to allow localized feature adjustments.", redFlag: "Recommending an immediate nationwide rollout without evaluating localized banking regulations or language infrastructure differences across regional footprints." },
+            { id: "s4_q_17", category: "Consulting Fit & Motivation", difficulty: "Expert", question: "How do you evaluate whether a client's commercial go-to-market failure is driven by an un-optimized pricing tier architecture or a mismatch in their product distribution channels?", conversational: "I run a diagnostic that separates sales funnel conversion metrics from margin data. First, I check channel conversion rates—if sales reps are securing product trials but buyers walk away during final contract steps, the bottleneck is an un-optimized pricing tier setup. Next, I look at target account discovery—if salespeople are failing to even book initial discovery calls with our ideal customer profile, the failure is a complete mismatch in product distribution channels.", deepdive: "Companies often mistakenly cut prices to fix a commercial launch slowdown, when the true issue is that their distribution channels are targeting the wrong buyer segments entirely.", coaching: "Demonstrate a consultant's diagnostic mindset: detail how you drill into sales funnel stages to separate pricing bottlenecks from channel execution gaps.", redFlag: "Assuming that every commercial go-to-market failure can be fixed by simply running a new marketing campaign or dropping prices by 20% across the board." },
+            { id: "s4_q_18", category: "Personal Experience / Behavioral Interview", difficulty: "Core", question: "Tell me about a time you had to realign a technology project team when stakeholders disagreed on core feature priorities. What was your alignment framework?", conversational: "During our data migration project, our marketing director wanted to focus all engineering capacity on building outward customer features, while our risk VP demanded we prioritize data compliance security patches. The team was stuck in endless alignment meetings. I refocused both stakeholders around a shared metric: user friction. I proved that data security gaps would trigger compliance delays that freeze future launches, and built a phased rollout roadmap that de-risked security first while delivering marketing features in a fast phase 2.", deepdive: "Cross-departmental tech prioritization requires moving stakeholders away from narrow functional goals to focus on shared enterprise business impacts and risk-mitigation paths.", coaching: "Focus on your prioritization framework: detail how you used data and risk metrics to resolve conflicting requirements and build a collaborative rollout roadmap.", redFlag: "Choosing one department's features entirely over another without creating a balanced roadmap, which creates long-term organizational silos." },
+            { id: "s4_q_19", category: "Case Interview Fundamentals", difficulty: "Advanced", question: "A traditional logistics client wants to install automated predictive routing hardware across its delivery network. What are the core technology integration risks?", conversational: "They must manage three major technology integration risks. First, legacy device compatibility—verifying if older delivery trucks can support modern IoT sensor wiring without requiring a complete fleet replacement. Second, data processing latency—ensuring edge computing devices can process routing data in real-time to adjust driver paths before delivery windows miss targets. Third, cybersecurity perimeter security across thousands of connected network endpoints.", deepdive: "Deploying predictive logistics hardware requires building robust real-time data pipelines and modern data architectures to connect edge devices with slow back-office scheduling tools.", coaching: "Focus on operational realities: explain how automated routing data alerts are useless unless your driver communication and dispatch systems can update paths instantly.", redFlag: "Treating predictive logistics routing as a pure software code project, while ignoring the hardware compatibility challenges across the physical truck fleet." },
+            { id: "s4_q_20", category: "Case Interview Fundamentals", difficulty: "Core", question: "Our automotive retail client wants to deploy an online digital checkout option for car buyers. What supply chain and retail risks must they check?", conversational: "They must check three operational risk channels. First, inventory tracking accuracy—ensuring online vehicle listings sync in real-time with physical dealership floor sales to prevent double-bookings. Second, specialized logistics coordination—building out home-delivery networks and vehicle transport operations. Third, dealer network franchise friction—managing commission allocation splits to ensure physical dealership managers don't view the digital channel as a threat.", deepdive: "Launching automotive e-commerce options requires real-time inventory visibility, specialized auto-transport logistics, and careful dealer incentive alignment to prevent internal channel friction.", coaching: "Address the channel strategy challenge. A successful automotive e-commerce transformation must integrate digital sales with the physical dealer footprint to preserve customer trust and support channels.", redFlag: "Approving the digital checkout platform based on online user interface features alone without testing vehicle tracking sync accuracy across physical dealer lots." }
+        ];
+
+        function switchView(viewId, activeBtn) {
+            document.querySelectorAll('.section-container').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.toolbar-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            activeBtn.classList.add('active');
+            document.getElementById('header-display-title').innerText = viewId === 'cases-view' ? 'Sprint 4: Case Prompts' : 'Sprint 4: Paired Question Bank';
+        }
+
+        function populateSprintArchitecture() {
+            const casesAnchor = document.getElementById('cases-anchor'); casesAnchor.innerHTML = '';
+            SPRINT_CASES.forEach(c => {
+                casesAnchor.innerHTML += `
+                    <div class="card">
+                        <div class="card-header-row">
+                            <div>
+                                <h3 class="card-title">${c.title}</h3>
+                                <div class="tag-row"><span class="badge badge-category">${c.caseType}</span><span class="badge badge-difficulty">${c.difficulty}</span></div>
+                            </div>
+                        </div>
+                        <div class="content-block"><div class="content-block-title">Situation & Strategic Context</div><div class="content-block-text">${c.clientContext}</div></div>
+                        <div class="content-block"><div class="content-block-title">Interviewer Prompt</div><div class="content-block-text" style="color:#fff; font-weight:600; font-style:italic;">"${c.interviewerPrompt}"</div></div>
+                        <div class="tabs-container">
+                            <div class="tab-headers">
+                                <button class="tab-btn active" onclick="toggleCardTab(event, 'objectives')">Objectives</button>
+                                <button class="tab-btn" onclick="toggleCardTab(event, 'structure')">Structure</button>
+                                <button class="tab-btn" onclick="toggleCardTab(event, 'data')">Data/Exhibit</button>
+                                <button class="tab-btn" onclick="toggleCardTab(event, 'path')">Ideal Solution</button>
+                                <button class="tab-btn" onclick="toggleCardTab(event, 'coaching')">Partner Notes</button>
+                            </div>
+                            <div class="tab-content active" data-tab="objectives">
+                                <strong>Candidate Milestones:</strong><br>${c.candidateObjectives}<br><br>
+                                <strong>Clarifying Questions:</strong><br><span style="font-style:italic; color:var(--accent-gold);">"${c.clarifyingQuestions}"</span>
+                            </div>
+                            <div class="tab-content" data-tab="structure"><strong>Tailored Framework:</strong><br>${c.suggestedStructure}<br><br><strong>Key Parameters:</strong><br>${c.keyBusinessIssues}</div>
+                            <div class="tab-content" data-tab="data"><strong>Quantitative Requirements:</strong><br>${c.mathRequired}<br><br><strong>Exhibit Reference:</strong><br><pre style="background:#111; padding:10px; border-radius:4px; color:#fff; font-family:sans-serif; white-space:pre-wrap;">${c.sampleDataOrExhibit}</pre></div>
+                            <div class="tab-content" data-tab="path"><strong>Elite Path:</strong><br>${c.strongAnswerPath}<br><br><strong>Recommendation Blueprint:</strong><br><span style="color:var(--accent-gold); font-style:italic;">"${c.finalRecommendation}"</span></div>
+                            <div class="tab-content" data-tab="coaching"><span style="color:#4ecdc4;"><strong>Coaching Note:</strong></span><br>${c.coachingNotes}<br><br><span style="color:#ff6b6b;"><strong>Fatal Red Flags:</strong></span><br>${c.redFlags}</div>
+                        </div>
+                        <button class="btn-action" onclick="openPracticeModal('${c.id}', 'case')">Practice Case Opening Remarks →</button>
+                    </div>`;
+            });
+
+            const questionsAnchor = document.getElementById('questions-anchor'); questionsAnchor.innerHTML = '';
+            SPRINT_QUESTIONS.forEach(q => {
+                questionsAnchor.innerHTML += `
+                    <div class="card">
+                        <div class="card-header-row">
+                            <div>
+                                <h3 class="card-title">${q.question}</h3>
+                                <div class="tag-row"><span class="badge badge-category">${q.category}</span><span class="badge badge-difficulty">${q.difficulty}</span></div>
+                            </div>
+                        </div>
+                        <div class="tabs-container">
+                            <div class="tab-headers">
+                                <button class="tab-btn active" onclick="toggleCardTab(event, 'conversational')">Conversational Answer</button>
+                                <button class="tab-btn" onclick="toggleCardTab(event, 'deepdive')">Strategic Deep-Dive</button>
+                                <button class="tab-btn" onclick="toggleCardTab(event, 'notes')">Coaching & Red Flags</button>
+                            </div>
+                            <div class="tab-content active" data-tab="conversational"><div style="font-style:italic; color:#e5c158; background:#1a1a1a; padding:15px; border-radius:4px; border-left:3px solid var(--accent-gold);">"${q.conversational}"</div></div>
+                            <div class="tab-content" data-tab="deepdive">${q.deepdive}</div>
+                            <div class="tab-content" data-tab="notes"><span style="color:#4ecdc4;"><strong>Delivery Coaching Note:</strong></span><br>${q.coaching}<br><br><span style="color:#ff6b6b;"><strong>Fatal Red Flag Boundary:</strong></span><br>${q.redFlag}</div>
+                        </div>
+                        <button class="btn-action" onclick="openPracticeModal('${q.id}', 'question')">Practice Live Verbalization →</button>
+                    </div>`;
+            });
+        }
+
+        function toggleCardTab(event, tabName) {
+            const container = event.target.closest('.tabs-container');
+            container.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            container.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            event.target.classList.add('active');
+            container.querySelector(`.tab-content[data-tab="${tabName}"]`).classList.add('active');
+        }
+
+        let recognition, isRecording = false, activeItemId = null, activeItemType = null;
+
+        function openPracticeModal(id, type) {
+            activeItemId = id; activeItemType = type;
+            let sourceItem = type === 'case' ? SPRINT_CASES.find(c => c.id === id) : SPRINT_QUESTIONS.find(q => q.id === id);
+            if (!sourceItem) return;
+            document.getElementById('practice-modal').classList.add('active');
+            document.getElementById('modal-title-header').innerText = type === 'case' ? 'Case Structuring Sprint' : 'Verbalization Sprint';
+            document.getElementById('modal-item-title').innerText = type === 'case' ? sourceItem.title : sourceItem.category;
+            document.getElementById('modal-context-label').innerText = type === 'case' ? 'Interviewer Case Prompt:' : 'Target Interview Question:';
+            document.getElementById('modal-prompt-text').innerText = type === 'case' ? sourceItem.interviewerPrompt : sourceItem.question;
+            document.getElementById('transcription-box').value = '';
+            document.getElementById('filler-words').innerText = 'Filler Words: 0';
+            document.getElementById('ai-prompt-output').style.display = 'none';
+            resetAnswerTimer();
+            lastFocusedElement = document.activeElement;
+            document.getElementById('btn-record').focus();
+        }
+
+        let lastFocusedElement = null;
+        function closeModal() { document.getElementById('practice-modal').classList.remove('active'); if (isRecording) stopRecordingEngine(); stopAnswerTimer(); if (lastFocusedElement) lastFocusedElement.focus(); }
+
+        function toggleRecordingEngine() {
+            if (!isRecording) {
+                if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) { alert("Requires Chrome/Edge browser speech engine."); return; }
+                const SpeechClass = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechClass(); recognition.continuous = true; recognition.interimResults = true; recognition.lang = 'en-US';
+                recognition.onresult = function(event) {
+                    let finalSegment = '';
+                    for (let i = event.resultIndex; i < event.results.length; ++i) { if (event.results[i].isFinal) finalSegment += event.results[i][0].transcript; }
+                    if (finalSegment) { const box = document.getElementById('transcription-box'); box.value += finalSegment + ' '; countTrackedFillers(box.value); }
+                };
+                // Chrome ends recognition on its own after silence or transient
+                // network errors. While the user still intends to record, restart
+                // instead of dying silently with a stale "Stop Recording" button.
+                recognition.onend = function() {
+                    if (isRecording) {
+                        try { recognition.start(); }
+                        catch (e) { stopRecordingEngine(); }
+                    }
+                };
+                recognition.onerror = function(event) {
+                    if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                        stopRecordingEngine();
+                        alert("Microphone access is blocked. Allow mic access for this site in your browser settings, then restart the recording.");
+                    }
+                    // 'no-speech', 'network', 'aborted' fall through to onend,
+                    // which restarts the session while isRecording is true.
+                };
+                recognition.start(); document.getElementById('btn-record').innerText = "🛑 Stop Recording"; document.getElementById('recording-status').style.display = "inline-flex"; isRecording = true; startAnswerTimer();
+            } else { stopRecordingEngine(); }
+        }
+
+        function stopRecordingEngine() { isRecording = false; if (recognition) recognition.stop(); document.getElementById('btn-record').innerText = "🎙️ Start Spoken Answer"; document.getElementById('recording-status').style.display = "none"; stopAnswerTimer(); }
+
+        function countTrackedFillers(text) {
+            const singles = ['um', 'uh', 'like', 'basically', 'actually'];
+            const phrases = [/\byou know\b/g, /\bsort of\b/g, /\bkind of\b/g];
+            const lower = text.toLowerCase();
+            let score = 0;
+            lower.split(/\s+/).forEach(p => { if (singles.includes(p.replace(/[^a-z]/g, ''))) score++; });
+            phrases.forEach(re => { const m = lower.match(re); if (m) score += m.length; });
+            document.getElementById('filler-words').innerText = `Filler Words: ${score}`;
+        }
+
+        /* ---- 2-minute answer timer (starts with recording) ---- */
+        const TIMER_LIMIT_SECONDS = 120;
+        let timerInterval = null, timerRemaining = TIMER_LIMIT_SECONDS;
+
+        function renderAnswerTimer() {
+            const el = document.getElementById('timer-display');
+            const overtime = timerRemaining < 0;
+            const t = Math.abs(timerRemaining);
+            const mm = Math.floor(t / 60), ss = String(t % 60).padStart(2, '0');
+            el.innerText = overtime ? `⏱ +${mm}:${ss} over` : `⏱ ${mm}:${ss}`;
+            el.style.color = overtime ? 'var(--mbb-red, #ff3333)' : (timerRemaining <= 30 ? 'var(--accent-gold)' : 'var(--text-muted)');
+        }
+
+        function startAnswerTimer() {
+            stopAnswerTimer();
+            timerRemaining = TIMER_LIMIT_SECONDS;
+            renderAnswerTimer();
+            timerInterval = setInterval(() => { timerRemaining--; renderAnswerTimer(); }, 1000);
+        }
+
+        function stopAnswerTimer() { if (timerInterval) { clearInterval(timerInterval); timerInterval = null; } }
+
+        function resetAnswerTimer() { stopAnswerTimer(); timerRemaining = TIMER_LIMIT_SECONDS; renderAnswerTimer(); }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && document.getElementById('practice-modal').classList.contains('active')) closeModal();
+        });
+
+       function triggerAIFeedbackPayload() {
+    let item = activeItemType === 'case' ? SPRINT_CASES.find(c => c.id === activeItemId) : SPRINT_QUESTIONS.find(q => q.id === activeItemId);
+    const userSpeech = document.getElementById('transcription-box').value;
+    if (!item) return;
+
+    let payload = `
+[CONSULTING / MBB INTERVIEW COACHING — ECCLES MBA MODULE]
+Evaluate the candidate response to the following consulting tracking prompt using partner-level standards:
+
+${activeItemType === 'case' ? `CASE SCENARIO: ${item.title}\nPROMPT EXPECTATION: "${item.interviewerPrompt}"\nIDEAL FRAMEWORK PATH: "${item.suggestedStructure}"` : `INTERVIEW PROMPT: "${item.question}"\nEXPECTED MODEL DELIVERY: "${item.conversational}"`}
+
+CANDIDATE AUDIO TRANSCRIPT INPUT:
+"${userSpeech || "[No transcript provided. Evaluate parameters and provide an elite baseline model response.]"}"
+
+Provide deep structured metrics using exactly this markdown output schema:
+
+**What Worked**
+[Detail 1-2 key operational strengths from what the candidate said.]
+
+**Top 2 Areas for Improvement**
+1. [Identify the primary gap versus an elite MBB delivery and give specific replacement phrasing.]
+2. [Identify any logical gaps, calculation slips, or structural blind spots.]
+
+**Advanced Consulting Power Move**
+[Provide one custom partner-level business insight or analytical variable tailored to this specific scenario context.]
+
+**Dashboard Scorecard Matrix**
+Assign exactly one rubric score (1. Emerging | 2. Developing | 3. Interview-Ready | 4. MBB-Caliber) for each applicable competency based on this specific performance:
+* Case Structuring: [Score]
+* Business Judgment: [Score]
+* Math Accuracy: [Score]
+* Synthesis: [Score]
+* Fit / PEI Storytelling: [Score]
+* Executive Presence: [Score]
+* Communication Clarity: [Score]
+* Recommendation Strength: [Score]
+    `;
+
+    document.getElementById('ai-copy-text').innerText = payload.trim();
+    document.getElementById('ai-prompt-output').style.display = 'block';
+}
+
+        function copyPayloadToClipboard() { navigator.clipboard.writeText(document.getElementById('ai-copy-text').innerText); alert("Payload packed to clipboard!"); }
+        window.onload = () => { populateSprintArchitecture(); };
+    </script>
+</body>
+</html>
