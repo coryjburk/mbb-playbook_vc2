@@ -1,10 +1,10 @@
-# MBB Consulting Interview Playbook — User Manual
+# MBB Consulting Interview Playbook - User Manual
 
 **Full-Time MBA Program · David Eccles School of Business · Consulting Track**
 
 A browser-based training suite for McKinsey, Bain, and BCG interview preparation. No installation, no account, no login — everything runs in your browser.
 
-**Start here:** **[Intv Playbook - MBB Consulting (vC2)](https://coryjburk.github.io/mbb-playbook_vg/)**
+## **▶ Live tool:** **[Intv Playbook - MBB Consulting (vC2)](https://coryjburk.github.io/mbb-playbook_vg/)**
 
 ---
 
@@ -126,3 +126,8 @@ Full detail is on the Landing Hub under **4-Week Preparation Plan**. In brief:
 ## 9. Feedback
 
 Spot an error in a case, drill, or answer key? Contact the MBA Career Management team at the David Eccles School of Business.
+
+---
+
+Developed by Cory Burk, Senior Manager, Program Management · Full-Time MBA Program · David Eccles School of Business.
+© 2026 University of Utah, David Eccles School of Business. All rights reserved.
